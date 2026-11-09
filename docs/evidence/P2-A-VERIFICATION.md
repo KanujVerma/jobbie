@@ -27,18 +27,22 @@ This record is a durable checkpoint for PR #23, not a claim of production activa
 - Ashby own board: **73 postings**, 3 missing descriptions, 0 missing posted timestamp.
 - Candidate classifier returned **excluded for all 92** at the time of this check. The board counts prove live discovery, NOT appropriate new-grad jobs.
 - Both APIs used GET only. Config/state SHA256 hashes were identical before/after. `discord_sent=false`, `production_enabled=false`, `state_and_config_unchanged=true`.
+- Local verification re-run on 2026-11-09 against current HEAD observed **20 Greenhouse postings** and **76 Ashby postings** (all classified excluded, GET only, state/config hashes unchanged, `discord_sent=false`, `production_enabled=false`).
 
 ## Independent review
 - Codex summary: https://github.com/KanujVerma/jobbie/pull/23#issuecomment-6702690334
 - Reviewed source: 5e56bc668a6615002b5ac0fbe8592b2a84987162.
 - Completed at 2026-11-07T05:24:10.891873Z; no findings and no unresolved findings in its machine-readable review summary.
 - Initial finding: HTML get_text(newline) could separate inline `5 years` from `professional experience`, causing a false eligible new-grad result. Fixed by preserving inline continuity and inserting only block boundaries; seven regression cases passed before re-review.
+- Runtime source in `src`, `tests`, and `.github/workflows` remains byte-identical to `5e56bc6`.
+
+## Prerequisite Phase 1 operational gate resolution
+- Phase 1 issue #6 post-P1-E runtime gate was SATISFIED on 2026-11-09 by scheduled `Job Alerts` run #42698015121 (job 129434952835) at source `ffc8c09bd2ec0cbcb7dd48143204c26255324bcb` (verified descendant of P1-E `9c9365ae`).
+- Verified telemetry: duration=666.83s, adapters=12/13, zero=2, matched=0, review=277, excluded=8844, alerted=0. Plaid Lever 404 logged as expected.
+- Complete documentation: [P1-E-PRODUCTION-VERIFICATION.md](P1-E-PRODUCTION-VERIFICATION.md).
 
 ## Still not established by this evidence
-- A production merge or deployment of PR #23.
-- Activation of additional employers in companies.yaml (none added).
-- New job alerts or application submissions (none sent).
-- Closure of Phase 1 issue #6's post-P1-E runtime gate.
+- Activation of additional employers in companies.yaml (none added; original 13 remain).
+- New ongoing job alerts or application submissions (none sent).
 - Fifteen-minute cron reliability or completeness of every employer's API data.
 
-Use [the Gemini completion checklist](../agent-prompts/PHASE-2A-VERIFY.md) to resolve the remaining operational/merge gates without rewriting the implementation.

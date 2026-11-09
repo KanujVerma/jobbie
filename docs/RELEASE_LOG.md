@@ -46,3 +46,17 @@ Every functional PR must append a concise entry naming its PR slot, actual commi
 - **Independent Codex review:** https://github.com/KanujVerma/jobbie/pull/23#issuecomment-6702690334 . Completed with no findings on exact runtime source `5e56bc6` after fixing inline HTML splitting numeric tenure from experience. Added seven regression cases before re-review.
 - **Durable proof:** [verification narrative](evidence/P2-A-VERIFICATION.md) and [raw receipt](evidence/P2-A-live-2026-11-07.json). Receipt source SHA `00111df...` is the synthetic PR merge checkout of 5e56bc6 into d98afe7, NOT a production merge.
 - **Remaining:** Phase 1 issue #6 post-P1-E runtime check, final-head consistency, conditional merge/post-merge CI, separately authorized employer activation. Existing original 13 company config and history unchanged. Gemini should follow [exact completion runbook](agent-prompts/PHASE-2A-VERIFY.md), not reimplement source or start Phase 2B/C.
+
+## 2026-11-09: Phase 1 post-P1-E production verification
+- **Workflow:** Job Alerts (`.github/workflows/job-alerts.yml`), scheduled run https://github.com/KanujVerma/jobbie/actions/runs/42698015121 , job 129434952835.
+- **Source:** commit `ffc8c09bd2ec0cbcb7dd48143204c26255324bcb`, verified direct descendant of P1-E squash `9c9365ae5f3d936b20fc8a90c7ac22a5e0c6ff42` via `git merge-base --is-ancestor`.
+- **Observed telemetry:** Duration 666.83s, adapters 12/13, zero 2, matched 0, review 277, excluded 8844, alerted 0. Scheduler gap 626.5 minutes. Plaid Lever API returned HTTP 404 (tracked source limitation). State committed as `62e8fdb`.
+- **Disposition:** Proves production execution of the post-P1-E pipeline without crash; resolves the outstanding operational prerequisite in issue #6. Zero matches is not proof that no suitable jobs exist. Durable evidence recorded in `docs/evidence/P1-E-PRODUCTION-VERIFICATION.md`.
+
+## 2026-11-09: P2-A feature branch synchronization and release prep
+- **PR #23:** https://github.com/KanujVerma/jobbie/pull/23 on `feat/p2-a-public-job-boards`.
+- **Sync:** Merged `origin/main` (`62e8fdb`, 12 production state commits) cleanly. Verified `companies.yaml`, `state/seen_jobs.json`, and `.github/workflows/job-alerts.yml` diff against `origin/main` is empty.
+- **Code invariance:** Runtime code in `src`, `tests`, and `.github/workflows` remains 100% byte-identical to independently reviewed source `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
+- **Verification:** Config validation PASS, compileall PASS, 812 tests PASS in 31.01s. Documentation continuity PASS. Local live read smoke observed 20 Greenhouse and 76 Ashby postings, all excluded, zero state/config mutation, `discord_sent=false`, `production_enabled=false`.
+- **Status:** Release gates passed; squash-merge pending actual squash. Production companies remain the original 13; example boards disabled.
+
