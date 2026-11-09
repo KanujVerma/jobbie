@@ -53,10 +53,12 @@ Every functional PR must append a concise entry naming its PR slot, actual commi
 - **Observed telemetry:** Duration 666.83s, adapters 12/13, zero 2, matched 0, review 277, excluded 8844, alerted 0. Scheduler gap 626.5 minutes. Plaid Lever API returned HTTP 404 (tracked source limitation). State committed as `62e8fdb`.
 - **Disposition:** Proves production execution of the post-P1-E pipeline without crash; resolves the outstanding operational prerequisite in issue #6. Zero matches is not proof that no suitable jobs exist. Durable evidence recorded in `docs/evidence/P1-E-PRODUCTION-VERIFICATION.md`.
 
-## 2026-11-09: P2-A feature branch synchronization and release prep
+## 2026-11-09: P2-A squash merge release
 - **PR #23:** https://github.com/KanujVerma/jobbie/pull/23 on `feat/p2-a-public-job-boards`.
-- **Sync:** Merged `origin/main` (`62e8fdb`, 12 production state commits) cleanly. Verified `companies.yaml`, `state/seen_jobs.json`, and `.github/workflows/job-alerts.yml` diff against `origin/main` is empty.
+- **Merge Commit:** `ecb553fa652750e32f5eb8ec775ae7da70285a86` (squash-merge to main).
 - **Code invariance:** Runtime code in `src`, `tests`, and `.github/workflows` remains 100% byte-identical to independently reviewed source `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
-- **Verification:** Config validation PASS, compileall PASS, 812 tests PASS in 31.01s. Documentation continuity PASS. Local live read smoke observed 20 Greenhouse and 76 Ashby postings, all excluded, zero state/config mutation, `discord_sent=false`, `production_enabled=false`.
-- **Status:** Release gates passed; squash-merge pending actual squash. Production companies remain the original 13; example boards disabled.
+- **Pre-merge Verification:** Config validation PASS, compileall PASS, 812 tests PASS in 31.01s. Documentation continuity PASS. Local live read smoke observed 20 Greenhouse and 76 Ashby postings, all excluded, zero state/config mutation, `discord_sent=false`, `production_enabled=false`.
+- **Post-merge Main CI:** https://github.com/KanujVerma/jobbie/actions/runs/42720639467 passed in 45s (812 tests).
+- **Status:** MERGED, NOT PRODUCTION_ENABLED. Production companies remain the original 15 configured / 13 enabled sources; example boards in `examples/p2a-public-boards.yaml` remain disabled.
+
 

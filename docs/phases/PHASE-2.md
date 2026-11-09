@@ -34,10 +34,9 @@ STATUS PLANNED. Prerequisite: P1-E CI/review merged (done) plus a documented pos
 
 This scope is about **adding read-only discovery adapters**, not a Cloudflare migration, LLM matching, automated application submission, or resume processing.
 
-## P2-A implementation handoff
-Owner explicitly requested implementation on an isolated branch before the old
-post-P1-E production gate was observed. This authorizes staging, not automatic
-activation or a fabricated RELEASED status. Implementation and acceptance matrix:
-[implementation/P2-A.md](../implementation/P2-A.md). Exact verifier workflow:
-[PHASE-2A-VERIFY.md](../agent-prompts/PHASE-2A-VERIFY.md). Original 13-company
-production configuration remains unchanged; examples are disabled outside it.
+## P2-A implementation and release
+P2-A is MERGED into `main` via PR #23 (`ecb553fa652750e32f5eb8ec775ae7da70285a86`).
+All 812 tests passed in main CI run #42720639467. The adapters are available but remain
+disabled in production (examples in `examples/p2a-public-boards.yaml`). Original 15
+configured / 13 enabled Network Priority production sources remain unchanged.
+

@@ -2,26 +2,21 @@
 
 Read this file and [STATUS.md](STATUS.md) before changing Jobbie. Then read [AGENTS.md](../AGENTS.md), [DECISIONS.md](DECISIONS.md), [PRODUCT.md](PRODUCT.md), [PHASES.md](PHASES.md), the active phase, [CONTRACTS.md](CONTRACTS.md), [SECURITY.md](SECURITY.md), [OPERATIONS.md](OPERATIONS.md), [EVALS.md](EVALS.md) and [OPEN_SOURCE.md](OPEN_SOURCE.md). Current runtime and future architecture are intentionally separate in IMPLEMENTED_ARCHITECTURE.md and ARCHITECTURE.md.
 
-## Current task: finish verification/merge of implemented P2-A
-- Repository: `KanujVerma/jobbie`; branch `feat/p2-a-public-job-boards`; **PR #23**, issue #20.
-- Source work is written, tested and publicly read-verified. Do NOT rebuild it or begin P2-B/C.
-- Reviewed source commit: `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
-- **812 full-suite tests pass** in local and Actions CI (Python 3.12).
-- Real read-only check https://github.com/KanujVerma/jobbie/actions/runs/42342377775 fetched **19 Greenhouse + 73 Ashby** jobs (re-verified locally with 20 Greenhouse + 76 Ashby). All were excluded by the candidate classifier. This proves API fetch/normalization, not actual suitable openings or Discord delivery.
-- Codex review completed at that source commit with no findings: PR #23 summary comment 6702690334. Initial review caught inline HTML splitting required tenure; source fix plus seven regressions resolved it.
-- Config and state were unchanged by the smoke. New example employers are disabled and outside production `companies.yaml`.
-- **Phase 1 issue #6 post-P1-E live gate:** SATISFIED. Scheduled Job Alerts run 42698015121 at commit `ffc8c09` (descendant of P1-E `9c9365ae`) completed successfully on 2026-11-09 with duration=666.83s, adapters=12/13, zero=2, matched=0, review=277, excluded=8844, alerted=0. Recorded in [evidence/P1-E-PRODUCTION-VERIFICATION.md](evidence/P1-E-PRODUCTION-VERIFICATION.md).
-- Exact Gemini checklist: [agent-prompts/PHASE-2A-VERIFY.md](agent-prompts/PHASE-2A-VERIFY.md).
-- Evidence, including synthetic merge SHA explanation: [evidence/P2-A-VERIFICATION.md](evidence/P2-A-VERIFICATION.md).
+## Current state: Phase 2A release completed and merged
+- Repository: `KanujVerma/jobbie`; branch `main`.
+- Phase 2A PR #23 has been **merged to main** via squash commit `ecb553fa652750e32f5eb8ec775ae7da70285a86`.
+- Main post-merge CI https://github.com/KanujVerma/jobbie/actions/runs/42720639467 passed: **812 tests passed in 45s**, config valid, documentation continuity PASS.
+- Production status: **MERGED, NOT PRODUCTION_ENABLED**. The 2 public board example entries remain in `examples/p2a-public-boards.yaml` and disabled. `companies.yaml` maintains the original 15 configured / 13 enabled sources. No new active alerts, no database, no LLMs.
+- Real read-only smoke verified with zero state/config mutations and `discord_sent=false`.
+- Phase 1 issue #6 post-P1-E live gate is SATISFIED via scheduled run 42698015121 at descendant commit `ffc8c09bd2ec0cbcb7dd48143204c26255324bcb`.
+- As instructed, STOP after Phase 2A. Do not start Phase 2B or Phase 2C.
 
 ## Takeover procedure
-1. Query GitHub repo metadata, current main HEAD, PR #23 state/head/base, checks, and all review discussions. Do not assume a branch is unmerged if someone already completed it.
-2. Fetch origin, inspect working tree; never discard local work. If PR is open, check out `feat/p2-a-public-job-boards` and fast-forward. If already merged, verify the real main merge and follow post-merge checks instead of duplicating work.
-3. Inspect `git diff origin/main...HEAD -- companies.yaml state/seen_jobs.json .github/workflows/job-alerts.yml`. The implementation must not alter these production files. Reconcile any newer main state commits without overwriting history.
+1. Query GitHub repo metadata, current main HEAD, PRs and open issues. Check whether Phase 2A is merged before assuming it is open.
+2. Fetch origin, inspect working tree; never discard local work.
+3. Inspect `git diff origin/main...HEAD -- companies.yaml state/seen_jobs.json .github/workflows/job-alerts.yml`. The implementation must not alter these production files.
 4. Run `python main.py validate-config`, `python -m compileall -q src scripts`, `pytest -q`, and `python scripts/check_handoff_docs.py --base origin/main --head HEAD` on the actual checkout using Python 3.12 and requirements-dev.txt.
-5. Read source docs and the actual PR's metadata-only live receipt. When code changes, rerun the live smoke with a fresh /tmp receipt and explicit `--allow-network`; do not substitute old fixture/receipt results for the new SHA.
-6. Verify issue #6's production prerequisite through actual scheduled run evidence containing P1-E code. No synthetic job alerts or state resets to manufacture proof.
-7. Merge only green, independently reviewed code with gates satisfied; then confirm main CI and update the three handoff docs with actual merge evidence. Keep all newly added employers disabled absent separately authorized activation.
+5. All functional PRs must update STATUS.md, HANDOFF.md, and RELEASE_LOG.md together.
 
 ## As-built code map
 | Area | Files | Invariant |
@@ -33,7 +28,7 @@ Read this file and [STATUS.md](STATUS.md) before changing Jobbie. Then read [AGE
 | Eligibility | filtering.py, eligibility.py, experience.py | tri-state; required qualifications and source employment override title guesses |
 | Delivery | notifier.py, storage.py, backfill.py | accurate date labels, canonical URL dedup, acknowledge only delivered visible links |
 | Health | src/health.py | actual failed/empty distinction and scheduler gap evidence |
-| P2-A tests | tests/test_public_board_adapters.py, test_public_board_html.py | 85 new cases plus existing 727-suite baseline |
+| P2-A tests | tests/test_public_board_adapters.py, test_public_board_html.py | 85 new cases plus existing 727-suite baseline (812 total) |
 | Read-only live check | scripts/verify_public_boards.py, examples/p2a-public-boards.yaml | no production config enabling, no Notifier calls, hashes before/after |
 
 ## Locked product constraints
