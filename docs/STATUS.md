@@ -2,17 +2,18 @@
 
 **Audited:** 2026-11-09 America/Chicago. This is a snapshot, not continuous telemetry. Verify GitHub HEAD, PRs and Actions before acting.
 
-Canonical repository: **KanujVerma/jobbie**, ID 1339847701. Repository rename is complete. Current inspected main is `62e8fdb` (contains 12 state-only commits since `d98afe73674925f8aaeb9d6fe21df0b077375689`).
+Canonical repository: **KanujVerma/jobbie**, ID 1339847701. Repository rename is complete. Current inspected main is `ecb553fa652750e32f5eb8ec775ae7da70285a86` (squash-merge of Phase 2A PR #23).
 
-## Active delivery: Phase 2A, PR #23
+## Completed release: Phase 2A, PR #23
 - **PR:** https://github.com/KanujVerma/jobbie/pull/23
-- **Branch:** `feat/p2-a-public-job-boards`
-- **Status:** IMPLEMENTED, CI-TESTED, PUBLIC-API-READ-VERIFIED, INDEPENDENTLY REVIEWED, PREREQUISITE-RESOLVED. Ready for merge release.
-- **Reviewed runtime source:** `5e56bc668a6615002b5ac0fbe8592b2a84987162`. Subsequent commits are documentation/evidence and origin/main state-only sync; runtime source in `src`, `tests`, and `.github/workflows` remains byte-identical.
-- **Full CI:** Baseline CI passed at https://github.com/KanujVerma/jobbie/actions/runs/42342377756 and https://github.com/KanujVerma/jobbie/actions/runs/42343188762 — **812 passed in 31.01s**, Python 3.12, config validation and documentation gate passed. Baseline was 727 tests; P2-A adds 85 parametrized regression cases.
-- **Live public reads:** Actions run https://github.com/KanujVerma/jobbie/actions/runs/42342377775 (19 Greenhouse + 73 Ashby) and re-verified locally on current head (20 Greenhouse + 76 Ashby). All classified excluded on these provider-owned smoke boards. These counts are source connectivity/normalization proof, NOT new-grad matches.
+- **Branch:** `feat/p2-a-public-job-boards` (merged and closed)
+- **Status:** MERGED to main at `ecb553fa652750e32f5eb8ec775ae7da70285a86`.
+- **Production Status:** MERGED, NOT PRODUCTION_ENABLED. New Greenhouse and Ashby public adapters are tested and available in codebase; sample boards in `examples/p2a-public-boards.yaml` remain disabled. Production `companies.yaml` is unchanged with the original 15 configured / 13 enabled sources.
+- **Reviewed runtime source:** `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
+- **Full CI:** Pre-merge CI passed at https://github.com/KanujVerma/jobbie/actions/runs/42342377756 and https://github.com/KanujVerma/jobbie/actions/runs/42343188762 (812 passed). Post-merge main CI passed at https://github.com/KanujVerma/jobbie/actions/runs/42720639467 — **812 passed in 45s**, Python 3.12, config validation and documentation gate passed.
+- **Live public reads:** Actions run https://github.com/KanujVerma/jobbie/actions/runs/42342377775 (19 Greenhouse + 73 Ashby) and re-verified locally on merge prep (20 Greenhouse + 76 Ashby). All classified excluded on these provider-owned smoke boards. These counts are source connectivity/normalization proof, NOT new-grad matches.
 - **Side effects:** receipts verify identical `companies.yaml` and `state/seen_jobs.json` hashes before/after; no Discord sender was constructed or called; examples remain disabled.
-- **Independent review:** Codex completed review of `5e56bc6` with `has_any_findings=false`, `has_unresolved_findings=false`. Receipt: https://github.com/KanujVerma/jobbie/pull/23#issuecomment-6702690334 . The initial inline-HTML tenure bug was fixed and seven regressions added before this review.
+- **Independent review:** Codex completed review of `5e56bc6` with `has_any_findings=false`, `has_unresolved_findings=false`. Receipt: https://github.com/KanujVerma/jobbie/pull/23#issuecomment-6702690334 .
 - **Durable evidence:** [P2-A verification record](evidence/P2-A-VERIFICATION.md), [unaltered live JSON](evidence/P2-A-live-2026-11-07.json), and [P1-E production verification](evidence/P1-E-PRODUCTION-VERIFICATION.md).
 
 ## Implemented P2-A functionality
@@ -28,7 +29,5 @@ The normal filter, immutable Job model, notification-payload builder, review que
 - Known limitations tracked separately: GitHub's nominal 15-minute cron has observed multi-hour gaps (run 42698015121 had a 626.5-minute gap). Plaid's known Lever 404 is an upstream endpoint failure.
 - Phases 2B/2C and 3–6 remain PLANNED. The two P2-A example boards are outside production config and disabled; no new ongoing job alerts are active.
 
-## Exact remaining work for Gemini / next agent
-Follow [PHASE-2A-VERIFY.md](agent-prompts/PHASE-2A-VERIFY.md), using **PR #23**, not a new implementation branch. All verification checks have passed. With the upstream Phase 1 operational gate verified, merge PR #23 using squash merge with expected-head protection. Keep new production employers disabled until separately source-verified and activation is authorized. Record actual merge and post-merge CI. Do not start Phase 2B.
-
-Every functional PR updates STATUS, HANDOFF and RELEASE_LOG together. CI enforces their presence; a reviewer must still verify statements against actual code, logs and source evidence.
+## Next steps
+Phase 2A is complete and merged. Per instructions, stop after Phase 2A. Do not start P2-B or P2-C. Any future activation of additional employers requires source-grounded verification, separate owner authorization, and isolated PRs.
