@@ -32,3 +32,31 @@ Every functional PR must append a concise entry naming its PR slot, actual commi
 ## 2026-11-06: handoff documentation and follow-up gate hardening
 - [PR #19](https://github.com/KanujVerma/jobbie/pull/19) merged `7458d18299b1ab36b25a221990ef2fd6d265252c` with canonical current state, cold-agent handoff, release log, accurate README and initial CI doc guard. 725 tests passed on PR CI; subsequent Codex review found test HTML and git-renamed source paths bypassing the guard.
 - [PR #21](https://github.com/KanujVerma/jobbie/pull/21) merged `dbb309a6b30bbf90cf4fa2d887052467d8760720` and actually changes `scripts/check_handoff_docs.py` + `tests/test_handoff_gate.py` to count HTML fixtures and include source deletion paths on rename (`--no-renames`). [CI #42331100940](https://github.com/KanujVerma/jobbie/actions/runs/42331100940) **727 passing**, Codex final review with no findings. This is documentation CI hardening, no new runtime job sources or code changes to the scanner.
+
+## 2026-11-06: P2-A initial implementation checkpoint (historical)
+- Branch `feat/p2-a-public-job-boards`, baseline `d98afe7367`; issue #20.
+- Public Greenhouse/Ashby adapters; registry/config, optional immutable source metadata, typed employment exclusions, preserved pay units/date meaning, read-only smoke CLI and disabled example targets. No source code copied from external repos; existing HTTPClient/BaseAdapter reused against official APIs.
+- Local initial full regression: **803 passed in 32.68s**, before the final two URL regressions and seven HTML review regressions. Remote checks were pending at this initial checkpoint; the later verified record below supersedes that pending state.
+- No production employers enabled, Discord test messages or historical state edits. Temporary transfer workflows/files removed from final diff.
+
+## 2026-11-07 UTC / 2026-11-06 Chicago: P2-A verified source checkpoint
+- **Implementation PR #23:** https://github.com/KanujVerma/jobbie/pull/23 . Source `5e56bc668a6615002b5ac0fbe8592b2a84987162`; PR remains open for remaining operational/merge gates, not production-enabled.
+- **CI #42342377756:** https://github.com/KanujVerma/jobbie/actions/runs/42342377756 . **812 passed in 32.95s** (727 baseline + 85 new), config valid, documentation continuity PASS, Python 3.12.16.
+- **Live read-only #42342377775:** https://github.com/KanujVerma/jobbie/actions/runs/42342377775 . GET requests observed 19 Greenhouse and 73 Ashby postings; all were classifier-excluded on these smoke boards. Metadata receipt confirms unchanged config/state hashes, no Discord sends and production_enabled=false.
+- **Independent Codex review:** https://github.com/KanujVerma/jobbie/pull/23#issuecomment-6702690334 . Completed with no findings on exact runtime source `5e56bc6` after fixing inline HTML splitting numeric tenure from experience. Added seven regression cases before re-review.
+- **Durable proof:** [verification narrative](evidence/P2-A-VERIFICATION.md) and [raw receipt](evidence/P2-A-live-2026-11-07.json). Receipt source SHA `00111df...` is the synthetic PR merge checkout of 5e56bc6 into d98afe7, NOT a production merge.
+- **Remaining:** Phase 1 issue #6 post-P1-E runtime check, final-head consistency, conditional merge/post-merge CI, separately authorized employer activation. Existing original 13 company config and history unchanged. Gemini should follow [exact completion runbook](agent-prompts/PHASE-2A-VERIFY.md), not reimplement source or start Phase 2B/C.
+
+## 2026-11-09: Phase 1 post-P1-E production verification
+- **Workflow:** Job Alerts (`.github/workflows/job-alerts.yml`), scheduled run https://github.com/KanujVerma/jobbie/actions/runs/42698015121 , job 129434952835.
+- **Source:** commit `ffc8c09bd2ec0cbcb7dd48143204c26255324bcb`, verified direct descendant of P1-E squash `9c9365ae5f3d936b20fc8a90c7ac22a5e0c6ff42` via `git merge-base --is-ancestor`.
+- **Observed telemetry:** Duration 666.83s, adapters 12/13, zero 2, matched 0, review 277, excluded 8844, alerted 0. Scheduler gap 626.5 minutes. Plaid Lever API returned HTTP 404 (tracked source limitation). State committed as `62e8fdb`.
+- **Disposition:** Proves production execution of the post-P1-E pipeline without crash; resolves the outstanding operational prerequisite in issue #6. Zero matches is not proof that no suitable jobs exist. Durable evidence recorded in `docs/evidence/P1-E-PRODUCTION-VERIFICATION.md`.
+
+## 2026-11-09: P2-A feature branch synchronization and release prep
+- **PR #23:** https://github.com/KanujVerma/jobbie/pull/23 on `feat/p2-a-public-job-boards`.
+- **Sync:** Merged `origin/main` (`62e8fdb`, 12 production state commits) cleanly. Verified `companies.yaml`, `state/seen_jobs.json`, and `.github/workflows/job-alerts.yml` diff against `origin/main` is empty.
+- **Code invariance:** Runtime code in `src`, `tests`, and `.github/workflows` remains 100% byte-identical to independently reviewed source `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
+- **Verification:** Config validation PASS, compileall PASS, 812 tests PASS in 31.01s. Documentation continuity PASS. Local live read smoke observed 20 Greenhouse and 76 Ashby postings, all excluded, zero state/config mutation, `discord_sent=false`, `production_enabled=false`.
+- **Status:** Release gates passed; squash-merge pending actual squash. Production companies remain the original 13; example boards disabled.
+
