@@ -1,6 +1,6 @@
-# Jobbie incremental delivery roadmap — current 2026-11-10 owner plan
+# Jobbie incremental delivery roadmap — current 2026-11-11 owner plan
 
-**Evidence:** Phase 1 and Phase 2A were implemented/merged; P2-A Greenhouse/Ashby API reads verified but no additional employer boards are production enabled. See [STATUS.md](STATUS.md) for actual main HEAD. ALL future slots listed here are **PLANNED**, not implementation claims. PR slot IDs are stable design labels, not GitHub numeric PRs.
+**Evidence:** Phase 1 and Phase 2A were implemented/merged; P2-A Greenhouse/Ashby API reads verified but no additional employer boards are production enabled. See [STATUS.md](STATUS.md) for actual main HEAD. P2-UX1 #29 is merged; live delivery remains unverified. Other future slots are **PLANNED**, not implementation claims. PR slot IDs are stable design labels, not GitHub numeric PRs.
 
 ## Delivery principle
 One small user-usable release at a time. Each functionality PR must keep earlier job polling/alerts available, pass full regression tests, receive independent review and update STATUS/HANDOFF/RELEASE_LOG. No huge one-shot implementation, no pseudo-buttons, no mass applications, no silent paid provider use.
@@ -9,10 +9,11 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 |---|---|---|---|
 | Shipped | Phase 1 + hardening (#12–18) | New-grad filtering and original 13 Network Priority stars | Existing bot |
 | Shipped code | P2-A (#23, docs #24) | Official Greenhouse and Ashby read-only adapters available, **not activated** | Phase 1 |
-| **Next** | **P2-UX1 — Alert card v2** | Readable source-grounded Discord webhook cards; existing job links work | P2-A merged |
-| After UX | P2-ACT — Controlled board activation | 3–5 individually verified + owner-approved discovered employers monitored when available | P2-UX1; source rights |
-| Then | P2-B — permitted new-grad feeds | Broader leads, verified employer originals, source provenance, no unauthorized scraping | P2-ACT |
-| Then | P2-C — canonical catalogue | Global identity, dedup/history, safe state dual-write + 72h shadow, future private search substrate | P2-B |
+| Shipped code | P2-UX1 (#29) | Source-grounded webhook cards; live delivery unverified | P2-A merged |
+| Active | P2-R1/P2-R2 reliability | Failure/empty distinction, dry-run safety, actionable health, state-safe original-source repairs | P2-UX1 merged |
+| Then | P2-ACT owner-directed intake | Issue form, tested portable CLI requests and disabled reviewed proposals for monitor/startup-research | P2-R1; activation separately approved |
+| Then | P2-B optional public feeds | Reusable OFF capability, rights/provenance/official-link checks; activate only if permitted and owner-approved | P2-A; expansion optional |
+| Then | P2-C canonical catalogue | SQLite pre-filter identity/history/search/export; legacy delivery authority through >=72h shadow and approved cutover | Existing normalized adapters; feed activation optional |
 | 3A | P3-A — Signed Discord interactions | Real private buttons/commands, allowlist, durable task status | P2-C |
 | 3B | P3-B — Private store + basic app ledger | Saved jobs, owner-only docs/versioned uploads, append-only application event/attempt records | P3-A |
 | 3C | P3-C — Candidate evidence | Owner-confirmed facts and explicitly approved GitHub project evidence, no private leaks | P3-B |
@@ -33,7 +34,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 
 ## Release boundaries
 - P2-UX1 is PRESENTATION-ONLY. Do not enable a new employer, add an account, alter persistent state or create a fake button.
-- P2-ACT enables only owner-approved boards with verified employer provenance, ensuring original 13 never lose Network Priority.
+- P2-ACT is owner-directed intake, replacing mandatory expansion. Proposals are disabled; only a separately approved exact company can be enabled. Preserve 13 original flags and 2 historical disabled entries. Missing approvals/rights never block independent implementation. No company is requested by this roadmap itself.
 - Phase 3 moves basic application records early because later approval/execution must reference immutable job/resume IDs. Auto-submit remains impossible here.
 - Phase 4 never submits an application. It only signs `Approve resume` and optionally `Prepare application packet` as an UNSENT DRAFT. Phase 5 introduces per-job `Approve & Apply` authorization (job/URL/answer/resume hash/nonce) alongside a tested executor.
 - Phase 5 starts with a dot manual-handoff test. A supported direct dot API is UNKNOWN; no claimed automated trigger until verified. If unavailable, keep manual handoff or a separately approved local browser runner. No vendor ToS evasion or hidden paid runtime.
@@ -48,8 +49,8 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 6. Proven rollback. A mock alert or automated form fixture is NOT proof of a real delivered alert or submitted employer application.
 7. Blocked secret/provider/consent means `BLOCKED_LIVE` or `BLOCKED_APPROVAL`. Do not forge success.
 
-## First executable goal
-**[P2-UX1 issue #25](https://github.com/KanujVerma/jobbie/issues/25), [contract](phases/PHASE-2-UX.md), and [ready-to-paste /goal](agent-prompts/PHASE-2-UX-GOAL.md).** Next is [P2-ACT issue #26](https://github.com/KanujVerma/jobbie/issues/26) / [contract](phases/PHASE-2-ACT.md), with [second /goal](agent-prompts/PHASE-2-ACT-GOAL.md). The historical `docs/agent-prompts/PHASE-2-CODE.md` is not the next instruction unless explicitly redirected to the new slots.
+## Current executable work
+Follow the [remaining Phase 2 goal](agent-prompts/PHASE-2-CODE.md) and [delivery plan](superpowers/plans/2026-11-11-phase-2-completion.md). Complete scoped reliability, owner intake, optional feeds and catalogue PRs sequentially. Never collapse them into one PR. Phase 2 stays PARTIAL/BLOCKED while live-delivery, source health, approval, rights or >=72h/cutover evidence remains missing. No forced production changes to manufacture a pass.
 
 ## Subsequent phase specs
 - [P2-B/C](phases/PHASE-2.md)

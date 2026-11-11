@@ -1,3 +1,5 @@
+Status update 2026-11-11: P2-UX1 merged in #29 at e0346f49bd572179250fe08bed73131db0ba311a. Live webhook delivery remains unverified. This is its historical scoped contract; current work is the remaining Phase 2 goal.
+
 # P2-UX1 executable PR — make existing Discord alerts informative
 
 **Status:** PLANNED. [Tracking issue #25](https://github.com/KanujVerma/jobbie/issues/25). This is the next smallest user-visible coding milestone after P2-A merged in [PR #23](https://github.com/KanujVerma/jobbie/pull/23) and its documentation PR #24. It is one REVIEWABLE PR, not a broad Phase 2 rewrite or a promise of personal matching. Normative specification: [NOTIFICATIONS_V2.md](../NOTIFICATIONS_V2.md).

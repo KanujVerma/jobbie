@@ -48,3 +48,6 @@ Adversarial job descriptions/README content may contain prompt-injection instruc
 
 ## Mandatory negative tests
 Unauthorized Discord user; forged signature; replayed nonce; PDF with misleading content; prompt injection in job description; malicious mention; long Unicode Discord field; GitHub private file accidentally selected as public proof; double-click send; changed recipient after approval; backend 429 / timeout; revoked candidate fact used in resume draft; changed job URL/resume hash after application approval; double Submit; unsupported dot trigger; unknown EEO/legal question; employer confirmation missing; uncertain submission retry. Preserve approved packet privacy and fail closed. Fail closed, preserve old alerts.
+
+## P2-R1 observed logging and state safeguards
+Failed webhook requests log only exception type or HTTP status, omitting response bodies and secret-bearing exception URLs. Successful requests log HTTP ACK without payload. Read-only health reports omit raw error strings. Dry-run and health cannot persist v1 migrations. Corrupt ledger containers/timestamps fail closed before alerting. These tests do not establish successful live delivery or complete security coverage.

@@ -1,6 +1,6 @@
 # Phase 2 executable contract — broaden job discovery without losing original cohort
 
-STATUS: P2-A **MERGED (#23)**, Greenhouse/Ashby source adapters tested but ZERO new boards production-enabled. Phase 1's post-P1-E scheduled-run verification is complete. Next implementation is **P2-UX1**, followed by **P2-ACT**, then P2-B and P2-C. No mandatory AI. Original 13 network flags persist; no new company inherits them. See STATUS and PHASES for exact current evidence.
+STATUS: PARTIAL. P2-A #23 and P2-UX1 #29 are merged. Live P2-UX1 delivery is unverified. Owner instruction 2026-11-11 authorizes completing all feasible remaining Phase 2 across scoped PRs, without automatic roster/feed expansion. See STATUS and the delivery plan for actual evidence.
 
 ## P2-A: direct company ATS adapters
 - Add reusable Greenhouse and Ashby read-only adapters under `src/adapters/` with fixture contracts for pagination/HTTP failures/rate limits/descriptions, salary structured fields and locations. Maintain existing BaseAdapter/Job compatibility or migrate through a tested normalization layer.
@@ -8,9 +8,11 @@ STATUS: P2-A **MERGED (#23)**, Greenhouse/Ashby source adapters tested but ZERO 
 - Show direct employer link, source ID and fetch observation time. Synthetic fixture cannot establish a live opening. Tests against fixture and allowed live read-only smoke.
 - Merge only if existing 13 continue working; run source-specific health checks.
 
-## P2-UX1 and P2-ACT (two small independent releases)
-- [P2-UX1 notification layout](PHASE-2-UX.md): existing webhook formatter only, truthful job-title/salary/eligibility/referral/date/location and direct link; tests and rollback; NO inert buttons, AI, source changes or state edits.
-- [P2-ACT controlled source activation](PHASE-2-ACT.md): only verified, owner-approved employer boards (3–5 when available), original 13 untouched, discovered by default; no false current hiring claims.
+## P2-R1/R2 and owner-directed P2-ACT
+- P2-R1: audit original 13 fetch, eligibility reasons, errors, scheduler gaps and delivery; fix reproduced false-health and dry-run defects with regression proof. Preserve partial results while surfacing failures.
+- P2-R2: repair independently verified original-source migrations with identity reconciliation and suppression of historical alerts. No replacement/new employer is implicitly approved. Missing ownership/permission or a risky cutover is an explicit blocker.
+- P2-UX1 is merged (#29). Synthetic payloads and workflow success do not prove live delivery.
+- [P2-ACT](PHASE-2-ACT.md) is now an owner-directed issue/CLI proposal workflow. Accept company name, optional careers URL, role/location, priority, and monitor versus startup-research. Verify aliases, official ATS ownership/ID, access permission, health and actual listings. Generate disabled reviewable config proposals; preserve original 13 plus 2 historical disabled. Discovered never means confirmed referral. Dot compatibility is a portable request, not a fabricated trigger.
 
 ## P2-B: licensed/allowed curated feeds
 - Source candidates: New-Grad-Jobs public output; SimplifyJobs list, Jobright public GitHub list, Freehire API, other aggregators ONLY after per-source license/robots/terms/data rights are documented. Reuse publicly licensed scraper code only where license allows.
@@ -25,7 +27,7 @@ STATUS: P2-A **MERGED (#23)**, Greenhouse/Ashby source adapters tested but ZERO 
 - Emit source label `network_priority` vs `discovered`, source attribution and employer-verified link confidence. Stage a shadow-run at least 72h with duplicate/coverage counters and rollback before switching canonical source.
 - Tests: 30+ cross-source identity cases, source outage/corrupt feed, tracking URLs, reopened role, timezone/freshness, no duplicate/network-flag loss. Live smoke verified with exact links.
 
-**Phase 2 shipping:** broader new-grad feeds/companies generate verified, deduplicated alerts in existing Discord channel; old network source visibility and legacy runs unchanged. Unknown data/rights -> not shipped.
+**Phase 2 completion:** all feasible components implemented, merged, tested and rollback-ready; original alerts preserved. Company/feed expansion is opt-in. Unknown feed rights -> BLOCKED_SOURCE_RIGHTS with tested disabled capability. Missing activation/cutover approval -> BLOCKED_APPROVAL. Missing >=72h real shadow -> BLOCKED_72H_EVIDENCE. Do not label those operational gates satisfied from fixtures. Observe a real scheduled run after an explicitly authorized canonical cutover.
 ## P2-A historical implementation packet (COMPLETED; NOT NEXT)
 1. Verify current `main`, CI, post-P1E scheduled scan and [Phase 1 tracker #6](https://github.com/KanujVerma/jobbie/issues/6). If missing live verification, record BLOCKED_LIVE rather than pretending it occurred.
 2. Inspect `src/adapters/base.py`, `src/adapters/__init__.py`, `src/models.py`, `src/config.py`, `src/http.py`, `src/notifier.py`, `main.py` and adapter fixture idioms. Preserve the frozen `Job` constructor and current CLI.

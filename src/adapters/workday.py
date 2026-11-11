@@ -143,9 +143,11 @@ class WorkdayAdapter(BaseAdapter):
                     "WorkdayAdapter[%s]: request failed at offset=%d: %s",
                     self.company, offset, exc,
                 )
+                self.record_fetch_error(exc)
                 return
 
             if resp.status_code != 200:
+                self.record_fetch_error(f"HTTP {resp.status_code}")
                 logger.error(
                     "WorkdayAdapter[%s]: non-200 at offset=%d: %s",
                     self.company, offset, resp.status_code,
@@ -162,6 +164,7 @@ class WorkdayAdapter(BaseAdapter):
                     "WorkdayAdapter[%s]: JSON parse error at offset=%d: %s",
                     self.company, offset, exc,
                 )
+                self.record_fetch_error(exc)
                 return
 
             for posting in postings:

@@ -3,6 +3,9 @@ import argparse
 import logging
 import os
 import sys
+import json
+import time
+from collections import Counter
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
@@ -37,6 +40,8 @@ from src.health import (
     HEALTH_RECOVERED,
     compute_run_diagnostics,
     record_run_heartbeat,
+    health_report,
+    render_health_markdown,
 )
 from src.http import HTTPClient
 from src.browser import BrowserClient
@@ -123,7 +128,7 @@ def do_run(args) -> int:
 
     state_path = config.defaults.get("state_path", "state/seen_jobs.json")
     try:
-        state = load_state(state_path, raise_on_corrupt=True)
+        state = load_state(state_path, raise_on_corrupt=True, persist_migration=not getattr(args, "dry_run", False))
     except StateCorruptionError as e:
         logger.error(f"Failed to load state: {e}. Aborting run to prevent alert storm.")
         return 1
@@ -204,13 +209,21 @@ def do_run(args) -> int:
             companies_attempted += 1
             fetch_error: str | None = None
             adapter_succeeded = False
+            fetch_start = time.monotonic()
             try:
-                fetched = list(adapter.fetch())
-                any_company_succeeded = True
+                for job in adapter.fetch():
+                    fetched.append(job)
                 adapter_succeeded = True
             except Exception as e:
                 fetch_error = str(e)
                 logger.error(f"{cname}: fetch failed: {e}", exc_info=True)
+
+            query_errors = getattr(adapter, "fetch_errors", [])
+            if isinstance(query_errors, list) and query_errors:
+                adapter_succeeded = False
+                fetch_error = ", ".join(query_errors)
+            any_company_succeeded = any_company_succeeded or adapter_succeeded
+            fetch_duration = round(time.monotonic() - fetch_start, 2)
 
             # Adapter health. Keyed on pre-filter count.
             company_state = state["companies"].setdefault(
@@ -224,16 +237,19 @@ def do_run(args) -> int:
                 company_state.pop("last_error_at", None)
 
             verdict = update_health(
-                company_state, len(fetched), datetime.now(timezone.utc), stale_after_hours
+                company_state, len(fetched), datetime.now(timezone.utc), stale_after_hours,
+                fetch_succeeded=adapter_succeeded,
             )
             if verdict and notifier and not getattr(args, "dry_run", False):
                 if verdict == HEALTH_STALE:
                     sent = notifier.send_summary(
-                        title="🗝 No postings",
+                        title="⚠️ Source needs attention",
                         description=(
-                            f"**{cname}** has returned no job postings for over "
-                            f"{stale_after_hours:.0f}h. Either the site has nothing "
-                            f"open, or the adapter is broken — worth a look."
+                            f"**{cname}** has no complete nonempty scan for over "
+                            f"{stale_after_hours:.0f}h. Latest scan: "
+                            f"{'failed or partial' if not adapter_succeeded else 'empty response'}. "
+                            "Inspect Actions health report and the official careers page. "
+                            "This does not establish that the employer has no openings."
                         ),
                     )
                     if not sent:
@@ -264,6 +280,7 @@ def do_run(args) -> int:
             review_count = 0
             excluded_count = 0
             filter_reasons = {}
+            reason_counts = Counter()
             loop_now = datetime.now(timezone.utc)
             for job in fetched:
                 # Normal pipeline evaluation (standard 48h freshness threshold for individual alerts)
@@ -331,6 +348,7 @@ def do_run(args) -> int:
                         if is_excluded:
                             remove_review_job(state, job.id)
                 filter_reasons[job.id] = reasons
+                reason_counts.update(reasons)
 
             # Record per-company stats for health reporting
             company_stats[cname] = {
@@ -340,6 +358,8 @@ def do_run(args) -> int:
                 "matched": len(matched),
                 "review": review_count,
                 "excluded": excluded_count,
+                "fetch_duration_seconds": fetch_duration,
+                "filter_reason_counts": dict(reason_counts),
             }
 
             # Classify against first_seen state for individual alerts
@@ -405,6 +425,17 @@ def do_run(args) -> int:
             mark_alerted(actually_alerted, cname, state)
             mark_cap_suppressed(cap_suppressed_jobs, cname, state)
             update_last_checked(cname, state, now)
+            company_stats[cname].update({
+                "candidates": len(alert_candidates),
+                "alerted": alerted,
+                "acknowledged": len(actually_alerted),
+                "cap_suppressed": len(cap_suppressed_jobs),
+            })
+            logger.info(
+                "%s: status=%s fetched=%d matched=%d review=%d excluded=%d candidates=%d alerted=%d duration=%.2fs",
+                cname, company_stats[cname]["status"], len(fetched), len(matched),
+                review_count, excluded_count, len(alert_candidates), alerted, fetch_duration,
+            )
 
             # Collect bounded backfill candidates if pending migration
             # Kept separate from alert_candidates: historical postings (48-168h) appear in backfill summary, not individual alerts
@@ -534,6 +565,20 @@ def cmd_run(args) -> int:
     return do_run(args)
 
 
+def cmd_health(args) -> int:
+    """Read an existing snapshot without polling employers or constructing a sender."""
+    try:
+        config = load_config(args.config)
+        state = load_state(config.defaults.get("state_path", "state/seen_jobs.json"),
+                           raise_on_corrupt=True, persist_migration=False)
+        report = health_report(state, datetime.now(timezone.utc))
+    except (OSError, ValueError, StateCorruptionError) as error:
+        print(f"ERROR: cannot read health snapshot ({type(error).__name__})", file=sys.stderr)
+        return 1
+    print(render_health_markdown(report) if args.format == "markdown" else json.dumps(report, indent=2))
+    return 0
+
+
 def cmd_daemon(args) -> int:
     load_dotenv()
     try:
@@ -566,6 +611,8 @@ def main():
 
     # validate-config
     subparsers.add_parser("validate-config", help="Validate the YAML config")
+    health_parser = subparsers.add_parser("health", help="Read existing source/delivery health; no network or writes")
+    health_parser.add_argument("--format", choices=("json", "markdown"), default="json")
 
     # needs-browser
     subparsers.add_parser(
@@ -628,6 +675,8 @@ def main():
         sys.exit(cmd_needs_browser(args))
     elif args.command == "test-discord":
         sys.exit(cmd_test_discord(args))
+    elif args.command == "health":
+        sys.exit(cmd_health(args))
     elif args.command == "run":
         sys.exit(cmd_run(args))
     elif args.command == "daemon":

@@ -132,9 +132,11 @@ class MicrosoftResearchAdapter(BaseAdapter):
                 logger.error(
                     "MicrosoftResearchAdapter: careers API page %d failed: %s", page, exc
                 )
+                self.record_fetch_error(exc)
                 return
 
             if not isinstance(payload, dict):
+                self.record_fetch_error("INVALID_RESPONSE")
                 logger.error(
                     "MicrosoftResearchAdapter: expected a JSON object, got %s",
                     type(payload).__name__,
@@ -143,6 +145,8 @@ class MicrosoftResearchAdapter(BaseAdapter):
 
             items = payload.get("items")
             if not isinstance(items, list) or not items:
+                if not isinstance(items, list) or page > 1:
+                    self.record_fetch_error("INCOMPLETE_ITEMS")
                 if page == 1:
                     logger.warning(
                         "MicrosoftResearchAdapter: careers API returned no items."

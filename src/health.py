@@ -5,6 +5,7 @@ persists. main.py owns the side effects.
 """
 from __future__ import annotations
 from datetime import datetime, timedelta
+import html
 
 HEALTH_STALE = "stale"
 HEALTH_RECOVERED = "recovered"
@@ -15,6 +16,8 @@ def update_health(
     fetched_count: int,
     now: datetime,
     stale_after_hours: float,
+    *,
+    fetch_succeeded: bool = True,
 ) -> str | None:
     """Record this run's fetch outcome and report any health transition.
 
@@ -36,8 +39,12 @@ def update_health(
     health.setdefault("first_tracked_at", now.isoformat())
     health.setdefault("last_nonempty_at", None)
     health.setdefault("alerted", False)
+    health["last_fetch_status"] = "failed" if not fetch_succeeded else ("nonempty" if fetched_count else "empty")
+    health["consecutive_failures"] = 0 if fetch_succeeded else health.get("consecutive_failures", 0) + 1
+    if fetch_succeeded:
+        health["last_success_at"] = now.isoformat()
 
-    if fetched_count > 0:
+    if fetched_count > 0 and fetch_succeeded:
         health["last_nonempty_at"] = now.isoformat()
         if health["alerted"]:
             health["alerted"] = False
@@ -132,3 +139,48 @@ def record_run_heartbeat(
     history.append(diagnostics)
     if len(history) > max_history:
         state["heartbeat_history"] = history[-max_history:]
+
+
+def health_report(state: dict, now: datetime) -> dict:
+    """Public counters only. Absence of evidence is never a healthy snapshot."""
+    heartbeat = state.get("last_heartbeat") or {}
+    finished = heartbeat.get("finished_at")
+    try:
+        age = max(0, (now - datetime.fromisoformat(finished)).total_seconds())
+    except (TypeError, ValueError):
+        age = None
+    sources = {}
+    fields = ("status", "fetched", "matched", "review", "excluded", "candidates",
+              "alerted", "acknowledged", "cap_suppressed", "fetch_duration_seconds", "filter_reason_counts")
+    for name, row in heartbeat.get("per_adapter_breakdown", {}).items():
+        sources[name] = {key: row.get(key) for key in fields}
+        sources[name]["has_error"] = bool(row.get("error"))
+    return {
+        "snapshot_finished_at": finished,
+        "snapshot_age_seconds": age,
+        "snapshot_stale": age is None or age > 2700,
+        "scheduler_gap_detected": heartbeat.get("scheduler_gap_detected"),
+        "gap_since_last_run_seconds": heartbeat.get("gap_since_last_run_seconds"),
+        "alert_success_count": heartbeat.get("alert_success_count"),
+        "alert_failure_count": heartbeat.get("alert_failure_count"),
+        "sources": sources,
+        "interpretation": "Empty is a source response, not proof of no employer openings. Missing counters are unknown. Inspect official careers pages for failed/empty sources. GitHub cron is best effort. Job ACK counts do not prove digest delivery.",
+    }
+
+
+def render_health_markdown(report: dict) -> str:
+    def cell(value):
+        if value is None:
+            return "unknown"
+        return html.escape(str(value)).replace("|", "&#124;").replace("\n", " ").replace("\r", " ")[:200]
+    lines = ["## Jobbie health snapshot", "",
+             f"Finished: {cell(report['snapshot_finished_at'])}. Stale: {report['snapshot_stale']}.",
+             f"Scheduler gap: {cell(report['gap_since_last_run_seconds'])} seconds.",
+             f"Job sends acknowledged: {cell(report['alert_success_count'])}; failed: {cell(report['alert_failure_count'])}.", "",
+             "| Source | Scan | Fetched | Matched | Review | Excluded | Candidates | Sent | Seconds |",
+             "|---|---|---:|---:|---:|---:|---:|---:|---:|"]
+    for name, row in report["sources"].items():
+        lines.append("| " + " | ".join(cell(v) for v in [name, row.get('status'), *[row.get(k) for k in
+            ('fetched', 'matched', 'review', 'excluded', 'candidates', 'alerted', 'fetch_duration_seconds')]]) + " |")
+    lines.extend(["", report["interpretation"]])
+    return "\n".join(lines)

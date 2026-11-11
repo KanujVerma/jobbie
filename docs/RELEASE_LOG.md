@@ -78,3 +78,19 @@ Every functional PR must append a concise entry naming its PR slot, actual commi
 - Independent Sol review found a hidden review-digest eligibility blocker and an unknown verdict level overwritten by the legacy role label. Both were reproduced using `apply_filter_pipeline` and corrected; a focused re-review is required before shipping.
 - After the two review fixes: `python main.py validate-config` returned `Config is valid.`, `python -m compileall -q src scripts` exited 0, and `pytest -q` returned `826 passed in 34.03s` on Python 3.15.2. Exact-head Python 3.12 CI and live delivery remain pending.
 - Independent Sol re-review approved the changed behavior, resolved both findings, and independently ran 826 tests on Python 3.15.2. This does not substitute for hosted exact-head review or CI.
+
+## 2026-11-11: Phase 2 completion audit and P2-R1 candidate
+- Confirmed P2-UX1 #29 merged at e0346f49bd572179250fe08bed73131db0ba311a; post-merge Tests 42944213890 succeeded. Current owner scope supersedes UX-only and mandatory P2-ACT expansion.
+- Production schedule 43032487797 on da898dc: 12/13 responding, Plaid 404, 2 matched/309 review/9002 excluded, 0 job ACKs/failures, 472.9-minute gap. No verified P2-UX1 live delivery.
+- Candidate fixes reproduced legacy failure masking and dry-run v1 migration writes; adds partial-failure health, source/filter/candidate/ACK timing reports, Actions summary, corrupt-state guard and secret-safe webhook logs. Original roster/config/seen state remain unchanged. Initial focused reproduction: 26 failed/3 passed before fixes. Full final tests/review/CI/merge evidence belongs in the PR; not yet a released or live-verified claim. See evidence/P2-RELIABILITY.md.
+- Rollback code/workflow only, retain state. Remaining independent PRs: original-source repair, owner intake, OFF feeds, SQLite catalogue/shadow/search/export. Missing approval/rights/72h remain explicit gates.
+
+- P2-R1 local verification checkpoint: 869 tests passed in 32.98s (Python 3.15.2), config/compileall/diff-check passed. Full no-webhook dry-run exited 0; production config and seen-state SHA-256s unchanged. This proves read-only execution, not live delivery. PR CI/review/merge pending.
+
+P2-R1 review checkpoint: S1's malformed-health ACK-loss path reproduced (6 failing two-source cases), then fixed with pre-delivery validation; S2 stale onboarding rows corrected. Latest full local suite: 875 passed in 32.59s; config/compileall/health/diff checks passed. Final SanDisk/Plaid no-webhook dry-runs returned 0/1 respectively (empty/404) with unchanged state/config hashes. Sol round 2, candidate CI/hosted review and merge remain pending.
+
+Sol-loop round 2 approved behavior at fbb13745f4f64a3ede9a6b169fcb086d78eb94b1, resolving S1/S2; independent suite 875 passed in 36.66s and reliability suite 49 passed. Hosted exact-head review, Python 3.12 CI and merge remain pending. See evidence/P2-R1-REVIEW.md.
+
+Hosted review H1 (ef4d864) found that an all-failed/partial scan can save successful delivery ACKs locally but return 1, causing Actions to skip Commit state. Reproduced with a synthetic partial scan: one successful fake send, failed run result, ACK saved locally, missing workflow failure override. The regression failed before correction and now passes. Commit state now runs after an executed scan succeeds or fails, excluding cancellation/skipped scans; the workflow still reports the scan failure. No live failure or test send was induced. New exact-head CI/hosted review required before merge.
+
+H1 correction verification: `.venv/bin/pytest -q` passed 876 tests in 33.01s; validate-config, compileall and diff-check passed. Updated workflow failure-path execution is covered by a synthetic partial-scan ACK regression plus configuration checks, not a forced live outage.

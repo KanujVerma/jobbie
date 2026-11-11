@@ -69,3 +69,8 @@ unknown interval. Greenhouse post and internal IDs remain distinct.
 ## P2-UX1 candidate presentation contract
 
 `build_job_embed(Job) -> dict` and `Notifier.send_job_alert(Job) -> bool` remain available. Card output reports the existing deterministic verdict as a screen, not a hiring decision. The current model does not persist per-card first-seen provenance or verify legacy employer-link ownership, so observation and link uncertainty are explicit. The review digest is bounded and sanitized; long URLs can be omitted. Transport and acknowledgement behavior do not change. See `STATUS.md` for release evidence.
+
+## P2-R1 reliability boundary
+`BaseAdapter.fetch()` remains an iterator. A multi-query adapter may expose sanitized `fetch_errors` through `record_fetch_error`; main retains yielded observations but records the scan failed. Raised exceptions also retain already-yielded observations. Partial rows may be classified, but cannot establish successful completeness/recovery. `update_health(..., fetch_succeeded=False)` records failed status and consecutive failures; a successful empty response is distinct. Source health is not employer-wide coverage.
+
+`load_state(..., persist_migration=False)` is read-only even for v1. Invalid state containers/timestamps fail closed under `raise_on_corrupt=True`. Legacy delivery authority, eligibility policy version, ACK/rate limits/backfill/caps are unchanged. The `health` command exposes snapshot counters and unknowns without polling or sending. It omits raw source errors and private payloads.

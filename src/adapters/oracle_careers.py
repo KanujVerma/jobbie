@@ -94,17 +94,20 @@ class OracleAdapter(BaseAdapter):
                 logger.error(
                     "Oracle HCM API HTTP error at offset %d: %s", offset, exc
                 )
+                self.record_fetch_error(exc)
                 return
             except requests.RequestException as exc:
                 logger.error(
                     "Oracle HCM API request failed at offset %d: %s", offset, exc
                 )
+                self.record_fetch_error(exc)
                 return
 
             try:
                 data = resp.json()
             except ValueError as exc:
                 logger.error("Oracle HCM API returned invalid JSON: %s", exc)
+                self.record_fetch_error(exc)
                 return
 
             count = data.get("count", 0)
