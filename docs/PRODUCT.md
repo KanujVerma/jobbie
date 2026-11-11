@@ -1,61 +1,54 @@
-# Jobbie 2.0 — Product specification
+# Jobbie product specification — owner-approved 2026-11-10 direction
 
-## Mission and scope
-A personal, single-user Discord-first recruiting assistant that progresses through six independently usable releases:
-1. reliable FULL-TIME new-grad alerts for existing sources, visibly differentiated network-priority employers;
-2. expanded verified job discovery;
-3. resume/approved-GitHub-aware matching plus Discord commands;
-4. natural, role- and company-specific, fact-preserving resume tailoring;
-5. startup discovery and human-approved outbound outreach;
-6. application tracking, reminders, outcome-informed ranking.
+**Current deployed code:** GitHub Actions + Python webhook-only job alerts for original 13 company sources; P2-A Greenhouse/Ashby adapters are merged but no additional employer boards are active. Read [STATUS.md](STATUS.md) first. **Everything below about Discord buttons, AI resume previews, dots or application submission is PLANNED** until release evidence says otherwise.
 
-**Do not bundle later capabilities into Phase 1.** Every release must leave earlier working features intact.
+## Mission
+A personal, single-user Discord-first job-search system for relevant US full-time new-grad engineering roles. Three recruiting paths remain:
+1. traditional new-grad/early-career openings with direct employer applications;
+2. relevant startup openings;
+3. proactively contacting verified startup founders/engineering leads when no posting exists.
 
-## Candidate policy (owner-confirmed 2026-11-04)
-- UW–Madison BS Computer Science; expected graduation December 2026.
-- Desired start: January 2027 onward (earlier possible if job clearly permits); do not automatically exclude 2027 cohort postings. A cohort year alone does not prove eligibility.
-- US employment authorization and no sponsorship needed; currently a permanent resident, NOT yet a citizen. Security/clearance/citizenship-only jobs are not automatically eligible.
-- Roles: software engineer (new grad, SWE I), backend, full-stack, product engineer, applied AI, AI engineer, forward-deployed engineer; startup/founding engineer as an explicitly marked stretch; ML/data/platform adjacent when justified.
-- No internship/co-op alerts. Full-time permanent prioritized; contract and fractional work kept separate as opt-in.
-- Salary $100,000+ annual BASE preferred, not absolute. Unknown base/bonus/equity distinguishable; do not infer equity as cash salary. Unknown salary should not be hard rejected.
-- Geo priority: SF/Bay Area first; other California, NYC, Chicago, TX (Austin/Dallas/Houston and elsewhere), FL (Miami and elsewhere). Other US roles remain searchable; remote must be US-eligible, not merely the word "remote".
-- Personal use only. No family/referral names or contact information in the public repo.
+New owner-approved long-term workflow: **source-backed discovery -> clear actionable alert -> verified profile match -> natural role-specific resume -> private edit/PDF review -> owner approves ONE exact application -> dot or controlled browser executor submits where permitted -> capture employer receipt -> track follow-ups/outcomes**.
 
-## Original employer cohort — exact, locked
-13 ENABLED source entries as of 2026-11-04:
+**Approve resume alone != approve job application.** A per-job `Approve & Apply` action is separate, authenticated, revocable and bound to exact employer/requisition/URL, answer version and PDF hash.
+
+## Candidate preferences (locked, unchanged)
+- UW–Madison BS Computer Science, December 2026 graduation; January 2027 onward preferred start (verify specific cohort windows).
+- US permanent resident authorized to work without sponsorship; not US citizen. Citizenship-only/clearance requirements not automatically eligible. Keep personal immigration details private.
+- SWE/general, SWE I, backend, full-stack, product engineering, applied AI, forward-deployed AI, AI agent/retrieval/evaluation, select junior ML/data/platform and clearly labeled stretch startup engineering.
+- Full-time US roles; internships/co-ops excluded. Salary ≥$100,000 USD annual BASE preferred, not a hard filter; undisclosed compensation not rejected, bonus/equity separate.
+- SF Bay Area top; other CA, NYC, Chicago, Texas and Florida also prioritized; other US positions searchable, remote must be US-eligible.
+- Free-first hosting and inference; no silent paid fallback or assumed dot entitlements.
+
+## Network cohort (exact 13 original ENABLED sources)
 `Micron`, `Salesforce`, `CrowdStrike`, `Intel`, `Applied Materials`, `Western Digital`, `SanDisk`, `Plaid`, `Oracle`, `Microsoft Research`, `Microsoft`, `Amazon`, `Apple`.
 
-They each have `network_priority=true`, because the owner/family may have referral paths there. They each have `referral_status=unconfirmed` unless manually changed. The two DISABLED historic entries (`Snowflake`, `Applied Digital`) remain configured but do not automatically receive the network flag. `Microsoft Research` and `Microsoft` are two monitored sources for one broader employer; dedup both without losing source auditability.
+All are permanently `network_priority=true` for source grouping unless owner changes them. Actual referral status defaults `unconfirmed`; DO NOT claim a confirmed referral/contact. Disabled historical configurations `Snowflake` and `Applied Digital` do not gain network priority. Microsoft & Microsoft Research are separate source entries for one employer.
 
-Future discovered companies are NOT network priority by default. Referrals require explicit statuses: `unconfirmed`, `contact_possible`, `referral_requested`, `referral_submitted`, `referral_confirmed`, `unavailable`; never label an application referred without evidence.
+New discovered companies get `network_priority=false` / `referral_status=unavailable` unless explicitly owner-approved. For an original company with an unconfirmed potential referral, let owner choose `hold for referral` or `apply directly`. Do not block job discovery while waiting on a referral.
 
-## Three recruiting paths
-### A. Traditional new grad
-Verified full-time early career postings at established employers. Employer direct application links. Alerts, salary/status/eligibility evidence, network flags. Formal 2026/2027 cohort eligibility read from posting text, not guessed from its name.
+## UX and actual incremental release order
+1. **P2-UX1: clear notification cards** on existing webhook: job-title-first, actual company/location, eligibility screen reason (not a hiring probability), verified base salary or undisclosed, network/referral, truthful posted vs first-seen date, and direct employer URL. NO AI skill match or inert buttons. [Details](NOTIFICATIONS_V2.md).
+2. **P2-ACT:** separately approve and activate a few source-verified Greenhouse/Ashby employer boards. Original 13 retained. Never claim test boards are real matched openings.
+3. **P2-B:** allowed/verified new-grad feeds and employer link resolution. **P2-C:** canonical catalogue/dedupe/shadow migration and optional measured scheduler improvement.
+4. **Phase 3:** signed Discord interactions and private owner profile/storage, fact/GitHub evidence, job matching, and basic application ledger. `/jobs find`, `/jobs top`, `/resume upload`, `/github repos`, `/applications`, `/settings`; public webhook alerts continue if this service is down. Buttons can now perform actual actions.
+5. **Phase 4:** high-quality evidence-preserving company/role resume tailoring, human inline change review (what changed and why), one-page PDF and DOCX preview, immutable exact artifact, owner `Approve resume` and a separate private single-job application packet.
+6. **Phase 5:** dot-first application execution feasibility and one-job delegation. No asserted direct dot trigger until official supported integration is proven. Use explicit owner manual dot handoff first; then replaceable authenticated executor, optional local Stagehand/Playwright fallback, consent per role, definitive receipts.
+7. **Phase 6:** startup/company research, permitted business contacts, separately owner-approved outbound outreach, reminders, application outcome feedback.
 
-### B. Startup openings
-Find SF/NYC/Miami and other preferred-region startups with actual employer postings. Separate "confirmed active opening" from "company to consider". Prioritize evidence from work relevant to the startup's product.
+## Approval and privacy
+- No mass auto-apply, unauthenticated job-board scraping, bot evasion, guessed screening answers, invented career metrics, false US citizenship or clearance, or automated LinkedIn sending contrary to platform restrictions.
+- User may approve a single job's exact packet and authorize final submission; the executor can fill/submit THAT role where site policy and safety permit. New legal/EEO/signature/verification questions require owner response.
+- Private resume, referrals, personal contacts, account credentials and private GitHub code never in PUBLIC GitHub, PRs or Discord alert embeds. Approved private repositories are explicitly allowlisted read-only; reading is not permission to disclose.
+- Dot programmatic inbound handoff is **unverified**. Treat manual delegation and cloud session login/takeover as possible constraints. Never invent an API or claim automatic background execution before testing.
+- A job marked `applied` requires authoritative employer confirmation, not merely opening a form or pressing Submit.
+- Match/explanations and resume changes trace to employer source and verified candidate facts. No model-only eligibility/authorization.
 
-### C. Proactive founder/engineering-team outreach
-Discover relevant companies even without an open job. Find verified public business contacts where permitted; otherwise say contact unknown. Draft human-readable, company-specific message using approved public evidence. No outbound email without exact-draft, exact-recipient approval; LinkedIn sending manual. A trial project, if offered, should be scoped and paid, never automatically promised.
+## Success and release gates
+- Every mini-release independently improves a working system, with passing regression suite, code review, rollback, source provenance and observed live evidence when available. Documentation alone is not a shipped feature.
+- Job discovery: source rights, coverage/false-positive audits, no duplicate floods, correct 13-star flags and accurate salary/date semantics.
+- Resume editing: zero accepted invented facts, naturalness/source review, correct diff/PDF/DOCX, no unapproved artifact sent.
+- Application execution: zero unauthorized submissions, one-job approval digest, no blind retries on uncertain results, verified submitted receipt, documented fallback if dot unsupported.
+- Preserve \$0 recurring budget and original webhook pipeline if private services fail.
 
-## UX by phase
-Phase 1: existing channel continues to receive webhook embeds. New alerts show label `NETWORK PRIORITY` vs `DISCOVERED`, posting title, employer, location, role type, source URL, posting date when known, eligibility reason; salary only if provided. Review/ambiguous postings go to bounded digest/log, not incorrectly labeled confirmed.
-
-Phase 2: broader job coverage, direct apply links, dedupe, optional digests, source metadata. Do not assume another company has a referral.
-
-Phase 3: slash commands + private replies (`/jobs find`, `/jobs top`, `/resume upload`, `/profile show`, `/github repos`, `/settings`, `/health`); accept PDF/DOCX; ask owner to approve newly extracted facts; rank using verified job evidence and versioned candidate profile. No entire-message surveillance.
-
-Phase 4: `/resume tailor` against verified posting or pasted JD; one-page default PDF and editable DOCX; inspect diff, edit, accept/reject, download, preserve precise submission version. Quality matters more than high keyword count.
-
-Phase 5: `/startups find`, `/outreach draft`, `/outreach approve`; mark whether there is an active job, source-backed contact, consented public evidence, send record. Messages cannot be sent twice by retries.
-
-Phase 6: `/applications` (saved, applied, assessment, interview, offer, rejected, withdrawn), reminders, follow-ups and optional consented Gmail classification. No auto-apply.
-
-## Success
-- Phase 1: user receives useful NEW-GRAD full-time alerts from existing original cohort, with visible priority flag, no internship spam and measured schedule reliability.
-- Later: higher verified-job coverage, lower false positives, provenance-backed match explanations, actual user-approved resumes/outreach and persistent application records.
-- Always: hard evidence for claims; measurable quality; $0 recurring target; graceful free-tier throttling, no surprises.
-
-## Explicit non-goals
-No mass applications; no job-board account scraping/login automation; no reverse-engineering of proprietary Jobright; no unsolicited email or automatic LinkedIn sends; no hidden paid LLM expenditure; no fictitious hiring probability; no publishing private repository details; no "production ready" claim without operational evidence.
+See [PHASES.md](PHASES.md) for scoped PRs, [AUTO_APPLY.md](AUTO_APPLY.md) for executor protocol, [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md) for card spec, and [RESUME_TAILORING.md](RESUME_TAILORING.md) for grounded revisions.
