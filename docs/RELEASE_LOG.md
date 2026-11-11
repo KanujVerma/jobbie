@@ -55,10 +55,15 @@ Every functional PR must append a concise entry naming its PR slot, actual commi
 
 ## 2026-11-09: P2-A squash merge release
 - **PR #23:** https://github.com/KanujVerma/jobbie/pull/23 on `feat/p2-a-public-job-boards`.
-- **Merge Commit:** `ecb553fa652750e32f5eb8ec775ae7da70285a86` (squash-merge to main).
+- **Merge Commit:** `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb` (squash-merge to main).
 - **Code invariance:** Runtime code in `src`, `tests`, and `.github/workflows` remains 100% byte-identical to independently reviewed source `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
 - **Pre-merge Verification:** Config validation PASS, compileall PASS, 812 tests PASS in 31.01s. Documentation continuity PASS. Local live read smoke observed 20 Greenhouse and 76 Ashby postings, all excluded, zero state/config mutation, `discord_sent=false`, `production_enabled=false`.
 - **Post-merge Main CI:** https://github.com/KanujVerma/jobbie/actions/runs/42720639467 passed in 45s (812 tests).
 - **Status:** MERGED, NOT PRODUCTION_ENABLED. Production companies remain the original 15 configured / 13 enabled sources; example boards in `examples/p2a-public-boards.yaml` remain disabled.
 
 
+## 2026-11-10 owner-approved architecture and roadmap amendment (DOCUMENTATION ONLY)
+- Scope: clearer source-grounded webhook notifications, owner-approved activation of verified public boards, private resume diff/PDF preview, separate one-job `Approve & Apply`, dot-first application handoff feasibility with local browser fallback, startup outreach and application results. Explicit per-job authorization supersedes older blanket "no autoapply" design; NO bulk or unapproved submissions.
+- Planned PR sequence: `P2-UX1` first, `P2-ACT` next, `P2-B` feeds then `P2-C` catalogue; P3 private commands/ledger/evidence; P4 resume review/packet; P5 dot/manual+controlled browser executor; P6 outreach/reminders. See [PHASES.md](PHASES.md), [AUTO_APPLY.md](AUTO_APPLY.md), [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md).
+- Actual runtime remains Phase 2A source release [PR #23](https://github.com/KanujVerma/jobbie/pull/23), merge `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb`, post-merge docs [#24](https://github.com/KanujVerma/jobbie/pull/24) at `58b108c07e070725dbde181d4d0fb8c1b62d8917`. Previous full hashes in docs had mismatched suffixes; corrected here. Main later advanced through state-only commit(s), which do not represent new product features.
+- No live source config, state, Discord webhook, dot, AI calls or browser apply behavior changed by this documentation update. The new executor plan is speculative until actual integration tests; status `SPECIFIED` only. First functional PR should add clear notification payload with synthetic tests and existing live alert compatibility.

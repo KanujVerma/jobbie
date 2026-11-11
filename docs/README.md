@@ -1,6 +1,6 @@
 # Jobbie technical and product documentation
 
-**Start here if joining cold:** [Agent handoff](HANDOFF.md) -> [Current audited status](STATUS.md) -> [Agent rules](../AGENTS.md) -> [Roadmap](PHASES.md) -> [next P2-UX1 contract](phases/PHASE-2-UX.md). Phase 1 and P2-A release evidence is recorded in STATUS. GitHub source HEAD and Actions evidence override old snapshots.
+**Start here if joining cold:** [Agent handoff](HANDOFF.md) -> [Current audited status](STATUS.md) -> [Agent rules](../AGENTS.md) -> [Roadmap](PHASES.md) -> [next P2-UX1 contract](phases/PHASE-2-UX.md). Phase 1 and P2-A release evidence is recorded in STATUS. The auto-apply design is PLANNED, not deployed. GitHub source HEAD and Actions evidence override old snapshots.
 
 ## Sources of truth
 - [STATUS.md](STATUS.md): CURRENT code release, CI evidence, live operation confidence, blockers and next implementation.
@@ -27,7 +27,7 @@
 |---|---|---|---|
 | 1, P2-A | New-grad filtering and public ATS adapters merged; 13 original sources only active | [P1](phases/PHASE-1.md), [P2](phases/PHASE-2.md) | Historical P1/P2 prompts |
 | **Next P2-UX1** | Clear truthful Discord job alert format (not implemented yet) | [P2-UX1](phases/PHASE-2-UX.md) | [First /goal](agent-prompts/PHASE-2-UX-GOAL.md) |
-| P2-ACT | Owner-approved new employer board activation | [P2-ACT](phases/PHASE-2-ACT.md) | Prompt authored after P2-UX1 release |
+| P2-ACT | Owner-approved new employer board activation | [P2-ACT](phases/PHASE-2-ACT.md) | [Next /goal after UX](agent-prompts/PHASE-2-ACT-GOAL.md) |
 | P2-B/P2-C | Permitted feeds then canonical catalogue | [Phase 2](phases/PHASE-2.md) | [P2 overview](agent-prompts/PHASE-2-CODE.md) |
 | P3 | Real private commands/profile/evidence/basic app ledger | [Phase 3](phases/PHASE-3.md) | [P3](agent-prompts/PHASE-3-CODE.md) |
 | P4 | Grounded tailored resume, diff/preview, private approval packet | [Phase 4](phases/PHASE-4.md) | [P4](agent-prompts/PHASE-4-CODE.md) |

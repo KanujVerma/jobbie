@@ -49,7 +49,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 7. Blocked secret/provider/consent means `BLOCKED_LIVE` or `BLOCKED_APPROVAL`. Do not forge success.
 
 ## First executable goal
-**[P2-UX1 contract](phases/PHASE-2-UX.md) + [ready-to-paste /goal](agent-prompts/PHASE-2-UX-GOAL.md).** Next is [P2-ACT](phases/PHASE-2-ACT.md). The historical `docs/agent-prompts/PHASE-2-CODE.md` is not the next instruction unless explicitly redirected to the new slots.
+**[P2-UX1 contract](phases/PHASE-2-UX.md) + [ready-to-paste /goal](agent-prompts/PHASE-2-UX-GOAL.md).** Next is [P2-ACT](phases/PHASE-2-ACT.md), with [second /goal](agent-prompts/PHASE-2-ACT-GOAL.md). The historical `docs/agent-prompts/PHASE-2-CODE.md` is not the next instruction unless explicitly redirected to the new slots.
 
 ## Subsequent phase specs
 - [P2-B/C](phases/PHASE-2.md)
