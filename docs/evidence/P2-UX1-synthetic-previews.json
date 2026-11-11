@@ -1,0 +1,141 @@
+{
+  "notice": "SYNTHETIC FIXTURES ONLY. No real listing or notification was sent.",
+  "payloads": {
+    "original_network_fictional": {
+      "embeds": [
+        {
+          "title": "Software Engineer I | Example Employer",
+          "description": "⭐ NETWORK PRIORITY | Referral: Unconfirmed\nChicago, IL; Austin, TX\nFull-time | Entry-level",
+          "fields": [
+            {
+              "name": "Base compensation",
+              "value": "Not disclosed",
+              "inline": false
+            },
+            {
+              "name": "Eligibility screen",
+              "value": "Pass \\| Reasons: entry level title \\| Unknown: description completeness \\| Deterministic screen, not hiring confirmation",
+              "inline": false
+            },
+            {
+              "name": "Observed by Jobbie",
+              "value": "2026-11-04 6:00 AM CST",
+              "inline": true
+            },
+            {
+              "name": "Employer posting",
+              "value": "Employer link unverified: https://example.com/jobs/101",
+              "inline": false
+            }
+          ],
+          "footer": {
+            "text": "workday"
+          },
+          "color": 16705372
+        }
+      ]
+    },
+    "discovered_ashby_fictional": {
+      "embeds": [
+        {
+          "title": "Software Engineer | Example Startup",
+          "description": "DISCOVERED\nSan Francisco, CA\nFull-time | Entry-level",
+          "fields": [
+            {
+              "name": "Base compensation",
+              "value": "USD 25-35 / hour",
+              "inline": false
+            },
+            {
+              "name": "Eligibility screen",
+              "value": "Pass \\| Reasons: entry level title \\| Unknown: description completeness \\| Deterministic screen, not hiring confirmation",
+              "inline": false
+            },
+            {
+              "name": "Last published",
+              "value": "2026-11-01 1:30 AM CST",
+              "inline": true
+            },
+            {
+              "name": "Employer posting",
+              "value": "https://jobs.ashbyhq.com/example/102",
+              "inline": false
+            }
+          ],
+          "footer": {
+            "text": "ashby | example | 102"
+          },
+          "color": 5793266
+        }
+      ]
+    },
+    "greenhouse_needs_review_fictional": {
+      "embeds": [
+        {
+          "title": "Junior Software Engineer | Example Company",
+          "description": "DISCOVERED\nNew York, NY\nFull-time: Unknown | New grad",
+          "fields": [
+            {
+              "name": "Base compensation",
+              "value": "Not disclosed",
+              "inline": false
+            },
+            {
+              "name": "Eligibility screen",
+              "value": "Needs review \\| Reasons: source description incomplete, source employment unknown \\| Unknown: full job description, employment type \\| Deterministic screen, not hiring confirmation",
+              "inline": false
+            },
+            {
+              "name": "First published",
+              "value": "2026-05-06 3:30 PM CDT",
+              "inline": true
+            },
+            {
+              "name": "Employer posting",
+              "value": "https://job-boards.greenhouse.io/example/jobs/103",
+              "inline": false
+            }
+          ],
+          "footer": {
+            "text": "greenhouse | example | 103"
+          },
+          "color": 5793266
+        }
+      ]
+    },
+    "legacy_unknown_fictional": {
+      "embeds": [
+        {
+          "title": "Software Engineer | Fictional Employer",
+          "description": "DISCOVERED\nLocation unknown\nFull-time: Unknown | New grad",
+          "fields": [
+            {
+              "name": "Base compensation",
+              "value": "Not disclosed",
+              "inline": false
+            },
+            {
+              "name": "Eligibility screen",
+              "value": "Not assessed \\| Unknown: employment type, description completeness \\| Deterministic screen, not hiring confirmation",
+              "inline": false
+            },
+            {
+              "name": "Observed by Jobbie",
+              "value": "2026-11-04 6:00 AM CST",
+              "inline": true
+            },
+            {
+              "name": "Employer posting",
+              "value": "Employer link unverified: https://example.com/jobs/104",
+              "inline": false
+            }
+          ],
+          "footer": {
+            "text": "workday"
+          },
+          "color": 5793266
+        }
+      ]
+    }
+  }
+}

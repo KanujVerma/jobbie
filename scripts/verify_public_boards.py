@@ -77,7 +77,7 @@ def verify(manifest: Path) -> tuple[dict, int]:
                 sample = jobs[0] if jobs else None
                 if sample:
                     embed = build_job_embed(sample)
-                    assert embed['title'].startswith('DISCOVERED')
+                    assert embed['description'].startswith('DISCOVERED')
                     assert not sample.network_priority
                 receipt.update(status='observed_nonempty' if jobs else 'observed_empty',
                                count=len(jobs), eligibility_counts=dict(verdicts),

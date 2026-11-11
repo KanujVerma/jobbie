@@ -4,6 +4,14 @@
 
 Canonical repository: **KanujVerma/jobbie**, ID 1339847701. Repository rename is complete. Last verified runtime release is `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb` (Phase 2A PR #23), followed by docs merge `58b108c07e070725dbde181d4d0fb8c1b62d8917` (#24). Most recently observed `main` was state-only commit `8d05cf3474fea796a361e3809d68f5e635e1420a`; verify actual HEAD again before coding.
 
+## P2-UX1 candidate: PARTIAL, live delivery unverified
+
+At PR authoring, the P2-UX1 branch is based on `1d943c9b105d7309b04acf9c44ea3e641cc00c56`. The source change is a title-first webhook card and bounded review digest; merge, exact-head CI and independent review must be checked on the PR. [Synthetic payloads](evidence/P2-UX1-synthetic-previews.json) are fixtures, not live messages. No new source was enabled. No live webhook smoke was authorized or sent: **LIVE_DELIVERY_UNVERIFIED**.
+
+The source model does not retain a true first-seen timestamp for individual cards, so the fallback says `Observed by Jobbie`. Legacy source dates lack reliable time precision and are shown as source dates; Workday relative dates use observation instead. Only Ashby normalized Salary components with an explicit currency and period are shown as base. Other legacy and Greenhouse amounts remain undisclosed in the card until their base and period can be established. Legacy URL provenance is labeled unverified. Digest links over 200 UTF-16 units are omitted from the message. The existing send and acknowledgement contracts are unchanged; an unsafe individual URL is displayed as unavailable, and a successful webhook response is still acknowledged under existing behavior.
+
+Rollback is a revert of the P2-UX1 presentation change; preserve state and configuration. Do not activate P2-ACT until P2-UX1 is merged, reviewed and has its required live verification, and a separate exact employer shortlist has been source-verified and owner-approved.
+
 ## Completed release: Phase 2A, PR #23
 - **PR:** https://github.com/KanujVerma/jobbie/pull/23
 - **Branch:** `feat/p2-a-public-job-boards` (merged and closed)
@@ -29,9 +37,9 @@ The normal filter, immutable Job model, notification-payload builder, review que
 - Known limitations tracked separately: GitHub's nominal 15-minute cron has observed multi-hour gaps (run 42698015121 had a 626.5-minute gap). Plaid's known Lever 404 is an upstream endpoint failure.
 - Phases 2B/2C and 3–6 remain PLANNED. The two P2-A example boards are outside production config and disabled; no new ongoing job alerts are active.
 
-## Next coding step: P2-UX1 (PLANNED, not implemented)
+## Next coding step: P2-UX1 (candidate; release gates pending)
 Owner approved a new rollout plan on November 10: first [P2-UX1 issue #25](https://github.com/KanujVerma/jobbie/issues/25) / [notification layout v2](phases/PHASE-2-UX.md) as a **presentation-only** PR, then separately [P2-ACT](phases/PHASE-2-ACT.md) for 3–5 source-verified owner-approved employer boards when available; only then P2-B licensed feeds and P2-C canonical catalogue. [Pasteable first /goal](agent-prompts/PHASE-2-UX-GOAL.md).
 
 **New future product scope only, NOT deployed:** Phase 3 private authenticated Discord/buttons + candidate evidence + basic application ledger; Phase 4 natural resume diff/PDF preview and UNSENT packet preparation; Phase 5 explicit `Approve & Apply` authorization and dot-first single-job execution with manual handoff first and optional local browser fallback; Phase 6 startup outreach/reminders. See [AUTO_APPLY.md](AUTO_APPLY.md) and [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md). A Jobbie-to-dot external trigger has NOT been verified; no mass submissions.
-This documentation PR changes specifications only. Live notifier/autoapply behavior, existing 13 active sources, state and job workflow remain unchanged.
+The earlier roadmap documentation PR changed specifications only. This P2-UX1 candidate changes notifier presentation; autoapply, the 13 active sources, state and job workflow are outside its scope.
 

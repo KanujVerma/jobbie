@@ -40,7 +40,7 @@ from src.health import (
 )
 from src.http import HTTPClient
 from src.browser import BrowserClient
-from src.notifier import Notifier
+from src.notifier import Notifier, build_review_digest
 from src.backfill import deliver_backfill_batch
 from src.filtering import apply_filter_pipeline
 from src.scheduler import run_loop
@@ -469,13 +469,9 @@ def do_run(args) -> int:
         if digest_res is not None:
             review_items, total_rev = digest_res
             if review_items:
-                lines = [f"Found {total_rev} positions needing review (showing up to {len(review_items)}):"]
-                for item in review_items:
-                    reasons_str = ", ".join(item.get("reasons", []))
-                    lines.append(f"• [{item.get('company')}: {item.get('title')}]({item.get('url')}) — `{reasons_str}`")
                 sent = notifier.send_summary(
                     title="📋 Daily Review Digest",
-                    description="\n".join(lines),
+                    description=build_review_digest(review_items, total_rev),
                 )
                 if sent:
                     state.setdefault("review_digest", {})["last_sent_at"] = datetime.now(timezone.utc).isoformat()
