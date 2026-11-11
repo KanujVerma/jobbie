@@ -203,3 +203,54 @@ def test_corrupt_later_source_health_aborts_before_any_sender(tmp_path, monkeypa
     factory.assert_not_called()
     sender.send_job_alert.assert_not_called()
     assert path.read_bytes() == before
+
+
+def test_failed_partial_run_keeps_ack_and_workflow_commits_it(tmp_path, monkeypatch):
+    """A failed scan must keep its failed outcome and its successful-send ledger."""
+    import dataclasses
+    import main
+    import yaml
+    from pathlib import Path
+    from src.adapters.base import BaseAdapter
+    from src.config import Config
+    from src.storage import _empty_state, POLICY_VERSION
+    from tests.test_main_exit_code import _make_job
+    from types import SimpleNamespace
+
+    class Partial(BaseAdapter):
+        def fetch(self):
+            self.record_fetch_error('HTTP 429')
+            yield dataclasses.replace(_make_job(), company='Acme')
+
+    state = _empty_state()
+    state['first_run_completed_at'] = datetime.now(timezone.utc).isoformat()
+    state['policy_version'] = POLICY_VERSION
+    state['migrations'] = {POLICY_VERSION: {'backfill_completed': True}}
+    path = tmp_path / 'state.json'
+    path.write_text(json.dumps(state))
+    config = Config(defaults={'state_path': str(path), 'request_delay_seconds': [0, 0]}, filters={},
+                    companies=[{'name': 'Acme', 'adapter': 'partial', 'config': {}}])
+    sender = MagicMock()
+    sender.send_job_alert.return_value = True
+    monkeypatch.setattr(main, 'load_config', lambda _: config)
+    monkeypatch.setattr(main, 'ADAPTER_REGISTRY', {'partial': Partial})
+    monkeypatch.setattr(main, 'HTTPClient', MagicMock())
+    monkeypatch.setattr(main, 'Notifier', MagicMock(return_value=sender))
+    monkeypatch.setattr(main, 'apply_filter_pipeline', lambda job, *args: (job, []))
+    monkeypatch.setenv('DISCORD_WEBHOOK_URL', 'https://discord.com/api/webhooks/synthetic')
+    assert main.do_run(SimpleNamespace(config='unused', dry_run=False)) == 1
+    sender.send_job_alert.assert_called_once()
+    saved = json.loads(path.read_text())
+    assert saved['companies']['Acme']['seen_jobs']['health-test-1']['alerted'] is True
+    assert saved['last_heartbeat']['adapters_failed'] == 1
+    assert saved['last_heartbeat']['alert_success_count'] == 1
+
+    steps = yaml.safe_load(Path('.github/workflows/job-alerts.yml').read_text())['jobs']['check']['steps']
+    scan = next(step for step in steps if step.get('name') == 'Run job alerts')
+    commit = next(step for step in steps if step.get('name') == 'Commit state')
+    condition = commit.get('if', '')
+    # An explicit status function overrides Actions' default success() gate.
+    assert any(token in condition for token in ('always()', 'failure()', '!cancelled()'))
+    assert scan.get('id') and f"steps.{scan['id']}.outcome" in condition
+    assert "'failure'" in condition and "'success'" in condition
+    assert not scan.get('continue-on-error', False)

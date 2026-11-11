@@ -10,3 +10,7 @@ Round 1 head 4c3af988687b95e5f51ede5a7f3baf2a0eb08e3a: CHANGES. Independent 869-
 | S2 | nit | fixed | README and UX contract now identify #29 merged/live-delivery unverified, current reliability/owner-intake sequence. |
 
 Round 2 head fbb13745f4f64a3ede9a6b169fcb086d78eb94b1: APPROVE. S1 and S2 resolved, no new findings. Independent full suite 875 passed in 36.66s; 49 reliability tests, config validation and production-snapshot health read passed. This ledger update changes documentation only. Hosted Codex review and Python 3.12 CI remain separate required gates. Diff after correction: 36 files, 684 insertions/161 deletions before this documentation-only update. No declined findings.
+
+Hosted round 1 at ef4d86441fec0e99ff5d1aeb572fffe9e87040ad: H1/P2, all-partial scan returns failure after locally saving ACKs, so Actions skipped its default-success Commit state step. Agreed and fixed directly: explicit scan step ID and success/failure state-commit condition with cancellation exclusion. Focused regression failed before the change and passes after; failed run status and local saved ACK are asserted. No additional delegate was started for this small workflow fix. Fresh hosted exact-head review pending.
+
+H1 correction verification: `.venv/bin/pytest -q` passed 876 tests in 33.01s; validate-config, compileall and diff-check passed. Updated workflow failure-path execution is covered by a synthetic partial-scan ACK regression plus configuration checks, not a forced live outage.

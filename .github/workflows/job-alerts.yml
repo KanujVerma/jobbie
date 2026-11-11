@@ -95,6 +95,7 @@ jobs:
           print("chromium launched and rendered DOM text")
           PY
       - name: Run job alerts
+        id: scan
         # Raised 8 -> 14 on 2026-08-20. Adding Microsoft took a measured full
         # sweep from 276s to 444s: that adapter pages a rate-limited API and
         # must space requests 3-5s apart, costing ~90s on its own. 444s against
@@ -109,6 +110,9 @@ jobs:
         if: always()
         run: python main.py health --format markdown >> "$GITHUB_STEP_SUMMARY"
       - name: Commit state
+        # A partial scan can deliver postings, save their ACKs, then exit 1.
+        # Preserve that ledger while keeping the scan/workflow failure visible.
+        if: ${{ !cancelled() && (steps.scan.outcome == 'success' || steps.scan.outcome == 'failure') }}
         timeout-minutes: 3
         run: |
           git config user.name  "job-alerts-bot"

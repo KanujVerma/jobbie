@@ -130,3 +130,7 @@ Latest full `.venv/bin/pytest -q`: **875 passed in 32.59s**, Python 3.15.2. Conf
   "source_reads_only": true
 }
 ```
+
+Hosted review H1 (ef4d864) found that an all-failed/partial scan can save successful delivery ACKs locally but return 1, causing Actions to skip Commit state. Reproduced with a synthetic partial scan: one successful fake send, failed run result, ACK saved locally, missing workflow failure override. The regression failed before correction and now passes. Commit state now runs after an executed scan succeeds or fails, excluding cancellation/skipped scans; the workflow still reports the scan failure. No live failure or test send was induced. New exact-head CI/hosted review required before merge.
+
+The workflow condition follows [GitHub status-function semantics](https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions): an explicit status check is needed to override the default successful-predecessors condition. The scan step does not use continue-on-error. A canceled or skipped scan does not authorize a new state commit.
