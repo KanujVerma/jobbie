@@ -25,3 +25,5 @@ After Phase 2 implementation and its operational gates, execute P3-A signed, all
 Historical release evidence: [P2-A](evidence/P2-A-VERIFICATION.md), [P1-E](evidence/P1-E-PRODUCTION-VERIFICATION.md), [RELEASE_LOG](RELEASE_LOG.md). Preserve the existing production state; never force backfill or reset it to generate proof.
 
 P2-R1 review checkpoint: S1's malformed-health ACK-loss path reproduced (6 failing two-source cases), then fixed with pre-delivery validation; S2 stale onboarding rows corrected. Latest full local suite: 875 passed in 32.59s; config/compileall/health/diff checks passed. Final SanDisk/Plaid no-webhook dry-runs returned 0/1 respectively (empty/404) with unchanged state/config hashes. Sol round 2, candidate CI/hosted review and merge remain pending.
+
+Sol-loop round 2 approved behavior at fbb13745f4f64a3ede9a6b169fcb086d78eb94b1, resolving S1/S2; independent suite 875 passed in 36.66s and reliability suite 49 passed. Hosted exact-head review, Python 3.12 CI and merge remain pending. See evidence/P2-R1-REVIEW.md.
