@@ -49,6 +49,6 @@ New discovered companies get `network_priority=false` / `referral_status=unavail
 - Job discovery: source rights, coverage/false-positive audits, no duplicate floods, correct 13-star flags and accurate salary/date semantics.
 - Resume editing: zero accepted invented facts, naturalness/source review, correct diff/PDF/DOCX, no unapproved artifact sent.
 - Application execution: zero unauthorized submissions, one-job approval digest, no blind retries on uncertain results, verified submitted receipt, documented fallback if dot unsupported.
-- Preserve \$0 recurring budget and original webhook pipeline if private services fail.
+- Preserve $0 recurring budget and original webhook pipeline if private services fail.
 
 See [PHASES.md](PHASES.md) for scoped PRs, [AUTO_APPLY.md](AUTO_APPLY.md) for executor protocol, [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md) for card spec, and [RESUME_TAILORING.md](RESUME_TAILORING.md) for grounded revisions.

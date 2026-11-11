@@ -29,7 +29,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 | 6B | P6-B — Contact + approved outreach | Public business contacts and individually approved email, no LinkedIn auto-DM | P6-A |
 | 6C | P6-C — Follow-ups and feedback | Application reminders, recruiter/response statuses, outcome-informed ranking, privacy/export | P6-B |
 
-**Optional operational mini-PR:** P2-OPS1 may assess more reliable \$0-compatible scheduling once actual source activation makes timely delivery important; do not treat the existing `*/15` GitHub cron as a delivery SLA. Do not sneak this into P2-UX1.
+**Optional operational mini-PR:** P2-OPS1 may assess more reliable $0-compatible scheduling once actual source activation makes timely delivery important; do not treat the existing `*/15` GitHub cron as a delivery SLA. Do not sneak this into P2-UX1.
 
 ## Release boundaries
 - P2-UX1 is PRESENTATION-ONLY. Do not enable a new employer, add an account, alter persistent state or create a fake button.

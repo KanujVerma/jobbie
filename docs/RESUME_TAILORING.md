@@ -55,7 +55,7 @@ Freeze 24 legitimate job descriptions (6 per SWE/backend, applied AI/FDE, startu
 - Human owner reviews at least 12 diverse outputs before live rollout; >=10/12 must be rated more relevant AND at least as natural as baseline with no fabricated claim. Record disagreements, failed examples, and any manual corrections. This is internal product gate, NOT a proven employer/ATS advantage.
 - Multiple provider/challenger models if accessible for $0; log per-model factual fail rate, quality, latency, quota errors and context privacy.
 - Stale proposal/changed factual claim before acceptance must invalidate draft and require regeneration/revalidation.
-- §Approve resume§ alone NEVER sends a document to an employer. After separate exact per-job §Approve & Apply§, a later Phase 5 executor may use that approved immutable resume to submit where authorized and site-permitted; see §AUTO_APPLY.md§. No unattended/mass autoapply.
+- `Approve resume` alone NEVER sends a document to an employer. After separate exact per-job `Approve & Apply`, a later Phase 5 executor may use that approved immutable resume to submit where authorized and site-permitted; see `AUTO_APPLY.md`. No unattended/mass autoapply.
 
 ## Failure handling
 If model unavailable or quota exceeded, return error with original resume safely intact. If model proposes unsupported claim, remove/reject it rather than rephrase deceptively. If PDF is two pages or unreadable, fail build and show actionable layout errors. If user didn't approve final draft, never call it submitted.
