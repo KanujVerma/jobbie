@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 import yaml
 from dotenv import load_dotenv
+from src.source_migration import validate_source_revision
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,10 @@ def validate_config(
     # 3. Required fields per company
     for company in config.companies:
         cname = company.get("name", "<unnamed>")
+        try:
+            validate_source_revision(company)
+        except ValueError as error:
+            errors.append(f"Company '{cname}': {error}")
         if not company.get("name"):
             errors.append(f"Company missing 'name' field: {company}")
         if not company.get("adapter"):
