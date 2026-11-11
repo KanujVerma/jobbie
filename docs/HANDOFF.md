@@ -37,8 +37,8 @@ Personal single user; Dec 2026 UW–Madison BS CS; January 2027 target start; fu
 Private resumes, family contacts, credentials and private GitHub code never go in public commits/logs. Private repository reading requires explicit allowlist approval; reading is not outward-disclosure approval. No mass/unapproved auto-apply; future Phase 5 may submit a SINGLE owner-authorized exact job packet after separate `Approve & Apply`. No assumed dot API, unauthorized Jobright/LinkedIn scraping, unsolicited founder emails, or unapproved paid inference. Later phases use approved evidence for matching/tailoring and exact owner approval for outbound messages.
 
 ## Approved future plan: one PR at a time
-1. **First P2-UX1:** compact, informative truthful webhook alerts without changing source/state. [Exact scope](phases/PHASE-2-UX.md) and [first /goal](agent-prompts/PHASE-2-UX-GOAL.md).
-2. **Second P2-ACT:** source-check and owner-approve a small shortlist, then enable additional Greenhouse/Ashby boards with `discovered` status; original 13 remain star-marked.
+1. **First [P2-UX1 issue #25](https://github.com/KanujVerma/jobbie/issues/25):** compact, informative truthful webhook alerts without changing source/state. [Exact scope](phases/PHASE-2-UX.md) and [first /goal](agent-prompts/PHASE-2-UX-GOAL.md).
+2. **Second [P2-ACT issue #26](https://github.com/KanujVerma/jobbie/issues/26):** source-check and owner-approve a small shortlist, then enable additional Greenhouse/Ashby boards with `discovered` status; original 13 remain star-marked.
 3. P2-B allowed feeds; P2-C catalogue/global dedup/shadow cutover.
 4. P3 private authenticated Discord commands/profile/evidence and basic application ledger.
 5. P4 role/company resume tailoring with before/after reasons, PDF/DOCX preview, owner `Approve resume` separated from `Approve & Apply` packet.

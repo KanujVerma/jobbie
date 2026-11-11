@@ -1,6 +1,6 @@
 # P2-ACT executable PR — first additional source-verified employers
 
-**Status:** PLANNED. Start only after [P2-UX1](PHASE-2-UX.md) has merged and passed regression gates. P2-A existing Greenhouse/Ashby adapters have already merged, but NO new employer was enabled in `companies.yaml`.
+**Status:** PLANNED. [Tracking issue #26](https://github.com/KanujVerma/jobbie/issues/26). Start only after [P2-UX1](PHASE-2-UX.md) has merged and passed regression gates. P2-A existing Greenhouse/Ashby adapters have already merged, but NO new employer was enabled in `companies.yaml`.
 
 ## Why a separate PR?
 Alert presentation can be deployed and reverted without touching scraping or historical dedup. Activating employers changes production coverage, fresh-state and potential Discord volume. Do not conflate test-board connectivity with a relevant new-grad opportunity.

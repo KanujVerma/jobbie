@@ -1,6 +1,6 @@
 # P2-UX1 executable PR — make existing Discord alerts informative
 
-**Status:** PLANNED. This is the next smallest user-visible coding milestone after P2-A merged in [PR #23](https://github.com/KanujVerma/jobbie/pull/23) and its documentation PR #24. It is one REVIEWABLE PR, not a broad Phase 2 rewrite or a promise of personal matching. Normative specification: [NOTIFICATIONS_V2.md](../NOTIFICATIONS_V2.md).
+**Status:** PLANNED. [Tracking issue #25](https://github.com/KanujVerma/jobbie/issues/25). This is the next smallest user-visible coding milestone after P2-A merged in [PR #23](https://github.com/KanujVerma/jobbie/pull/23) and its documentation PR #24. It is one REVIEWABLE PR, not a broad Phase 2 rewrite or a promise of personal matching. Normative specification: [NOTIFICATIONS_V2.md](../NOTIFICATIONS_V2.md).
 
 ## Scope
 - Present job title prominently, followed by actual company/location and known full-time/early-career attributes.

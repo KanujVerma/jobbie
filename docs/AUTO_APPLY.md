@@ -58,7 +58,7 @@ All star/license observations are from GitHub on 2026-11-10 and subject to versi
 Source code licenses do not authorize employer data collection or website automation. Star counts are adoption signals, NOT validated success or safety.
 
 ## Stage gates and metrics
-### Gate 5A: Dot feasibility *without promising direct automation*
+### Gate 5A: Dot feasibility *without promising direct automation* ([future tracker #27](https://github.com/KanujVerma/jobbie/issues/27))
 - One owner-selected ordinary employer ATS job, verified official job URL, no sensitive data leaked in ChatGPT public output; owner explicitly agrees to the test.
 - Build packet and a manual dot prompt that cites exact approved resume version and source; verify dot can access the document securely, sign in / request takeover, fill allowed fields, return result.
 - Identify whether dot permits a supported inbound programmatic action on THIS account, with official documentation and real authorized end-to-end test. If unavailable, record `unsupported` and preserve one-step manual handoff.
