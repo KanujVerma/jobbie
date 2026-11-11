@@ -120,81 +120,33 @@ class TestNetworkCohortConfig:
 
 
 class TestNotifierEmbedFormatting:
-    """Validate precise notifier contract and embed fields."""
-
     def test_network_priority_embed_badge_and_color(self):
-        job = _make_sample_job(network_priority=True, referral_status="unconfirmed")
-        embed = build_job_embed(job)
-
-        assert embed["title"].startswith("⭐ NETWORK PRIORITY")
-        assert embed["color"] == 0xFEE75C  # Gold
-
-        ref_field = next(f for f in embed["fields"] if f["name"] == "🤝 Referral Status")
-        assert ref_field["value"] == "Unconfirmed (Original Cohort)"
-        assert "confirmed" not in ref_field["value"].lower().replace("unconfirmed", "")
+        embed = build_job_embed(_make_sample_job())
+        assert embed["title"].startswith("Software Engineer, New Grad")
+        assert "⭐ NETWORK PRIORITY" in embed["description"]
+        assert "Referral: Unconfirmed" in embed["description"]
+        assert embed["color"] == 0xFEE75C
 
     def test_discovered_embed_badge_and_color(self):
-        job = _make_sample_job(
-            network_priority=False,
-            cohort="discovered",
-            referral_status="unavailable",
-            company="StartupX",
-        )
-        embed = build_job_embed(job)
+        embed = build_job_embed(_make_sample_job(network_priority=False, company="StartupX"))
+        assert embed["description"].startswith("DISCOVERED")
+        assert "Referral" not in embed["description"]
+        assert embed["color"] == 0x5865F2
 
-        assert embed["title"].startswith("DISCOVERED")
-        assert embed["color"] == 0x5865F2  # Blurple
+    def test_location_and_microsoft_research_remain_distinct(self):
+        embed = build_job_embed(_make_sample_job(company="Microsoft Research", location="San Francisco, CA; Redmond, WA"))
+        assert "Microsoft Research" in embed["title"]
+        assert "San Francisco, CA; Redmond, WA" in embed["description"]
 
-        ref_field = next(f for f in embed["fields"] if f["name"] == "🤝 Referral Status")
-        assert ref_field["value"] == "Unavailable"
+    def test_unknown_date_uses_observation(self):
+        embed = build_job_embed(_make_sample_job(posted_at=None))
+        fields = {f["name"]: f["value"] for f in embed["fields"]}
+        assert "Observed by Jobbie" in fields
+        assert "Posted" not in fields
 
-    def test_location_priority_separation(self):
-        job = _make_sample_job(priority="preferred", location="San Francisco, CA")
-        embed = build_job_embed(job)
-
-        assert "⭐ NETWORK PRIORITY" in embed["title"]
-        assert "[PRIORITY: San Francisco, CA]" in embed["title"]
-
-    def test_microsoft_research_normalization(self):
-        job = _make_sample_job(
-            company="Microsoft Research",
-            network_priority=True,
-            priority="normal",
-        )
-        embed = build_job_embed(job)
-
-        assert "· Microsoft" in embed["title"]
-        co_field = next(f for f in embed["fields"] if f["name"] == "🏢 Company")
-        assert "Microsoft" in co_field["value"]
-        assert "Microsoft Research" in co_field["value"]
-
-    def test_known_vs_unknown_posted_date(self):
-        # Known posted date
-        job_known = _make_sample_job(posted_at=_POSTED)
-        embed_known = build_job_embed(job_known)
-        date_known = next(f for f in embed_known["fields"] if f["name"] == "📅 Posted")
-        assert "2026-11-03" in date_known["value"]
-        assert "Unknown" not in date_known["value"]
-
-        # Unknown posted date
-        job_unknown = _make_sample_job(posted_at=None)
-        embed_unknown = build_job_embed(job_unknown)
-        date_unknown = next(f for f in embed_unknown["fields"] if f["name"] == "📅 Posted")
-        assert date_unknown["value"] == "Unknown"
-        detected_field = next(f for f in embed_unknown["fields"] if f["name"] == "🕐 Detected")
-        assert "PT" in detected_field["value"] or "UTC" in detected_field["value"]
-
-    def test_salary_only_when_verified(self):
-        # Undisclosed salary
-        job_nosal = _make_sample_job(salary=None)
-        embed_nosal = build_job_embed(job_nosal)
-        assert not any(f["name"] == "💰 Salary" for f in embed_nosal["fields"])
-
-        # Verified salary
-        job_sal = _make_sample_job(salary="$135,000 - $155,000")
-        embed_sal = build_job_embed(job_sal)
-        sal_field = next(f for f in embed_sal["fields"] if f["name"] == "💰 Salary")
-        assert sal_field["value"] == "$135,000 - $155,000"
+    def test_legacy_salary_is_not_assumed_to_be_base(self):
+        embed = build_job_embed(_make_sample_job(salary="$135,000 - $155,000"))
+        assert next(f["value"] for f in embed["fields"] if f["name"] == "Base compensation") == "Not disclosed"
 
 
 class TestNotifierSanitizationAndLimits:
@@ -228,4 +180,4 @@ class TestNotifierSanitizationAndLimits:
         job = _make_sample_job(location=long_loc, priority="preferred")
         embed = build_job_embed(job)
         assert len(embed["title"]) <= 256
-        assert embed["title"].endswith("…]")
+        assert "A" * 300 in embed["description"]

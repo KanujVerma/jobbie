@@ -65,3 +65,7 @@ existing behavior. Structured source facts persist in the review queue.
 interval and source field/tier label. Never sum equity/bonus or annualize an
 unknown interval. Greenhouse post and internal IDs remain distinct.
 `updated_at` is not `posted_at`; Ashby `publishedAt` is labeled last published.
+
+## P2-UX1 candidate presentation contract
+
+`build_job_embed(Job) -> dict` and `Notifier.send_job_alert(Job) -> bool` remain available. Card output reports the existing deterministic verdict as a screen, not a hiring decision. The current model does not persist per-card first-seen provenance or verify legacy employer-link ownership, so observation and link uncertainty are explicit. The review digest is bounded and sanitized; long URLs can be omitted. Transport and acknowledgement behavior do not change. See `STATUS.md` for release evidence.

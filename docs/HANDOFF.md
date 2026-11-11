@@ -2,6 +2,12 @@
 
 Read this file and [STATUS.md](STATUS.md) before changing Jobbie. Then read [AGENTS.md](../AGENTS.md), [DECISIONS.md](DECISIONS.md), [PRODUCT.md](PRODUCT.md), [PHASES.md](PHASES.md), the active phase, [CONTRACTS.md](CONTRACTS.md), [SECURITY.md](SECURITY.md), [OPERATIONS.md](OPERATIONS.md), [EVALS.md](EVALS.md) and [OPEN_SOURCE.md](OPEN_SOURCE.md). Current runtime and future architecture are intentionally separate in IMPLEMENTED_ARCHITECTURE.md and ARCHITECTURE.md.
 
+## P2-UX1 handoff at candidate authoring
+
+The P2-UX1 candidate modifies only alert/digest presentation and its local smoke assertion, plus tests and documentation. Inspect the current PR head, CI and reviews for actual status. Synthetic examples are in [P2-UX1-synthetic-previews.json](evidence/P2-UX1-synthetic-previews.json), not sent messages. No production source, state or workflow configuration is changed by this candidate. Live delivery remains unverified. Preserve the existing state and revert the presentation PR to roll back.
+
+The old Job model cannot establish true first observation or precise legacy posting times; the card labels these as observation and source date respectively. Unproven base compensation and legacy employer-link provenance stay unknown. Digest links longer than 200 UTF-16 units are omitted. Existing webhook success still controls acknowledgement even if an unsafe individual link was omitted from display. The exact next activation gate is P2-UX1 merge/review/CI and its documented live verification, followed by separately source-verifying and obtaining owner approval for the exact P2-ACT employer shortlist. Do not start that work during P2-UX1.
+
 ## Current state: Phase 2A release completed and merged
 - Repository: `KanujVerma/jobbie`; branch `main`.
 - Phase 2A PR #23 has been **merged to main** via squash commit `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb`.

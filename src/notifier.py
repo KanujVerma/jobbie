@@ -92,106 +92,158 @@ def sanitize_url(url: str) -> str:
     return "https://invalid-url"
 
 
-def build_job_embed(job: Job) -> dict:
-    """Construct a sanitized, validated Discord embed dictionary following P1-B contract."""
-    # Prefix badge
-    badge = "⭐ NETWORK PRIORITY" if getattr(job, "network_priority", False) else "DISCOVERED"
-    emoji = ROLE_TYPE_EMOJI.get(job.role_type, "❓")
+def _safe_text(value: object, limit: int) -> str:
+    """Escape untrusted Discord markdown and keep within a UTF-16 budget."""
+    value = "".join(c for c in str(value or "") if not 0xD800 <= ord(c) <= 0xDFFF)
+    value = sanitize_discord_text(value, limit)
+    value = re.sub(r"([\\`*_{}\[\]()<>|~])", r"\\\1", value)
+    out = ""
+    for char in value:
+        if len((out + char).encode("utf-16-le", "surrogatepass")) // 2 > limit - 1:
+            return out.rstrip() + "…"
+        out += char
+    return out
 
-    # Employer normalization
-    if job.company in ("Microsoft", "Microsoft Research"):
-        display_company = "Microsoft"
-        company_field_val = "Microsoft" if job.company == "Microsoft" else "Microsoft (via Microsoft Research)"
-    else:
-        display_company = job.company
-        company_field_val = job.company
 
-    title = f"{badge} · {emoji} {job.role_type.title()} · {display_company}"
-
-    # Location priority
-    if job.priority == "preferred":
-        budget = _DISCORD_TITLE_MAX - len(title) - len(" [PRIORITY: ]")
-        loc_str = job.location or ""
-        if len(loc_str) > budget:
-            loc_str = loc_str[: max(budget - 1, 0)].rstrip(" ;,") + "…"
-        title += f" [PRIORITY: {loc_str}]"
-
-    title = sanitize_discord_text(title, _DISCORD_TITLE_MAX)
-    desc = sanitize_discord_text(job.title, 256)
-
-    # Format timestamps in PT
+def _date_text(value) -> str:
+    if value is None or value.tzinfo is None or value.utcoffset() is None:
+        return "Unknown"
     try:
-        import zoneinfo
-        pt_tz = zoneinfo.ZoneInfo("America/Los_Angeles")
-        detected_str = _fmt_ts(job.detected_at.astimezone(pt_tz), _PT_FORMAT)
-        posted_str = (
-            _fmt_ts(job.posted_at.astimezone(pt_tz), _PT_FORMAT)
-            if job.posted_at is not None
-            else "Unknown"
-        )
+        from zoneinfo import ZoneInfo
+        local = value.astimezone(ZoneInfo("America/Chicago"))
+        return _fmt_ts(local, local.tzname() or "CT")
     except Exception:
-        detected_str = _fmt_ts(job.detected_at, _UTC_FORMAT)
-        posted_str = (
-            _fmt_ts(job.posted_at, _UTC_FORMAT)
-            if job.posted_at is not None
-            else "Unknown"
-        )
+        from datetime import timezone
+        return _fmt_ts(value.astimezone(timezone.utc), "UTC")
 
-    # Department / category
-    dept_parts = [p for p in [job.department, job.category] if p]
-    dept_str = " / ".join(dept_parts) if dept_parts else "N/A"
 
-    # Role verification
-    v_level = getattr(job.verdict, "career_level", None) if job.verdict else job.role_type
-    if v_level == "new_grad":
-        verif_str = "Full-Time New Grad (Verified)"
-    elif v_level in ("entry_level", "junior"):
-        verif_str = "Full-Time Entry-Level (Verified)"
-    elif job.role_type == "new-grad":
-        verif_str = "Full-Time New Grad (Verified)"
+def _base_compensation(job: Job) -> str:
+    # Ashby normalizes only explicit Salary components; Greenhouse ranges and
+    # legacy strings do not consistently identify base pay or its period.
+    from decimal import Decimal
+    from src.adapters.public_board import format_pay
+    if job.source_platform != "ashby":
+        return "Not disclosed"
+    ranges = tuple(item for item in job.compensation
+                   if item.source_field.startswith("compensation.")
+                   and item.interval in {"1 HOUR", "1 MONTH", "1 YEAR"}
+                   and re.fullmatch(r"[A-Z]{3}", item.currency or "")
+                   and (item.minimum is not None or item.maximum is not None)
+                   and all(isinstance(n, Decimal) and n.is_finite() and n >= 0
+                           for n in (item.minimum, item.maximum) if n is not None)
+                   and (item.minimum is None or item.maximum is None or item.minimum <= item.maximum))
+    return (format_pay(ranges) or "Not disclosed").replace("–", "-")
+
+
+
+def _display_url(value: object, limit: int) -> str | None:
+    from src.adapters.public_board import public_https_url
+    is_http = isinstance(value, str) and value.startswith("http://")
+    candidate = "https://" + value[7:] if is_http else value
+    url = public_https_url(candidate)
+    if url and is_http:
+        url = "http://" + url[8:]
+    if not url or any(c in url for c in "@`|") or any(0xD800 <= ord(c) <= 0xDFFF for c in url):
+        return None
+    return url if len(url.encode("utf-16-le")) // 2 <= limit else None
+
+
+def build_job_embed(job: Job) -> dict:
+    """Build a bounded source-grounded card without changing delivery behavior."""
+    title = _safe_text(job.title or "Untitled job", 185)
+    company = _safe_text(job.company or "Unknown company", 65)
+    title = f"{title} | {company}"
+    location = _safe_text(job.location or "Location unknown", 400)
+    network = bool(job.network_priority)
+    badge = "⭐ NETWORK PRIORITY | Referral: Unconfirmed" if network else "DISCOVERED"
+    # Legacy text can mention full-time in an unrelated context.
+    employment = job.employment_type
+    if employment == "full_time":
+        employment_label = "Full-time"
+    elif employment in {"internship", "co_op", "contract", "part_time", "temporary"}:
+        employment_label = employment.replace("_", " ").title()
+    elif job.role_type == "internship":
+        employment_label = "Internship"
     else:
-        verif_str = f"Full-Time {job.role_type.title()} (Verified)"
+        employment_label = "Full-time: Unknown"
+    level = getattr(job.verdict, "career_level", None)
+    level = {"new_grad": "New grad", "entry_level": "Entry-level", "junior": "Junior"}.get(level)
+    if not level and job.verdict is None:
+        level = {"new-grad": "New grad", "entry-level": "Entry-level"}.get(job.role_type)
+    level = level or "Career level: Unknown"
+    description = f"{badge}\n{location}\n{employment_label} | {level}"
 
-    # Referral status
-    raw_ref = getattr(job, "referral_status", "unconfirmed") or "unconfirmed"
-    ref_title = raw_ref.replace("_", " ").title()
-    if getattr(job, "network_priority", False):
-        ref_val = f"{ref_title} (Original Cohort)"
+    verdict = job.verdict
+    status = getattr(verdict, "status", None)
+    screen = {"eligible": "Pass", "needs_review": "Needs review", "excluded": "Excluded"}.get(status, "Not assessed")
+    reasons = list(getattr(verdict, "reasons", ()) or ())[:2]
+    unknowns = list(getattr(verdict, "unknowns", ()) or ())
+    if employment_label == "Full-time: Unknown" and "employment_type" not in unknowns:
+        unknowns.append("employment_type")
+    if job.description_complete is False and "full_job_description" not in unknowns:
+        unknowns.append("full_job_description")
+    elif job.description_complete is None and "description_completeness" not in unknowns:
+        unknowns.append("description_completeness")
+    if reasons:
+        screen += " | Reasons: " + ", ".join(str(r).replace("_", " ").lower() for r in reasons)
+    if unknowns:
+        screen += " | Unknown: " + ", ".join(str(u).replace("_", " ").lower() for u in unknowns)
+    screen += " | Deterministic screen, not hiring confirmation"
+
+    if job.posted_at is not None and job.posted_at_kind in ("first_published", "last_published"):
+        date_name = "First published" if job.posted_at_kind == "first_published" else "Last published"
+        date_value = _date_text(job.posted_at)
+    elif job.posted_at is not None and job.posted_at_kind == "posted" and job.source_platform not in ("workday",):
+        # Legacy adapters may turn a date-only source into midnight UTC.
+        date_name = "Employer posted date" if job.source_platform in ("apple_jobs", "amazon_jobs") else "Source date"
+        date_value = job.posted_at.strftime("%Y-%m-%d")
     else:
-        ref_val = ref_title
-
-    posted_label = {
-        "first_published": "📅 First published", "last_published": "📅 Last published",
-    }.get(job.posted_at_kind, "📅 Posted")
-
+        date_name, date_value = "Observed by Jobbie", _date_text(job.detected_at)
+    url = _display_url(job.url, 2048)
+    trusted_board = bool(url and url.startswith("https://") and job.source_platform in ("greenhouse", "ashby"))
+    prefix = "" if trusted_board else "Employer link unverified: "
+    if not url:
+        link = "Unavailable or unsafe URL"
+    elif len((prefix + url).encode("utf-16-le")) // 2 <= 1024:
+        link = prefix + url
+    else:
+        link = "Open job title for posting" + (" (employer link unverified)" if not trusted_board else "")
+    footer_parts = [job.source_platform, job.source_board, job.source_job_id]
+    footer = " | ".join(_safe_text(p, 100) for p in footer_parts if p)
     fields = [
-        {"name": "📍 Location", "value": sanitize_discord_text(job.location or "Not specified", 256), "inline": True},
-        {"name": "🏢 Company", "value": sanitize_discord_text(company_field_val, 256), "inline": True},
-        {"name": "📋 Verification", "value": verif_str, "inline": True},
-        {"name": "🤝 Referral Status", "value": ref_val, "inline": True},
-        {"name": posted_label, "value": posted_str, "inline": True},
-        {"name": "🕐 Detected", "value": detected_str, "inline": True},
-        {
-            "name": "🏷️ Tags",
-            "value": sanitize_discord_text(f"{job.role_type} · {job.source_platform} · {job.priority}", 256),
-            "inline": True,
-        },
-        {"name": "🔗 Direct URL", "value": sanitize_url(job.url), "inline": False},
+        {"name": "Base compensation", "value": _safe_text(_base_compensation(job), 500), "inline": False},
+        {"name": "Eligibility screen", "value": _safe_text(screen, 900), "inline": False},
+        {"name": date_name, "value": date_value, "inline": True},
+        {"name": "Employer posting", "value": link, "inline": False},
     ]
+    embed = {"title": title, "description": description, "fields": fields,
+             "footer": {"text": footer or "Source unknown"},
+             "color": 0xFEE75C if network else 0x5865F2}
+    if url and link.startswith("Open job title"):
+        embed["url"] = url
+    return embed
 
-    # Salary ONLY when verified
-    sal = getattr(job, "salary", None)
-    if sal:
-        fields.append({"name": "💰 Salary", "value": sanitize_discord_text(str(sal), 256), "inline": True})
 
-    color = 0xFEE75C if getattr(job, "network_priority", False) else 0x5865F2
-
-    return {
-        "title": title,
-        "description": desc,
-        "fields": fields,
-        "color": color,
-    }
+def build_review_digest(items: list[dict], total: int) -> str:
+    """Format bounded, untrusted review entries without changing digest state."""
+    lines = [f"Needs review: {total} positions (showing up to {len(items)})."]
+    for item in items:
+        company = _safe_text(item.get("company"), 45)
+        title = _safe_text(item.get("title"), 75)
+        entries = [str(r) for r in item.get("reasons", [])]
+        eligibility = next((r for r in entries if r.startswith("eligibility: needs_review:")), "")
+        codes = [code.strip() for code in eligibility.partition("needs_review:")[2].split(",")]
+        review_codes = {
+            "COHORT_2027_UNSPECIFIED", "AMBIGUOUS_LEVEL", "EXPERIENCE_UNSPECIFIED",
+            "EXPERIENCE_PATHWAY_UNKNOWN", "SOURCE_EMPLOYMENT_UNKNOWN",
+            "SOURCE_DESCRIPTION_INCOMPLETE", "LOCATION_UNKNOWN", "WORK_AUTH_UNKNOWN",
+            "EXPERIENCE_EXCEEDS_RANGE",
+        }
+        blockers = [code.replace("_", " ").lower() for code in codes if code in review_codes]
+        reasons = _safe_text(", ".join(blockers[:2]) if blockers else eligibility or ", ".join(entries[:2]), 60)
+        url = _display_url(item.get("url"), 200) or "Link unavailable or too long"
+        lines.append(f"• {company}: {title} | {reasons or 'Review required'}\n{url}")
+    return "\n".join(lines)
 
 
 class Notifier:

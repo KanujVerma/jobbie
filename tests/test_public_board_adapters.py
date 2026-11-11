@@ -67,6 +67,9 @@ def test_greenhouse_full_description_post_identity_prospect_and_unknown_date():
     assert '<p>' not in job.raw_text
     assert job.posted_at is None  # updated_at is NOT first posted_at
     assert job.source_updated_at == datetime(2026, 11, 6, 9, tzinfo=timezone.utc)
+    embed_fields = {f['name']: f['value'] for f in build_job_embed(job)['fields']}
+    assert 'Observed by Jobbie' in embed_fields
+    assert 'First published' not in embed_fields and 'Employer posted date' not in embed_fields
     assert job.employment_type == 'full_time'
     assert job.salary is None
     assert not job.network_priority and job.cohort == 'discovered' and job.referral_status == 'unavailable'
@@ -86,7 +89,9 @@ def test_ashby_listed_only_multilocation_salary_and_last_published_label():
     assert job.salary == 'USD 100,000–140,000 / year'
     assert 'equity' not in job.salary.lower() and 'bonus' not in job.salary.lower()
     assert job.posted_at_kind == 'last_published'
-    assert any(f['name'] == '📅 Last published' for f in build_job_embed(job)['fields'])
+    embed_fields = {f['name']: f['value'] for f in build_job_embed(job)['fields']}
+    assert 'Last published' in embed_fields
+    assert embed_fields['Base compensation'] == 'USD 100,000-140,000 / year'
     assert parse_qs(urlsplit(responses.calls[0].request.url).query) == {'includeCompensation': ['true']}
 
 
@@ -328,8 +333,8 @@ def test_frozen_job_compatibility_and_discovered_embed():
     with pytest.raises(dataclasses.FrozenInstanceError):
         j.title='mutated'
     embed=build_job_embed(j)
-    assert embed['title'].startswith('DISCOVERED') and 'NETWORK PRIORITY' not in embed['title']
-    assert any(f['name']=='🤝 Referral Status' and f['value']=='Unavailable' for f in embed['fields'])
+    assert embed['description'].startswith('DISCOVERED') and 'NETWORK PRIORITY' not in embed['description']
+    assert 'Referral' not in embed['description']
 
 
 def _temp_run_config(tmp_path, companies):

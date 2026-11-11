@@ -2,6 +2,10 @@
 
 **Status:** PLANNED, not implemented. First next coding PR: `P2-UX1`. No interactive Discord app exists yet; v2 initially uses the existing outbound webhook and plain employer links. See [phase scope](phases/PHASE-2-UX.md).
 
+## P2-UX1 candidate implementation notes
+
+The candidate uses `Observed by Jobbie` because the current per-scan `detected_at` is not a persisted first-seen instant. For legacy source date values it avoids inventing a precise time; Workday relative dates fall back to observation. Only Ashby normalized salary components with an explicit period are presented as base; legacy strings and Greenhouse ranges do not prove both base and period. Legacy links are labeled unverified. The bounded review digest omits links longer than 200 UTF-16 units. Existing delivery ACK behavior remains unchanged if an individual link is unavailable. These are source-level statements, not live-delivery proof.
+
 ## Design goal
 An alert should tell the owner within seconds: *what is the job; is it worth considering; is there a potential referral; what was verified; what is unknown; what do I do next?* Avoid duplicative metadata and inflated "verified" statements. Do NOT display an unsupported fit score, hiring probability, employer salary, or personalized skill evidence before Phase 3.
 
