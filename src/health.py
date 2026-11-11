@@ -152,7 +152,7 @@ def health_report(state: dict, now: datetime) -> dict:
     sources = {}
     fields = ("status", "fetched", "matched", "review", "excluded", "candidates",
               "alerted", "acknowledged", "cap_suppressed", "fetch_duration_seconds", "filter_reason_counts",
-              "source_revision", "source_baseline_pending", "baseline_suppressed")
+              "source_revision", "source_baseline_pending", "source_baseline_scan", "baseline_suppressed")
     for name, row in heartbeat.get("per_adapter_breakdown", {}).items():
         sources[name] = {key: row.get(key) for key in fields}
         sources[name]["has_error"] = bool(row.get("error"))

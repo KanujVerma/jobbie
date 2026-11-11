@@ -373,7 +373,10 @@ def do_run(args) -> int:
                 "fetch_duration_seconds": fetch_duration,
                 "filter_reason_counts": dict(reason_counts),
                 "source_revision": company_cfg.get("source_revision"),
-                "source_baseline_pending": source_baseline_pending,
+                "source_baseline_scan": source_baseline_pending,
+                "source_baseline_pending": bool(company_cfg.get("source_revision")) and (
+                    company_state.get("source_revision") != company_cfg.get("source_revision")
+                ),
                 "baseline_suppressed": sum(
                     bool(company_state.get("seen_jobs", {}).get(jid, {}).get("baseline_suppressed"))
                     for jid in {job.id for job in fetched}

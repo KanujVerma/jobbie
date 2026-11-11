@@ -1,6 +1,6 @@
 # P2-R2 original-source repairs
 
-Parent P2-R1: PR #30, implementation ef4d86441fec0e99ff5d1aeb572fffe9e87040ad. This dependent local branch will be rebased onto merged main before its own PR. Do not change PR #30's branch.
+Parent P2-R1: PR #30 merged at 614b3edc14e86d952579a0c57db0eb68669c08d9; reviewed head 7a74936d22033c14abc2eac564c3db29edee09db. Rebase only this local branch's source-repair commits onto merged main before its PR. Do not change the merged PR branch.
 
 Reproduced findings: Plaid's configured Lever board returns 404; official Plaid careers job pages link to jobs.ashbyhq.com/plaid. Amazon sends its configured gated-category dictionary as literal query keys instead of the category string. SanDisk's official careers page links to avature.sandisk.com/Careers, whose read returned 406; stop there, no bypass or alternate request route. Oracle's configured HCM endpoint returns an empty result while the public careers search lists roles; the cause/access contract is not yet verified. Do not claim no openings or invent a new API protocol.
 
@@ -9,3 +9,5 @@ Files: src/source_migration.py for an additive in-memory source revision baselin
 Tests first: malformed Amazon query regression; new-source initial baseline with no ACK/send, next scan only new IDs eligible, duplicates/known ACKs retained, failed/partial scan cannot complete baseline, retries stay suppressed, empty complete baseline, malformed state/revision rejected before send, no forced backfill from baseline entries; 403/404/429 preserved. Full pytest/config/compileall/docs continuity, no-webhook dry-runs with state/config hashes, permitted public Ashby API smoke grounded in official employer links. No alternate access after Sandisk 406.
 
 Migration: additive source_revision/source_baselines and baseline_suppressed flags; never set alerted=true for a job not delivered, never remove old IDs/URLs. First complete scan records currently listed new-provider IDs silently; later newly observed postings follow existing eligibility/freshness/dedup/ACK. Failed/partial scans keep the transition pending and send no source candidates. Review digest stays bounded under existing policy. Rollback code/config to Lever retains old and new history; no state reset. Catalogue cutover, new employers, feeds, cron replacement, test sends and applications are out of scope.
+
+Oracle follow-up: official public HTML identifies site CX_45001 and the official US location ID; one documented finder GET returned 2 samples and advertised 2113 total, versus the old unscoped empty result. Implement this in a separate reviewed source-repair PR with real response pagination/date/URL semantics and silent first-scan protection, not this Plaid/Amazon PR.

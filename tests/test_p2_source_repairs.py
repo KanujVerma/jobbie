@@ -105,7 +105,7 @@ def test_source_without_revision_is_unchanged():
     assert state['companies'] == {}
 
 
-def _run_source(tmp_path, monkeypatch, jobs, *, revision='ashby-v1', state=None, send_success=True):
+def _run_source(tmp_path, monkeypatch, jobs, *, revision='ashby-v1', state=None, send_success=True, pipeline=None):
     import main
     from src.config import Config
     from src.storage import POLICY_VERSION
@@ -135,7 +135,7 @@ def _run_source(tmp_path, monkeypatch, jobs, *, revision='ashby-v1', state=None,
     monkeypatch.setattr(main, 'ADAPTER_REGISTRY', {'stub': Stub})
     monkeypatch.setattr(main, 'HTTPClient', MagicMock())
     monkeypatch.setattr(main, 'Notifier', factory)
-    monkeypatch.setattr(main, 'apply_filter_pipeline', lambda job, *args: (job, []))
+    monkeypatch.setattr(main, 'apply_filter_pipeline', pipeline or (lambda job, *args: (job, [])))
     monkeypatch.setenv('DISCORD_WEBHOOK_URL', 'https://discord.com/api/webhooks/synthetic')
     rc = main.do_run(SimpleNamespace(config='unused', dry_run=False))
     return rc, json.loads(path.read_text()), sender, factory
@@ -217,3 +217,57 @@ def test_failed_send_after_baseline_is_not_acknowledged(tmp_path, monkeypatch):
     rc, state, sender, _ = _run_source(tmp_path, monkeypatch, [_job('a'), _job('b')], state=state)
     sender.send_job_alert.assert_called_once_with(_job('b'))
     assert state['companies']['Plaid']['seen_jobs']['b']['alerted'] is True
+
+
+def test_completed_baseline_reports_no_pending_transition(tmp_path, monkeypatch):
+    _, state, _, _ = _run_source(tmp_path, monkeypatch, [_job('a')])
+    row = state['last_heartbeat']['per_adapter_breakdown']['Plaid']
+    assert row['source_baseline_pending'] is False
+    assert row['source_baseline_scan'] is True
+
+
+def test_partial_scan_sends_nothing_and_reports_pending(tmp_path, monkeypatch):
+    import requests
+    def partial():
+        yield _job('a')
+        raise requests.ConnectionError('later page failed')
+    rc, state, sender, _ = _run_source(tmp_path, monkeypatch, partial())
+    assert rc == 1
+    sender.send_job_alert.assert_not_called()
+    assert state['companies']['Plaid'].get('source_revision') is None
+    assert state['last_heartbeat']['per_adapter_breakdown']['Plaid']['source_baseline_pending'] is True
+    rc, state, sender, _ = _run_source(tmp_path, monkeypatch, [_job('a'), _job('b')], state=state)
+    assert rc == 0
+    sender.send_job_alert.assert_not_called()
+    assert state['companies']['Plaid']['source_revision'] == 'ashby-v1'
+
+
+def test_runtime_records_baseline_before_filtering(tmp_path, monkeypatch):
+    _, state, sender, _ = _run_source(tmp_path, monkeypatch, [_job('a'), _job('b')],
+                                    pipeline=lambda job, *args: (None, ['eligibility: excluded: NON_TECH_ROLE']))
+    assert len(state['companies']['Plaid']['seen_jobs']) == 2
+    assert state['last_heartbeat']['accepted_count'] == 0
+    sender.send_job_alert.assert_not_called()
+
+
+def test_duplicate_baseline_ids_are_one_unacknowledged_entry():
+    from src.source_migration import apply_source_baseline
+    state = _state()
+    apply_source_baseline([_job('a'), _job('a')], 'Plaid', {'source_revision': 'a'}, state,
+                          _job().detected_at, fetch_succeeded=True)
+    cs = state['companies']['Plaid']
+    assert len(cs['seen_jobs']) == 1
+    assert cs['source_baselines']['a']['observed_count'] == 1
+    assert cs['seen_jobs']['a']['alerted'] is False
+
+
+def test_complete_empty_baseline_allows_future_first_job():
+    from src.source_migration import apply_source_baseline
+    from src.storage import classify_jobs
+    now = _job().detected_at
+    state = _state()
+    cfg = {'source_revision': 'a'}
+    assert apply_source_baseline([], 'Plaid', cfg, state, now, fetch_succeeded=True)
+    assert state['companies']['Plaid']['source_baselines']['a']['observed_count'] == 0
+    assert apply_source_baseline([_job('a')], 'Plaid', cfg, state, now, fetch_succeeded=True) is False
+    assert classify_jobs([_job('a')], 'Plaid', state, 48, now) == [_job('a')]
