@@ -68,3 +68,43 @@ Guarded main dry-run: fetched 143, matched 0, review 8, excluded 135, candidates
 Only Plaid's provider/config changes in the original 15-source production file; its enabled/network/cohort/referral fields remain unchanged, with a new explicit source revision. First complete live scan seeds IDs silently. Revert code/config for rollback, preserving the same seen ledger and both providers' history. No state reset, manual seeding, forced backfill or fake delivery ACK.
 
 Independent review, exact-head CI, authorized merge and a real ordinary post-merge scheduled observation remain required. The catalogue, feeds, new employers, private profile and applications are out of scope.
+
+## Modernization onto merged intake
+
+PR31's actual conflict with main after #32 was resolved by preserving the current intake docs and adding source contracts, while replaying the same source code. Stable functional patch ID before/after is d3c04a39c60a21e63ef209bb22872ee5b273f992 across main/source/config/health/storage/tests. Current seen state is byte-identical to main, including the ordinary Amazon ACKs. Historical900test/5d034f5 review receipts remain historical; combined current-head tests and fresh CI/review are separate gates.
+
+PR31 modernization proof: combined full952tests passed36.35s (source repair plus merged intake), config/compileall/diff passed. Plaid targeted no-webhook dry-run exited0 with identical state/config hashes. Current state matches main exactly; no reset/seed/manual edits. Fresh full-head CI/hosted review remains required.
+
+```json
+{
+  "old_functional_patch_id": "d3c04a39c60a21e63ef209bb22872ee5b273f992",
+  "rebased_functional_patch_id": "d3c04a39c60a21e63ef209bb22872ee5b273f992",
+  "identical": true
+}
+```
+
+```json
+{
+  "command": [
+    "/Users/kanuj/Documents/projects/jobbie/.venv/bin/python",
+    "main.py",
+    "run",
+    "--company",
+    "Plaid",
+    "--dry-run",
+    "--verbose"
+  ],
+  "exit_code": 0,
+  "before": {
+    "companies.yaml": "8a44adcc21b5be919bd6d875d3a16ae9de9abdd8222a939cfe7fbc18e1f7d943",
+    "state/seen_jobs.json": "12bed813017dbd685b085e9b4fceceb79dadd158ef77df7be6071028343cbbbe"
+  },
+  "after": {
+    "companies.yaml": "8a44adcc21b5be919bd6d875d3a16ae9de9abdd8222a939cfe7fbc18e1f7d943",
+    "state/seen_jobs.json": "12bed813017dbd685b085e9b4fceceb79dadd158ef77df7be6071028343cbbbe"
+  },
+  "unchanged": true,
+  "webhook_environment": "empty",
+  "discord_sent": false
+}
+```

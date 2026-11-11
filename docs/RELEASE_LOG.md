@@ -111,3 +111,9 @@ P2-R2 local candidate checkpoint, NOT merged: dependent branch feat/p2-source-re
 Amazon request-shape fix and Plaid's source-verified Ashby migration are isolated from roster expansion. Silent source_revision baseline keeps alerted=false plus an explicit suppression reason, preserves original history and reports pending/completed truthfully. Local suite 900 passed in 35.71s, config/compileall/diff passed. Read-only source 143 unique rows; guarded dry-run 0 matched/8 review/135 excluded/0 sends and unchanged state/config hashes. Independent review, exact-head CI/hosted review, merge and real schedule remain pending. See evidence/P2-R2-VERIFICATION.md; rollback reverts code/config together without state reset.
 
 P2-R2 local Sol review approved implementation e09dc61b7e377d336b11a91c905781daf8c2d6f4 in one round, independently passing 900 tests in 33.27s. No findings. PR/hosted review/CI/merge and actual production observation remain pending; no live delivered-message claim. See evidence/P2-R2-REVIEW.md.
+
+## 2026-11-11: P2-ACT merged and PR31 conflict resolution
+- Intake #32 merged f46625845577f158da31974d927aa5748d0c3642 after exact-head checks/hosted review; post-merge Tests43114825827 passed. No company activated; new-source approval remains separate.
+- PR31 MODERNIZE: main's intake changes caused a real conflict. Rebase preserves production state and source runtime behavior; functional patch ID unchanged from5d034f5. Documentation retains both source baseline and intake invariants. Current combined tests/CI/review evidence is recorded next; no old approval is promoted into a fresh-head CI pass.
+
+PR31 modernization proof: combined full952tests passed36.35s (source repair plus merged intake), config/compileall/diff passed. Plaid targeted no-webhook dry-run exited0 with identical state/config hashes. Current state matches main exactly; no reset/seed/manual edits. Fresh full-head CI/hosted review remains required.
