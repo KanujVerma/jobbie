@@ -51,3 +51,8 @@ Unauthorized Discord user; forged signature; replayed nonce; PDF with misleading
 
 ## P2-R1 observed logging and state safeguards
 Failed webhook requests log only exception type or HTTP status, omitting response bodies and secret-bearing exception URLs. Successful requests log HTTP ACK without payload. Read-only health reports omit raw error strings. Dry-run and health cannot persist v1 migrations. Corrupt ledger containers/timestamps fail closed before alerting. These tests do not establish successful live delivery or complete security coverage.
+
+## P2-ACT local intake boundary
+Company issue text and packets are untrusted data. Only bounded version1 JSON/form fields are accepted; duplicate/unknown headings, authority fields and nested private-shaped extras are rejected. The CLI has no remote command endpoint, activation action, sender or state writer. It never fetches supplied careers/evidence URLs; validated fixed ATS endpoints alone are read after supplied manual ownership/permission gates. No credentials/private text belong in public requests or packets.
+
+Manual supplied evidence is labeled for review and cannot authorize production. Original13/twohistorical configuration is read-only; proposals stay OFF/discovered/no confirmed referral. HTTP errors expose status/type without secret-bearing exception strings or bodies. Future activation requires exact owner approval, public-source/data permission and reviewed baseline/scope/dedup/rollback. No assumed dot API or issue-trigger integration.

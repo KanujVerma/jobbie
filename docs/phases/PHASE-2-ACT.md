@@ -1,6 +1,6 @@
 # P2-ACT owner-directed company intake
 
-Owner amendment 2026-11-11 replaces the historical mandatory 3-5-company expansion. Status: SPECIFIED, implementation pending. Issue #26 tracks this workflow.
+Owner amendment 2026-11-11 replaces the historical mandatory 3-5-company expansion. Status: local implementation candidate, not merged. See COMPANY_INTAKE.md and STATUS.md for actual tests/review/CI. Issue #26 tracks this workflow.
 
 Accept a versioned portable request containing company name, optional official careers URL, aliases, requested roles/locations, priority and intent `monitor` or `startup-research`. A GitHub issue form and tested CLI/agent workflow must share the same semantics. A user may manually give this request to dot; no API, automatic trigger or session transfer is assumed.
 
@@ -11,3 +11,8 @@ Proposals are disabled and reviewable, with source URLs/retrieval time/evidence 
 Tests: request schema, missing optional URL, aliases and collisions, official provider/ID mismatch, missing rights/health/listings, 403/404/429, hostile URLs, startup-research separation, unconfirmed referrals and unchanged production config/state. Full pytest/config, no-mutation dry-run, independent review and exact-head CI. Update STATUS/HANDOFF/RELEASE_LOG and onboarding documentation.
 
 Missing owner requests or approval never authorizes inventing a shortlist and does not block independent P2-B/C implementation. Record BLOCKED_APPROVAL only for activation. Existing P2-A adapters stay available and examples stay disabled.
+
+## Implemented candidate interface
+`python main.py company-request` accepts direct fields or the GitHub form Markdown and emits version1 JSON. `company-proposal --request FILE --evidence FILE` validates supplied manual evidence; `--live-check` measures the fixed public ATS only after explicit ownership=verified and permission=permitted. Unknowns never become a config proposal. Successful output stays enabled=false/discovered/networkfalse/referralunavailable and BLOCKED_APPROVAL. Verified aliases persist in the proposal. A positive process exit is not activation authority.
+
+[Onboarding and exact commands](../COMPANY_INTAKE.md), [fictional fixtures](../../examples/company-intake/request.synthetic.json), and [verification](../evidence/P2-ACT-VERIFICATION.md) define the current candidate. Role/location preferences are preserved and shown through literal listing checks, not hard global filters or profile-fit claims. Startup-research remains a request with unknown opening status and no monitor/network check. No dot integration or automatic issue trigger.

@@ -17,7 +17,7 @@
 - [OPERATIONS.md](OPERATIONS.md): dry run, Actions, state safety, monitoring and rollback.
 - [OPEN_SOURCE.md](OPEN_SOURCE.md): permitted reusable code, candidate feeds and license checks.
 - [RESUME_TAILORING.md](RESUME_TAILORING.md): planned natural, evidence-locked tailored resume quality pipeline.
-- [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md): notification presentation contract; P2-UX1 #29 merged, live delivery unverified.
+- [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md): notification presentation contract; P2-UX1 #29 merged, ordinary webhook ACK observed.
 - [AUTO_APPLY.md](AUTO_APPLY.md): approved single-job packet, dot feasibility and fallback executor design (NOT deployed).
 - [RENAME.md](RENAME.md): verified repository rename and local-remote migration checklist.
 - [CURRENT_STATE.md](CURRENT_STATE.md): **historical 2026-11-04 baseline only**; do not treat as current implementation.
@@ -26,9 +26,9 @@
 | Order | User value / actual status | Contract | Agent prompt |
 |---|---|---|---|
 | 1, P2-A | New-grad filtering and public ATS adapters merged; 13 original sources only active | [P1](phases/PHASE-1.md), [P2](phases/PHASE-2.md) | Historical P1/P2 prompts |
-| P2-UX1 (#29 merged) | Source-grounded alert cards; live webhook delivery unverified | [P2-UX1](phases/PHASE-2-UX.md) | Historical UX goal |
+| P2-UX1 (#29 merged) | Source-grounded cards; ordinary HTTP204 ACKs verified | [P2-UX1](phases/PHASE-2-UX.md) | Historical UX goal |
 | **Current P2-R1/R2** | Source-failure health, read-only state safety and original-source repairs | [Phase 2](phases/PHASE-2.md) | [Remaining Phase 2 goal](agent-prompts/PHASE-2-CODE.md) |
-| P2-ACT | Owner-directed monitor/startup-research requests and disabled proposals; expansion opt-in | [P2-ACT](phases/PHASE-2-ACT.md) | [Intake goal](agent-prompts/PHASE-2-ACT-GOAL.md) |
+| P2-ACT candidate | Tested form/CLI for monitor/startup-research and OFF proposals; [onboarding](COMPANY_INTAKE.md) | [P2-ACT](phases/PHASE-2-ACT.md) | [Intake goal](agent-prompts/PHASE-2-ACT-GOAL.md) |
 | P2-B/P2-C | Permitted feeds then canonical catalogue | [Phase 2](phases/PHASE-2.md) | [P2 overview](agent-prompts/PHASE-2-CODE.md) |
 | P3 | Real private commands/profile/evidence/basic app ledger | [Phase 3](phases/PHASE-3.md) | [P3](agent-prompts/PHASE-3-CODE.md) |
 | P4 | Grounded tailored resume, diff/preview, private approval packet | [Phase 4](phases/PHASE-4.md) | [P4](agent-prompts/PHASE-4-CODE.md) |
@@ -38,3 +38,5 @@
 
 ## Exact update cadence
 Every functional PR changes [STATUS](STATUS.md), [HANDOFF](HANDOFF.md) and [RELEASE_LOG](RELEASE_LOG.md); a pull-request CI check enforces that these files were touched. Scheduled production state-only commits are exempt. The guard does NOT prove truth: reviewer must still compare documentation to code, CI and live logs.
+
+[COMPANY_INTAKE.md](COMPANY_INTAKE.md) is the current owner request, source-evidence and disabled-proposal workflow. It preserves the original roster and has no automatic activation/dot trigger.

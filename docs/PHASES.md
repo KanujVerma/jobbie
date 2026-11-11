@@ -1,6 +1,6 @@
 # Jobbie incremental delivery roadmap — current 2026-11-11 owner plan
 
-**Evidence:** Phase 1 and Phase 2A were implemented/merged; P2-A Greenhouse/Ashby API reads verified but no additional employer boards are production enabled. See [STATUS.md](STATUS.md) for actual main HEAD. P2-UX1 #29 is merged; live delivery remains unverified. Other future slots are **PLANNED**, not implementation claims. PR slot IDs are stable design labels, not GitHub numeric PRs.
+**Evidence:** Phase 1 and Phase 2A were implemented/merged; P2-A Greenhouse/Ashby API reads verified but no additional employer boards are production enabled. See [STATUS.md](STATUS.md) for actual main HEAD. P2-UX1 #29 is merged; ordinary webhook acceptance is verified in schedule43100310762, with client rendering unassessed. Other future slots are **PLANNED**, not implementation claims. PR slot IDs are stable design labels, not GitHub numeric PRs.
 
 ## Delivery principle
 One small user-usable release at a time. Each functionality PR must keep earlier job polling/alerts available, pass full regression tests, receive independent review and update STATUS/HANDOFF/RELEASE_LOG. No huge one-shot implementation, no pseudo-buttons, no mass applications, no silent paid provider use.
@@ -9,9 +9,9 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 |---|---|---|---|
 | Shipped | Phase 1 + hardening (#12–18) | New-grad filtering and original 13 Network Priority stars | Existing bot |
 | Shipped code | P2-A (#23, docs #24) | Official Greenhouse and Ashby read-only adapters available, **not activated** | Phase 1 |
-| Shipped code | P2-UX1 (#29) | Source-grounded webhook cards; live delivery unverified | P2-A merged |
-| Active | P2-R1/P2-R2 reliability | Failure/empty distinction, dry-run safety, actionable health, state-safe original-source repairs | P2-UX1 merged |
-| Then | P2-ACT owner-directed intake | Issue form, tested portable CLI requests and disabled reviewed proposals for monitor/startup-research | P2-R1; activation separately approved |
+| Shipped code | P2-UX1 (#29) | Source-grounded cards; ordinary HTTP204 ACKs observed | P2-A merged |
+| Source follow-up | P2-R1 merged / P2-R2/P2-R3 candidates | Failure/empty distinction, dry-run safety, actionable health, state-safe original-source repairs | P2-UX1 merged |
+| Local candidate | P2-ACT owner-directed intake | Issue form, tested portable CLI requests and disabled reviewed proposals for monitor/startup-research | P2-R1; activation separately approved |
 | Then | P2-B optional public feeds | Reusable OFF capability, rights/provenance/official-link checks; activate only if permitted and owner-approved | P2-A; expansion optional |
 | Then | P2-C canonical catalogue | SQLite pre-filter identity/history/search/export; legacy delivery authority through >=72h shadow and approved cutover | Existing normalized adapters; feed activation optional |
 | 3A | P3-A — Signed Discord interactions | Real private buttons/commands, allowlist, durable task status | P2-C |
@@ -59,3 +59,5 @@ Follow the [remaining Phase 2 goal](agent-prompts/PHASE-2-CODE.md) and [delivery
 - [Phase 5](phases/PHASE-5.md) and [AUTO_APPLY.md](AUTO_APPLY.md)
 - [Phase 6](phases/PHASE-6.md)
 - [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md) and [RESUME_TAILORING.md](RESUME_TAILORING.md)
+
+Current P2-ACT CLI/form/helper candidate and onboarding are in COMPANY_INTAKE.md; it does not wait for an employer shortlist or activate one. Source repair/CI, OFF feeds, catalogue and real shadow/cutover gates remain separate work.

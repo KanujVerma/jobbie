@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "company_name": "Example Labs",
+  "verified_aliases": [],
+  "provider": "ashby",
+  "board_id": "example-labs",
+  "board_url": "https://jobs.ashbyhq.com/example-labs",
+  "employer_careers_url": "https://example.com/careers",
+  "ownership": {
+    "url": "https://example.com/careers",
+    "span": "SYNTHETIC EXAMPLE ONLY. Replace with verified official primary-source evidence.",
+    "board_url": "https://jobs.ashbyhq.com/example-labs",
+    "retrieved_at": "2026-11-11T00:00:00Z",
+    "status": "unknown"
+  },
+  "permission": {
+    "status": "unknown",
+    "basis": "No real company, source permission or activation approval is established by this example.",
+    "url": "https://example.com/policy",
+    "checked_at": "2026-11-11T00:00:00Z"
+  }
+}

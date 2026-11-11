@@ -53,3 +53,5 @@ At least 20 sourced company facts, zero guessed business contacts, no unsolicite
 `Base SHA:`, `Head SHA:`, `Files changed:`, `Reproduced behavior:`, `Tests (command / result):`, `Coverage (fixtures / live):`, `External source URLs/time:`, `Privacy review:`, `Known unknowns:`, `Rollout / rollback:`, `Codex review status / resolved findings:`, `Release gate status:`.
 
 No PR merges solely because an LLM or README says tests passed.
+
+P2-ACT candidate gates: form/CLI normalized JSON/digest parity; optional URL; aliases/canonical/provider collisions across enabled/historical entries; original roster/referrals unchanged; explicit ownership/permission provenance and unknowns before fixed-ATS read; unsafe/private-shaped input; real GH/Ashby fixture normalization; 403/404/429/empty/incomplete distinction; research mode without monitor/hiring inference; literal role/location evidence; bounded document reads, no sender or state/config writes. A verification-only provider probe is not an owner employer request or production approval. Hosted form rendering remains unassessed until available after merge.
