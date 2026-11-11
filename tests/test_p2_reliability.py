@@ -7,6 +7,7 @@ import pytest
 import requests
 
 from src.adapters import ADAPTER_REGISTRY
+from src.adapters.public_board import PublicBoardError
 from src.config import load_config
 from src.health import update_health
 from src.storage import load_state
@@ -19,13 +20,14 @@ def test_original_adapter_exposes_http_outage(name, status):
     http = MagicMock()
     response = requests.Response()
     response.status_code = status
+    response.raw = MagicMock()
     error = requests.HTTPError(f'HTTP {status}', response=response)
     http.get.side_effect = error
     http.post.side_effect = error
     adapter = ADAPTER_REGISTRY[company['adapter']](name, company['config'], http)
     try:
         list(adapter.fetch())
-    except requests.HTTPError:
+    except (requests.HTTPError, PublicBoardError):
         return  # propagated errors are also visible to the orchestrator
     assert adapter.fetch_errors == [f"HTTP {status}"]
 

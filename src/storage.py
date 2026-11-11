@@ -162,6 +162,9 @@ def get_backfill_candidates(
     seen_urls_in_batch: set[str] = set()
 
     for job in matched_jobs:
+        entry = state.get("companies", {}).get(job.company, {}).get("seen_jobs", {}).get(job.id, {})
+        if entry.get("baseline_suppressed"):
+            continue
         norm_url = normalize_url(job.url)
         if norm_url and norm_url in seen_urls_in_batch:
             continue
@@ -490,6 +493,13 @@ def load_state(path: str, raise_on_corrupt: bool = False, *, persist_migration: 
             malformed |= "first_tracked_at" in health and health["first_tracked_at"] is None
             failures = health.get("consecutive_failures", 0)
             malformed |= type(failures) is not int or failures < 0
+        revision = company.get("source_revision")
+        malformed |= revision is not None and not isinstance(revision, str)
+        baselines = company.get("source_baselines", {})
+        if not isinstance(baselines, dict):
+            malformed = True
+        else:
+            malformed |= any(not isinstance(entry, dict) for entry in baselines.values())
     for key in ("alerted_urls", "review_queue", "migrations"):
         if isinstance(data.get(key), dict):
             rows.extend(data[key].values())
@@ -497,6 +507,7 @@ def load_state(path: str, raise_on_corrupt: bool = False, *, persist_migration: 
         if not isinstance(row, dict):
             malformed = True
             continue
+        malformed |= "baseline_suppressed" in row and type(row["baseline_suppressed"]) is not bool
         for key in ("first_seen", "last_seen", "alerted_at", "first_tracked_at",
                     "last_nonempty_at", "last_success_at"):
             value = row.get(key)
@@ -580,6 +591,9 @@ def classify_jobs(
             if entry.get("alerted"):
                 if verbose:
                     logger.debug("%s job %s suppressed: already alerted", company, job.id)
+            elif entry.get("baseline_suppressed"):
+                if verbose:
+                    logger.debug("%s job %s suppressed: provider-transition baseline", company, job.id)
             else:
                 first_seen_dt = datetime.fromisoformat(entry["first_seen"])
                 age_hours = (now - first_seen_dt).total_seconds() / 3600

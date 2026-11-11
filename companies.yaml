@@ -210,13 +210,18 @@ companies:
       slug: sandisk
 
   - name: Plaid
-    adapter: lever
+    adapter: ashby
     enabled: true
     network_priority: true
     cohort: original_2026_11_04
     referral_status: unconfirmed
+    # Existing employer, verified from Plaid's own role page. First complete
+    # Ashby observation is a silent baseline, never a delivery ACK or backfill.
+    source_revision: plaid-ashby-2026-11-11
     config:
-      slug: plaid
+      board_name: plaid
+      board_url: https://jobs.ashbyhq.com/plaid
+      employer_careers_url: https://plaid.com/careers/
 
   - name: Oracle
     adapter: oracle_careers

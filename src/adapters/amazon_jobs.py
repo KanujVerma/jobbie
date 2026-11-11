@@ -84,6 +84,8 @@ class AmazonJobsAdapter(BaseAdapter):
             passes.append((f"category:{cat}", {"category[]": cat}))
 
         for cat in self.config.get("gated_categories", []):
+            if isinstance(cat, dict):
+                cat = cat["category"]
             passes.append((f"gated:{cat}", {"category[]": cat}))
 
         max_pages = int(self.config.get("max_pages_per_pass", 5))

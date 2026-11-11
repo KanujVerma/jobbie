@@ -49,6 +49,7 @@ from src.notifier import Notifier, build_review_digest
 from src.backfill import deliver_backfill_batch
 from src.filtering import apply_filter_pipeline
 from src.scheduler import run_loop
+from src.source_migration import apply_source_baseline, validate_source_revision
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -124,6 +125,13 @@ def do_run(args) -> int:
         config = load_config(args.config)
     except Exception as e:
         logger.error(f"Failed to load config: {e}")
+        return 1
+
+    try:
+        for company in config.companies:
+            validate_source_revision(company)
+    except ValueError as error:
+        logger.error("Invalid source revision: %s", error)
         return 1
 
     state_path = config.defaults.get("state_path", "state/seen_jobs.json")
@@ -261,6 +269,10 @@ def do_run(args) -> int:
                     )
 
             # Apply filter pipeline
+            source_baseline_pending = apply_source_baseline(
+                fetched, cname, company_cfg, state, datetime.now(timezone.utc),
+                fetch_succeeded=adapter_succeeded,
+            )
             source_config = company_cfg.get("config", {})
             is_network = bool(company_cfg.get("network_priority", False))
             cohort = str(company_cfg.get("cohort", "discovered"))
@@ -360,6 +372,12 @@ def do_run(args) -> int:
                 "excluded": excluded_count,
                 "fetch_duration_seconds": fetch_duration,
                 "filter_reason_counts": dict(reason_counts),
+                "source_revision": company_cfg.get("source_revision"),
+                "source_baseline_pending": source_baseline_pending,
+                "baseline_suppressed": sum(
+                    bool(company_state.get("seen_jobs", {}).get(jid, {}).get("baseline_suppressed"))
+                    for jid in {job.id for job in fetched}
+                ),
             }
 
             # Classify against first_seen state for individual alerts
@@ -439,7 +457,7 @@ def do_run(args) -> int:
 
             # Collect bounded backfill candidates if pending migration
             # Kept separate from alert_candidates: historical postings (48-168h) appear in backfill summary, not individual alerts
-            if is_new_policy_migration:
+            if is_new_policy_migration and not source_baseline_pending:
                 company_backfill_candidates = get_backfill_candidates(backfill_matched, state, loop_now, lookback_days=7)
                 alerted_urls_this_run = {normalize_url(j.url) for j in actually_alerted}
                 company_backfill_candidates = [
