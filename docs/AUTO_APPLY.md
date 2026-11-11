@@ -5,7 +5,7 @@
 ## The owner's intended workflow
 Jobbie finds a relevant full-time role -> ranks against confirmed experience -> generates job/company-specific resume revisions -> user inspects exact before/after and fact/source rationale in an authenticated private page -> user accepts/edits/rejects changes -> PDF/DOCX render verified -> user separately chooses `Approve & Apply` for a specific JOB and exact RESUME version -> job application executor completes allowed form steps -> returns authoritative receipt or asks for owner input -> status stored and digest updated.
 
-**Approving a resume alone is NOT approval to submit an application.** Approval must explicitly bind candidate profile/answers, employer and requisition, exact destination and final resume checksum. Do not assume pressing "Open job" is an application.
+**Approving a resume alone is NOT approval to submit an application.** In Phase 4 the owner may `Prepare application packet` as an UNSENT DRAFT, without send authorization. Only after Phase 5 executor gates may a separate `Approve & Apply` action explicitly authorize submission bound to candidate profile/answers, employer/requisition, exact destination and final resume checksum. Do not assume pressing "Open job" is an application.
 
 ## Why dot-first; what remains UNVERIFIED
 OpenAI dots (where available) can use a cloud computer and supported websites to perform tasks with consent. The owner prefers reusing their dot instead of buying/managing another browser host. However, **no verified general-purpose programmatic Discord/Jobbie-to-dot API or event trigger has been established** in this project. Thus:
@@ -28,7 +28,7 @@ No plain passwords, OAuth refresh tokens, private repository source code or fami
 
 ## Privacy and approvals
 1. Signed-in/allowlisted owner reviews the exact posting and the final PDF/DOCX preview. Change after approval -> invalidates hash and requires reapproval.
-2. `Approve resume` only signs document content; `Approve & Apply` signs the *single job-specific* packet and authorizes submission for that destination. No bulk/blanket application approval, mass submissions or "autoapply while asleep" default.
+2. In Phase 4, `Approve resume` signs document content and `Prepare application packet` saves only a PRIVATE UNSENT DRAFT. In Phase 5, the separate `Approve & Apply` action signs the *single job-specific* packet with one-time nonce and authorizes submission for that destination. No bulk/blanket application approval, mass submissions or "autoapply while asleep" default.
 3. Prioritize referral path for original 13: if referral is possible but not yet confirmed, allow owner to choose `hold for referral` or `apply directly`; the bot never claims that referral exists or always requires it.
 4. Executor fills only grounded user-confirmed answers. No invented years/metrics, US citizenship/clearance, source code deployment, previous employer or demographic facts.
 5. For unfamiliar legal disclosures, required demographic/EEO/self-identification choices, privacy/terms attestations, salary/relocation commitments, accessibility requests, signatures, security questions or verification challenges: ask the owner. Optional EEO choices never guessed.
@@ -78,7 +78,7 @@ Source code licenses do not authorize employer data collection or website automa
 - Zero unauthorized submissions; no blind duplicates after uncertain status; zero invented screening claims; redacted audit evidence and no public resume PII in GitHub.
 
 ## Human-visible interaction (future)
-Private authenticated review UI: original resume vs tailored bullet change; reason tied to JD/evidence; accept/reject/edit; full PDF preview; `Approve resume`; separate `Approve & Apply` control with destination/answer confirmation. Discord buttons only after signed interaction endpoint and user identity checks exist. No inert webhook-only buttons.
+Private authenticated review UI: original resume vs tailored bullet change; reason tied to JD/evidence; accept/reject/edit; full PDF preview; `Approve resume`; `Prepare application packet` (Phase 4, UNSENT draft). Only once Phase 5 is released does a separate `Approve & Apply` control appear with destination/answer confirmation. Discord buttons only after signed interaction endpoint and user identity checks exist. No inert webhook-only buttons.
 
 ## Budget and scope boundaries
 The free-first constraint includes no automatic paid browser hosting or LLM credits, no undocumented dot access guarantees. If dot unsupported, keep manual dot prompt or local runner rather than silently spending. Job discovery and alerts must keep working if AI/dot/runner offline.

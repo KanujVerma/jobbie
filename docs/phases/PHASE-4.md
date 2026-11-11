@@ -17,7 +17,7 @@
 ## P4-D: actual preview and separate approval
 - Authenticated review page linked from signed Discord command: original vs new bullet-by-bullet diff, clear JD-based *why*, what was removed, accept/reject/edit, undo, full-page PDF preview, downloadable PDF/DOCX. Revalidate after edits.
 - `Approve resume` signs exact document hash without submitting an application.
-- Separate `Approve & Apply` requires a single verified job/requisition/official URL, confirmed candidate answer set and approved resume hash, one-time nonce/expiry. In this phase it may create a **private queued packet** only; NO executor/browser submit until Phase 5 is validated. Never display a fake fully functional auto-apply button.
+- Phase 4 action is explicitly **`Prepare application packet`** (no submission authority). Store a private **unsent draft** binding a single verified job/requisition/official URL, confirmed candidate answer set and approved resume hash; do not generate an authorized submission nonce or mark apply-approved. Phase 5 introduces the separate live **`Approve & Apply`** consent action, nonce/expiry and executor only after validated release. No fake or inert auto-apply button in Phase 4.
 - Store exact immutable resume version attached to application record, no substitution later.
 
 ### Release gates

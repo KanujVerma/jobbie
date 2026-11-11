@@ -38,6 +38,8 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 | J-029 | LOCKED | Controlled new-source activation after notification UX: source-verified employer board, exact company shortlist approval, non-network by default, separate PR, no state reset or forced backfill. P2-B/C source/data catalog follow as separate releases. |
 | J-030 | LOCKED | No simulated "Submitted" result: require employer confirmation page/application ID/authorized receipt; uncertain submission -> `indeterminate` and reconcile before retry; new legal/EEO/signature/MFA questions -> pause and ask owner. Private approved packets/resumes never in public GitHub or public Discord embeds. |
 
+| J-031 | IMPLEMENTATION CLARIFICATION 2026-11-10 | Phase 4 may create `Prepare application packet` ONLY as a private UNSENT draft. No `Approve & Apply` button or submission authorization until Phase 5 executor and exact per-job consent are implemented and validated. Keeps resume approval independent of application submission and prevents inert UI controls. |
+
 ## Open decisions: default actions
  (not questions to invent answers for)
 1. Referral people/contact details: UNKNOWN. Maintain `unconfirmed` for all 13 until owner supplies and confirms. Do not request names as prerequisite to Phase 1.
@@ -49,7 +51,7 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 7. GitHub repository rename COMPLETED and verified. Individual computers' local git remotes still need operator verification; do not claim they were updated.
 
 ## Change process
-New entries: `J-031` onward, date, request/justification, contracts affected, PR, migration, test delta, rollback. Never silently "resolve" two conflicting instructions. A lower-priority implementation detail may be selected with explicit rationale and tests; a LOCKED policy conflict requires owner decision.
+New entries: `J-032` onward, date, request/justification, contracts affected, PR, migration, test delta, rollback. Never silently "resolve" two conflicting instructions. A lower-priority implementation detail may be selected with explicit rationale and tests; a LOCKED policy conflict requires owner decision.
 ## Decisions deliberately unresolved (do not invent)
 - Exact 3–5 additional Greenhouse/Ashby employer board names/tokens: require source checks and owner activation approval (P2-ACT), not set by this documentation PR.
 - Direct dot task invocation from a Discord button: not verified on this account. The manual user-to-dot prompt is supported only if the dot can securely access required inputs during a pilot; record actual result.

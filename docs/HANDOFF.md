@@ -41,7 +41,7 @@ Private resumes, family contacts, credentials and private GitHub code never go i
 2. **Second [P2-ACT issue #26](https://github.com/KanujVerma/jobbie/issues/26):** source-check and owner-approve a small shortlist, then enable additional Greenhouse/Ashby boards with `discovered` status; original 13 remain star-marked.
 3. P2-B allowed feeds; P2-C catalogue/global dedup/shadow cutover.
 4. P3 private authenticated Discord commands/profile/evidence and basic application ledger.
-5. P4 role/company resume tailoring with before/after reasons, PDF/DOCX preview, owner `Approve resume` separated from `Approve & Apply` packet.
+5. P4 role/company resume tailoring with before/after reasons, PDF/DOCX preview, owner `Approve resume` and optional UNSENT `Prepare application packet`; P5 alone adds the live `Approve & Apply` control and submission permission.
 6. P5 prove dot manual delegation before assuming programmatic trigger, then secure one-job executor/receipt, local fallback only if needed and allowed.
 7. P6 startup sourcing/outreach and follow-up optimization.
 

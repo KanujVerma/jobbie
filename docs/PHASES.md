@@ -20,7 +20,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 | 4A | P4-A — Resume quality bench | Role/company evidence selection, 24-case benchmark, provider privacy/quality | P3-D |
 | 4B | P4-B — Fact-preserving tailored drafts | Structured edit ops, unsupported-claim rejection, source traceability | P4-A |
 | 4C | P4-C — PDF/DOCX rendering | Immutable previewable one-page PDF/DOCX with hashes and parse/layout tests | P4-B |
-| 4D | P4-D — Private edit approval + packet | Authenticated before/after review, reason and accept/reject/edit; explicit `Approve resume` vs `Approve & Apply` | P4-C |
+| 4D | P4-D — Private edit approval + packet draft | Authenticated before/after review with why; `Approve resume` and `Prepare application packet` (UNSENT, unapproved for submission) | P4-C |
 | 5A | P5-A — Dot feasibility pilot | One approved single-job manual dot handoff, actual outcome and supported-trigger investigation | P4-D |
 | 5B | P5-B — App executor protocol | Authenticated one-job packet, approval digest, idempotent attempts, receipts, pause/rollback | P5-A |
 | 5C | P5-C — Browser fallback | Optional local scoped Playwright/Stagehand for employer forms if dot can't act | P5-B; site permissions |
@@ -35,7 +35,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 - P2-UX1 is PRESENTATION-ONLY. Do not enable a new employer, add an account, alter persistent state or create a fake button.
 - P2-ACT enables only owner-approved boards with verified employer provenance, ensuring original 13 never lose Network Priority.
 - Phase 3 moves basic application records early because later approval/execution must reference immutable job/resume IDs. Auto-submit remains impossible here.
-- Phase 4 never submits an application when a resume is approved. A separate per-job action creates an approved packet.
+- Phase 4 never submits an application. It only signs `Approve resume` and optionally `Prepare application packet` as an UNSENT DRAFT. Phase 5 introduces per-job `Approve & Apply` authorization (job/URL/answer/resume hash/nonce) alongside a tested executor.
 - Phase 5 starts with a dot manual-handoff test. A supported direct dot API is UNKNOWN; no claimed automated trigger until verified. If unavailable, keep manual handoff or a separately approved local browser runner. No vendor ToS evasion or hidden paid runtime.
 - Phase 6 rehouses previously planned Phase 5 startup outreach and Phase 6 reminders/feedback. Old phase documents and goal prompts must follow this new plan.
 
