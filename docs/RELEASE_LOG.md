@@ -117,3 +117,6 @@ P2-R2 local Sol review approved implementation e09dc61b7e377d336b11a91c905781daf
 - PR31 MODERNIZE: main's intake changes caused a real conflict. Rebase preserves production state and source runtime behavior; functional patch ID unchanged from5d034f5. Documentation retains both source baseline and intake invariants. Current combined tests/CI/review evidence is recorded next; no old approval is promoted into a fresh-head CI pass.
 
 PR31 modernization proof: combined full952tests passed36.35s (source repair plus merged intake), config/compileall/diff passed. Plaid targeted no-webhook dry-run exited0 with identical state/config hashes. Current state matches main exactly; no reset/seed/manual edits. Fresh full-head CI/hosted review remains required.
+
+## 2026-11-11: P2-R3 Oracle candidate (not merged)
+Documented site-scoped finder replaces the erroneous empty unscoped query; inner pagination, requirement fields, official route and date precision are normalized. Live read-only scan: 2113 unique US-search rows/22 pages, 0 matched/19 review/2094 excluded/0 sends, unchanged state/config hashes. Full local suite 937 passed in 39.84s; config/compileall/diff passed. Narrow required-clause citizenship regression and optional negatives verified. Parent P2-R2 and own reviews/CI/merge/live schedule remain gates; no additional employer or fake ACK.

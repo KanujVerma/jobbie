@@ -180,6 +180,7 @@ _US_CITIZENSHIP_PATTERN = re.compile(
     r"(?:(?:\bus\b|u\.s\.|united states)\s+citizen(?:ship)?\s+(?:only|required|mandatory|must be)|"
     r"must be an?\s+(?:\bus\b|u\.s\.|united states)\s+citizen|"
     r"requires?(?:\s+active)?\s+(?:\bus\b|u\.s\.|united states)\s+citizen(?:ship)?|"
+    r"(?:^|[;\n])\s*required\s*:\s*(?:\bus\b|u\.s\.|united states)\s+citizen(?:ship)?|"
     r"only\s+(?:\bus\b|u\.s\.|united states)\s+citizens?\s+(?:may|can)\s+apply|"
     r"due to government contracts?,?\s+(?:candidates must be|must be an?)\s+(?:\bus\b|u\.s\.|united states)\s+citizen)",
     re.IGNORECASE,

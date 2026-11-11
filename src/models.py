@@ -50,6 +50,8 @@ class Job:
     employment_type: str | None = None
     description_complete: bool | None = None
     compensation: tuple[CompensationRange, ...] = ()
+    # A source calendar date is not an exact posting timestamp or timezone.
+    source_posted_date: str | None = None
 
     def __post_init__(self):
         if self.role_type not in ROLE_TYPES:

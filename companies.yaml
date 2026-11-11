@@ -229,9 +229,15 @@ companies:
     network_priority: true
     cohort: original_2026_11_04
     referral_status: unconfirmed
+    source_revision: oracle-cx45001-finder-2026-11-11
     config:
       base_url: https://eeho.fa.us2.oraclecloud.com
       api_path: /hcmRestApi/resources/latest/recruitingCEJobRequisitions
+      site_number: CX_45001
+      location_id: '300000000149325'
+      careers_url: https://careers.oracle.com/en/sites/jobsearch
+      limit: 100
+      max_pages: 50
 
   - name: Microsoft Research
     adapter: microsoft_research
