@@ -1,12 +1,16 @@
 # Phase 2 executable contract — broaden job discovery without losing original cohort
 
-STATUS PLANNED. Prerequisite: P1-E CI/review merged (done) plus a documented post-merge live check (verify STATUS). Three PRs P2-A/B/C. No mandatory AI. Original 13 network flags persist; no new company inherits them.
+STATUS: P2-A **MERGED (#23)**, Greenhouse/Ashby source adapters tested but ZERO new boards production-enabled. Phase 1's post-P1-E scheduled-run verification is complete. Next implementation is **P2-UX1**, followed by **P2-ACT**, then P2-B and P2-C. No mandatory AI. Original 13 network flags persist; no new company inherits them. See STATUS and PHASES for exact current evidence.
 
 ## P2-A: direct company ATS adapters
 - Add reusable Greenhouse and Ashby read-only adapters under `src/adapters/` with fixture contracts for pagination/HTTP failures/rate limits/descriptions, salary structured fields and locations. Maintain existing BaseAdapter/Job compatibility or migrate through a tested normalization layer.
 - Board discovery: explicit company IDs/board tokens validated against official employer career page. Add candidate startup boards only when public endpoints and terms permit. No job-board user login or bypassing blocks.
 - Show direct employer link, source ID and fetch observation time. Synthetic fixture cannot establish a live opening. Tests against fixture and allowed live read-only smoke.
 - Merge only if existing 13 continue working; run source-specific health checks.
+
+## P2-UX1 and P2-ACT (two small independent releases)
+- [P2-UX1 notification layout](PHASE-2-UX.md): existing webhook formatter only, truthful job-title/salary/eligibility/referral/date/location and direct link; tests and rollback; NO inert buttons, AI, source changes or state edits.
+- [P2-ACT controlled source activation](PHASE-2-ACT.md): only verified, owner-approved employer boards (3–5 when available), original 13 untouched, discovered by default; no false current hiring claims.
 
 ## P2-B: licensed/allowed curated feeds
 - Source candidates: New-Grad-Jobs public output; SimplifyJobs list, Jobright public GitHub list, Freehire API, other aggregators ONLY after per-source license/robots/terms/data rights are documented. Reuse publicly licensed scraper code only where license allows.
@@ -22,7 +26,7 @@ STATUS PLANNED. Prerequisite: P1-E CI/review merged (done) plus a documented pos
 - Tests: 30+ cross-source identity cases, source outage/corrupt feed, tracking URLs, reopened role, timezone/freshness, no duplicate/network-flag loss. Live smoke verified with exact links.
 
 **Phase 2 shipping:** broader new-grad feeds/companies generate verified, deduplicated alerts in existing Discord channel; old network source visibility and legacy runs unchanged. Unknown data/rights -> not shipped.
-## P2-A executable start packet (for the next coding agent)
+## P2-A historical implementation packet (COMPLETED; NOT NEXT)
 1. Verify current `main`, CI, post-P1E scheduled scan and [Phase 1 tracker #6](https://github.com/KanujVerma/jobbie/issues/6). If missing live verification, record BLOCKED_LIVE rather than pretending it occurred.
 2. Inspect `src/adapters/base.py`, `src/adapters/__init__.py`, `src/models.py`, `src/config.py`, `src/http.py`, `src/notifier.py`, `main.py` and adapter fixture idioms. Preserve the frozen `Job` constructor and current CLI.
 3. Confirm official Greenhouse/Ashby public job posting API formats, pagination, response limits, allowed fetch frequency and exact direct apply URLs using official documentation at execution time. Do not invent board IDs or use unauthorized authenticated endpoints.
@@ -35,7 +39,7 @@ STATUS PLANNED. Prerequisite: P1-E CI/review merged (done) plus a documented pos
 This scope is about **adding read-only discovery adapters**, not a Cloudflare migration, LLM matching, automated application submission, or resume processing.
 
 ## P2-A implementation and release
-P2-A is MERGED into `main` via PR #23 (`ecb553fa652750e32f5eb8ec775ae7da70285a86`).
+P2-A is MERGED into `main` via PR #23 (`ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb`).
 All 812 tests passed in main CI run #42720639467. The adapters are available but remain
 disabled in production (examples in `examples/p2a-public-boards.yaml`). Original 15
 configured / 13 enabled Network Priority production sources remain unchanged.
