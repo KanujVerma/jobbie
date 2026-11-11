@@ -71,3 +71,5 @@ Candidate claims: confirmed fact/evidence ledger.
 Resume output: approved version + edit ledger.
 Outreach: approved exact draft + recipient + provider receipt.
 Release status: CI, test evidence, actual operational verification; never README assertion alone.
+
+P2-ACT local boundary: issue form/manual CLI -> normalized public request -> supplied manual source evidence -> optional fixed public ATS read -> disabled config proposal and separate owner activation gate. The helper does not enter the production polling/state/sender path. Startup research remains a portable request without a monitor or asserted opening; no dot API/event trigger.

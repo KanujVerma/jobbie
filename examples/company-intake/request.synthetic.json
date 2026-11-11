@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "name": "Example Labs",
+  "careers_url": null,
+  "aliases": [],
+  "roles": ["Software Engineer"],
+  "locations": ["San Francisco, CA"],
+  "priority": "normal",
+  "intent": "monitor"
+}

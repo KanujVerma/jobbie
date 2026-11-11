@@ -1,0 +1,58 @@
+name: Company request
+description: Request an employer monitor or separate startup research.
+title: '[Company request] '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Public company information only. Keep resumes, personal contacts and credentials private.
+        A request does not activate a source or confirm a referral. An agent verifies the official source and permission, then prepares a disabled proposal for separate owner approval. Startup research does not assert an opening or create a monitor. The request can be manually handed to an agent or dot; there is no automatic trigger.
+  - type: input
+    id: company_name
+    attributes:
+      label: Company name
+      description: The employer's name, without private contact or referral details.
+    validations:
+      required: true
+  - type: input
+    id: careers_url
+    attributes:
+      label: Careers URL
+      description: Optional official careers page or hosted public ATS board.
+  - type: textarea
+    id: aliases
+    attributes:
+      label: Aliases
+      description: Optional names to verify, one per line. An alias is not assumed confirmed.
+  - type: textarea
+    id: roles
+    attributes:
+      label: Roles
+      description: Preferred role titles, one per line. These guide source review, not automatic eligibility.
+  - type: textarea
+    id: locations
+    attributes:
+      label: Locations
+      description: Preferred locations, one per line. Keep a city and state together on one line.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Request review priority; does not grant Network Priority.
+      options:
+        - normal
+        - high
+        - low
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: intent
+    attributes:
+      label: Request type
+      options:
+        - monitor
+        - startup-research
+      default: 0
+    validations:
+      required: true

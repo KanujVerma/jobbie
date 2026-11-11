@@ -1,33 +1,29 @@
 # Jobbie canonical project status
 
-Audited 2026-11-11. This is a snapshot. Verify current main, PRs and Actions before acting.
+Audited2026-11-11. Snapshot only; verify live GitHub HEAD, PRs and Actions before acting.
 
-## Released code and live limits
+## Merged and operationally observed
 
-Canonical repository: KanujVerma/jobbie, numeric ID 1339847701. Main inspected at `9779cd0` (state-only successor of `da898dc`), with P2-A #23 merged at `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb` and P2-UX1 #29 merged at `e0346f49bd572179250fe08bed73131db0ba311a`. P2-UX1 post-merge [Tests run 42944213890](https://github.com/KanujVerma/jobbie/actions/runs/42944213890) succeeded. Synthetic cards are not delivered messages.
+Main includes P2-A #23, P2-UX1 #29 and P2-R1 #30 (merge614b3edc14e86d952579a0c57db0eb68669c08d9). R1's exact reviewed head7a74936d22033c14abc2eac564c3db29edee09db passed both checks and completed hosted review without findings. Its all-partial-run state-commit finding was fixed before merge; the merge tree matched the reviewed tree.
 
-Production configuration remains 15 source entries: exactly 13 enabled original Network Priority sources and 2 historical disabled sources (Snowflake, Applied Digital). Greenhouse/Ashby example boards are disabled. No optional feeds, catalogue, private profile, AI or application executor is production enabled.
+Ordinary [Job Alerts43100310762](https://github.com/KanujVerma/jobbie/actions/runs/43100310762) ran merged R1 on2026-11-11: 12/13 responding, Plaid404, Oracle/SanDisk empty, 4matched/323review/8994excluded, 2individual Amazon HTTP204 ACKs and0failed job sends. State commit f3deaae743dd5e0c889cf5a2dfda5c42281452ba persisted the ACKs. This establishes P2-UX1 webhook acceptance; issue25 is closed. Human receipt, Discord-client rendering and independent employer eligibility are not established. [Live receipt](evidence/P2-UX1-LIVE-ACK-2026-11-11.md). The gap after previous finish was430.4minutes; cron remains best effort.
 
-[Scheduled Job Alerts run 43032487797](https://github.com/KanujVerma/jobbie/actions/runs/43032487797), at `da898dc817e4e8da23e14dfecede74d98657e981`, completed successfully on 2026-11-11: 12/13 adapters responding, Plaid Lever HTTP 404, SanDisk and Oracle empty responses, 2 matched, 309 review, 9002 excluded, 0 job sends acknowledged and 0 failed job sends. The gap after the previous finish was 28373.03 seconds (472.9 minutes), versus a configured 15-minute target. A successful workflow is not source health, a no-openings claim, or evidence of P2-UX1 webhook delivery: **LIVE_DELIVERY_UNVERIFIED**.
+Production still has exactly13 enabled original Network Priority sources, referral unconfirmed, plus Snowflake/Applied Digital disabled. No new employer/feed/catalogue/private profile/application service is enabled. State is preserved; never reset it or force backfill to manufacture proof.
 
-## Active Phase 2 completion work: PARTIAL
+## Source repair candidates
 
-The 2026-11-11 owner instruction replaces mandatory P2-ACT expansion with owner-directed company intake. No automatic 3-5-employer expansion. Company and feed activation are opt-in and never prerequisites to completing independent implementation. See [delivery plan](superpowers/plans/2026-11-11-phase-2-completion.md).
+[P2-R2 PR31](https://github.com/KanujVerma/jobbie/pull/31), head5d034f57ceebec206f3ca5b3279c41e398f29a7b: Plaid/Amazon repairs and silent provider baseline, local/independent900tests and clean hosted review. Exact-head Tests43098516268/public-read43098516215 remain queued at last observation, with zero jobs. R1 post-merge Tests43095321312 also queued. Existing handles are preserved; no merge without actual checks.
 
-P2-R1 candidate fixes reproduced swallowed request errors in original adapters and v1 state writes during dry-run. Partial observations remain usable but the scan is failed, not healthy. Adds fetch timing, filter-reason/candidate/ACK counters, a read-only `health` command and an Actions summary; failed send logs omit webhook URLs/response bodies. Existing eligibility, dedup, alert caps, rate limiting and backfill remain authoritative. Exact test, dry-run and review evidence is recorded in the PR and [audit](evidence/P2-RELIABILITY.md). Candidate is not yet a merged or live-verified release.
+P2-R3 Oracle candidate is published on [its source branch](https://github.com/KanujVerma/jobbie/tree/feat/p2-oracle-source), latest published5a167754a12ceddf0f0012fa1d577a4a7ac4e209. Local re-check approved b7112bcf4b30d277050a1556858f4e049093a62c, independent938tests. Documented finder restored2113 US-search rows in a no-webhook scan; overlapping pages fail baseline completion. Parent merge, own rebase/PR/CI/hosted review/merge and real schedule remain gates. SanDisk replacement ATS returned406; no bypass or no-openings claim.
 
-Remaining scoped implementation: P2-ACT request/proposal workflow, P2-B disabled lawful-feed capability, P2-C SQLite catalogue with legacy delivery authority, shadow comparison and rollback. No production employer is approved by this task. Missing rights remain **BLOCKED_SOURCE_RIGHTS**; activation and cutover remain **BLOCKED_APPROVAL**; the required 72-hour shadow is **BLOCKED_72H_EVIDENCE** until actually observed.
+## Active P2-ACT candidate
 
-## Next major phase
+Owner-directed issue form, portable request CLI, source-evidence/alias/collision checks and disabled proposals are implemented locally in feat/p2-owner-intake. Local full928tests passed in31.74s; intake52cases. Live verification-only provider reads and a complete Greenhouse CLI OFF-proposal probe passed with unchanged production hashes; this is not an owner company request or activation. [Intake guide](COMPANY_INTAKE.md), [verification](evidence/P2-ACT-VERIFICATION.md). Independent review, exact-head CI/hosted review and merge remain pending. No requested company inherits a confirmed referral or original Network Priority.
 
-After Phase 2 implementation and its operational gates, execute P3-A signed, allowlisted Discord interactions, then private resume/profile storage, owner-confirmed evidence and deterministic matching. Resume tailoring and owner artifact approval remain Phase 4. Application submission remains Phase 5 and requires a separately approved exact packet. No dot API or trigger has been verified.
+## Remaining full Phase2
 
-Historical release evidence: [P2-A](evidence/P2-A-VERIFICATION.md), [P1-E](evidence/P1-E-PRODUCTION-VERIFICATION.md), [RELEASE_LOG](RELEASE_LOG.md). Preserve the existing production state; never force backfill or reset it to generate proof.
+Implement P2-B reusable OFF public feeds with source/data rights and official employer confirmation, then P2-C SQLite pre-filter catalogue, identity/provenance/history, dedup/reclassification/search/export, shadow comparison and rollback. Cached upstream policy research identifies missing data rights; the feed capability is still to implement. Catalogue is still to implement; >=72h real shadow has not started and cutover is unapproved. Missing rights/approval/72h evidence stay BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL/BLOCKED_72H_EVIDENCE while independent work continues.
 
-P2-R1 review checkpoint: S1's malformed-health ACK-loss path reproduced (6 failing two-source cases), then fixed with pre-delivery validation; S2 stale onboarding rows corrected. Latest full local suite: 875 passed in 32.59s; config/compileall/health/diff checks passed. Final SanDisk/Plaid no-webhook dry-runs returned 0/1 respectively (empty/404) with unchanged state/config hashes. Sol round 2, candidate CI/hosted review and merge remain pending.
+Next major goal after Phase2 gates is P3-A signed allowlisted Discord interactions, private profile/resume upload/evidence and deterministic matching. Tailoring is Phase4; exact one-job approved application execution is Phase5. No dot API/trigger has been verified.
 
-Sol-loop round 2 approved behavior at fbb13745f4f64a3ede9a6b169fcb086d78eb94b1, resolving S1/S2; independent suite 875 passed in 36.66s and reliability suite 49 passed. Hosted exact-head review, Python 3.12 CI and merge remain pending. See evidence/P2-R1-REVIEW.md.
-
-Hosted review H1 (ef4d864) found that an all-failed/partial scan can save successful delivery ACKs locally but return 1, causing Actions to skip Commit state. Reproduced with a synthetic partial scan: one successful fake send, failed run result, ACK saved locally, missing workflow failure override. The regression failed before correction and now passes. Commit state now runs after an executed scan succeeds or fails, excluding cancellation/skipped scans; the workflow still reports the scan failure. No live failure or test send was induced. New exact-head CI/hosted review required before merge.
-
-H1 correction verification: `.venv/bin/pytest -q` passed 876 tests in 33.01s; validate-config, compileall and diff-check passed. Updated workflow failure-path execution is covered by a synthetic partial-scan ACK regression plus configuration checks, not a forced live outage.
+P2-ACT local review approved b58076cf7dcd7153a860841023ac246fb5f8280a in one round, independently passing928tests in36.74s, config/diff checks. No findings. Own PR/exact-head CI/hosted review/merge are still pending; production activation is not approved. See evidence/P2-ACT-REVIEW.md.

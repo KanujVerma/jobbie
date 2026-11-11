@@ -579,6 +579,55 @@ def cmd_health(args) -> int:
     return 0
 
 
+def _intake_file(path: str, *, issue_text=False):
+    """Read only a bounded local request/evidence document, never a URL."""
+    try:
+        if path == "-":
+            payload = sys.stdin.buffer.read(1024 * 1024 + 1)
+        else:
+            with open(path, "rb") as source:
+                payload = source.read(1024 * 1024 + 1)
+        if len(payload) > 1024 * 1024:
+            raise ValueError("intake document exceeds 1 MiB")
+        value = payload.decode("utf-8")
+        return value if issue_text else json.loads(value)
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        raise ValueError("cannot read bounded UTF-8 intake document") from None
+
+
+def cmd_company_request(args) -> int:
+    from src.company_intake import normalize_request, parse_issue_request
+    try:
+        if args.issue_file:
+            if any((args.careers_url, args.alias, args.role, args.location, args.priority, args.intent)):
+                raise ValueError("issue-file cannot be combined with manual request fields")
+            result = parse_issue_request(_intake_file(args.issue_file, issue_text=True))
+        else:
+            result = normalize_request({"schema_version": 1, "name": args.name,
+                "careers_url": args.careers_url, "aliases": args.alias,
+                "roles": args.role, "locations": args.location,
+                "priority": args.priority or "normal", "intent": args.intent or "monitor"})
+    except ValueError as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return 0
+
+
+def cmd_company_proposal(args) -> int:
+    from src.company_intake import build_proposal
+    try:
+        request = _intake_file(args.request)
+        evidence = _intake_file(args.evidence) if args.evidence else None
+        config = load_config(args.config)
+        result = build_proposal(request, config.companies, evidence, live_check=args.live_check)
+    except (OSError, TypeError, ValueError) as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return 0
+
+
 def cmd_daemon(args) -> int:
     load_dotenv()
     try:
@@ -613,6 +662,20 @@ def main():
     subparsers.add_parser("validate-config", help="Validate the YAML config")
     health_parser = subparsers.add_parser("health", help="Read existing source/delivery health; no network or writes")
     health_parser.add_argument("--format", choices=("json", "markdown"), default="json")
+    request_parser = subparsers.add_parser("company-request", help="Create a portable owner company request; no network or writes")
+    request_source = request_parser.add_mutually_exclusive_group(required=True)
+    request_source.add_argument("--name")
+    request_source.add_argument("--issue-file", help="Saved company issue form Markdown, or - for stdin")
+    request_parser.add_argument("--careers-url")
+    request_parser.add_argument("--alias", action="append", default=[])
+    request_parser.add_argument("--role", action="append", default=[])
+    request_parser.add_argument("--location", action="append", default=[])
+    request_parser.add_argument("--priority", choices=("normal", "high", "low"))
+    request_parser.add_argument("--intent", choices=("monitor", "startup-research"))
+    proposal_parser = subparsers.add_parser("company-proposal", help="Verify supplied evidence and print an OFF proposal; never activates")
+    proposal_parser.add_argument("--request", required=True, help="Portable request JSON file, or - for stdin")
+    proposal_parser.add_argument("--evidence", help="Manually source-verified evidence JSON file")
+    proposal_parser.add_argument("--live-check", action="store_true", help="Read the fixed public ATS endpoint after supplied permission/ownership checks")
 
     # needs-browser
     subparsers.add_parser(
@@ -677,6 +740,10 @@ def main():
         sys.exit(cmd_test_discord(args))
     elif args.command == "health":
         sys.exit(cmd_health(args))
+    elif args.command == "company-request":
+        sys.exit(cmd_company_request(args))
+    elif args.command == "company-proposal":
+        sys.exit(cmd_company_proposal(args))
     elif args.command == "run":
         sys.exit(cmd_run(args))
     elif args.command == "daemon":
