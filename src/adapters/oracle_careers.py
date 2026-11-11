@@ -98,6 +98,11 @@ class OracleAdapter(BaseAdapter):
                 elif job.id not in seen:
                     seen.add(job.id)
                     yield job
+                else:
+                    # Overlap can hide an omitted row even when the raw page
+                    # offsets reach TotalJobsCount. Keep unique observations,
+                    # but do not certify the source baseline complete.
+                    self.record_fetch_error("DUPLICATE_REQUISITION")
             if len(seen) == before:
                 raise PublicBoardError("Oracle finder repeated a page; scan incomplete")
             offset += len(rows)

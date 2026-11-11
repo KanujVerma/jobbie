@@ -202,3 +202,25 @@ def test_review_state_preserves_source_calendar_date():
     state = _empty_state()
     record_review_job(state, j, ['needs_review'], j.detected_at)
     assert state['review_queue'][j.id]['source_posted_date'] == '2026-11-11'
+
+
+def test_overlapping_pages_cannot_complete_source_baseline():
+    from src.source_migration import apply_source_baseline
+    from src.storage import _empty_state
+    a = adapter(payload([row('1'), row('2')], 4), payload([row('2'), row('3')], 4))
+    jobs = list(a.fetch())
+    assert [j.source_job_id for j in jobs] == ['1', '2', '3']
+    assert 'DUPLICATE_REQUISITION' in a.fetch_errors
+    state = _empty_state()
+    pending = apply_source_baseline(jobs, 'Oracle', {'source_revision': 'finder-v1'}, state,
+                                    datetime.now(timezone.utc), fetch_succeeded=not a.fetch_errors)
+    assert pending is True
+    assert state['companies']['Oracle'].get('source_revision') is None
+    assert all(entry['alerted'] is False for entry in state['companies']['Oracle']['seen_jobs'].values())
+    complete = adapter(payload([row('1'), row('2')], 4), payload([row('3'), row('4')], 4))
+    current = list(complete.fetch())
+    apply_source_baseline(current, 'Oracle', {'source_revision': 'finder-v1'}, state,
+                          datetime.now(timezone.utc), fetch_succeeded=not complete.fetch_errors)
+    from src.storage import classify_jobs
+    assert classify_jobs(current, 'Oracle', state, 48, datetime.now(timezone.utc)) == []
+    assert state['companies']['Oracle']['source_baselines']['finder-v1']['observed_count'] == 4

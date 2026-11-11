@@ -120,3 +120,7 @@ PR31 modernization proof: combined full952tests passed36.35s (source repair plus
 
 ## 2026-11-11: P2-R3 Oracle candidate (not merged)
 Documented site-scoped finder replaces the erroneous empty unscoped query; inner pagination, requirement fields, official route and date precision are normalized. Live read-only scan: 2113 unique US-search rows/22 pages, 0 matched/19 review/2094 excluded/0 sends, unchanged state/config hashes. Full local suite 937 passed in 39.84s; config/compileall/diff passed. Narrow required-clause citizenship regression and optional negatives verified. Parent P2-R2 and own reviews/CI/merge/live schedule remain gates; no additional employer or fake ACK.
+
+P2-R3 local review S1 correction: overlapping pages [1,2]/[2,3] with advertised total4 previously completed a three-ID baseline. Parent reproduced the failing regression, then records DUPLICATE_REQUISITION while retaining unique partial rows; completion remains pending and a later complete scan silently includes the previously omitted ID. Full suite 938 passed in 35.08s; final focused re-check also covers the completed retry. Fresh local re-review pending.
+
+New real operational evidence: scheduled Job Alerts 43100310762 on merged R1 614b3ed ran 21:07:18-21:14:55Z. Two individual Amazon candidates received HTTP204 ACKs at21:14:30Z, and state commit f3deaae persisted them. This establishes ordinary webhook acceptance, not visual-client or employer-eligibility verification. R2/R3 remain unmerged and unobserved in production.
