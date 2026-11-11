@@ -1,9 +1,9 @@
-# Single-phase /code objective: Phase 3
+# Phase 3 jobbie personal services (P3-A/B/C/D; each separate PR)
 
 /goal
 
-Repository: KanujVerma/jobbie if renamed and verified; else KanujVerma/job-alert. Read AGENTS.md, docs/README.md, DECISIONS.md, PRODUCT.md, ARCHITECTURE.md, CONTRACTS.md, SECURITY.md, EVALS.md, PHASES.md, OPERATIONS.md and docs/phases/PHASE-3.md; inspect current HEAD/tests/Phase 2 release evidence. Stop if Phase 2 not released.
+Repository: KanujVerma/jobbie. Implement only the CURRENT next scoped Phase-3 PR, not every capability at once. First verify P2-C actually released; if not, stop and report the gate. Read AGENTS.md, docs/HANDOFF.md, docs/STATUS.md, docs/PHASES.md, docs/PRODUCT.md, docs/DECISIONS.md, docs/CONTRACTS.md, docs/SECURITY.md and docs/phases/PHASE-3.md.
 
-Implement ONLY Phase 3 in ordered PRs P3-A (authenticated signed Discord commands), P3-B (private DB/storage/uploads and versioning), P3-C (owner-confirmed facts and approved GitHub evidence, private repo allowlist default empty), P3-D (deterministic ranking/optional budgeted AI explanations). Keep job alert pipeline independent of private services. Never commit private resumes, auth status, contact details, private repo content or API secrets. Preserve no-sponsorship/permanent-resident vs citizenship distinction, Dec 2026, network cohort and salary as soft preference.
+Order: P3-A signed/allowlisted Discord interactions and real command ACK; P3-B private owner data storage/upload and immutable app/attempt ledger; P3-C owner-confirmed facts and explicitly approved read-only GitHub evidence; P3-D deterministic ranking, explanations and saved jobs. One reviewable PR per slot with tests/live proof and rollback. Do not infer private repository approval or publish candidate information.
 
-Test unauthorized/replay attacks, 40 representative eligibility/match cases, user approval/revocation, private data containment, free-tier quotas and outages. Actual Discord runtime evidence required for release; without owner ID/secret approval report precise BLOCKED_LIVE. Preserve prior phases, request code review, produce exact PR/test/run/evidence summary and stop before Phase 4.
+No application submission in Phase 3. The approval/execution flow is PLANNED only; reading a job URL does not mark applied. Preserve all original network priorities and no change to working webhook. Update STATUS, HANDOFF, RELEASE_LOG in every PR, request independent review and report exact CI/run evidence. Stop after this single slot.

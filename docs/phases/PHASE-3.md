@@ -1,33 +1,26 @@
-# Phase 3 executable contract — candidate profile, approved GitHub and interactive Discord
+# Phase 3 executable contract — authenticated search, private profile and application ledger
 
-STATUS PLANNED. Requires Phase 2 released and $0 free-tier/permission feasibility confirmed. Four ordered PRs P3-A/B/C/D.
+**PLANNED.** Depends on P2-C released. No auto-application or model-driven external action in this phase. Four sequential PRs P3-A–P3-D; keep legacy webhook alerts working if this private subsystem fails.
 
-## P3-A: Discord command endpoint / identity
-- Register official Discord HTTP interactions, verify Ed25519 signatures and request timestamp/replay window BEFORE parsing/acting, allowlist one owner Discord user ID. Only commands and explicitly clicked context menu interactions; never read entire channel history.
-- `/jobs find`, `/jobs top`, `/profile show`, `/github repos`, `/settings`, `/health`; unauthorized requests return no private data.
-- Ack/defer per Discord API deadline, enqueue heavy work; correlation and idempotency on interaction ID. No new message reading permission.
-- Deploy Cloudflare Worker free-tier only after limits and required secrets verified; fallback CLI command interface until configured. Security negative tests mandatory.
+## P3-A: authenticated Discord interactions
+- Verify official Discord Ed25519 signature and timestamp/replay controls before executing commands. Single owner's allowlisted Discord ID; private ephemeral replies and rate limiting.
+- `/jobs find`, `/jobs top`, `/profile show`, `/github repos`, `/resume upload`, `/applications`, `/settings`, `/health`. Real buttons/commands: job source link, save, explain, request tailoring (only when Phase 4 live). No inert "Approve & Apply" before Phase 5.
+- Defer tasks within Discord deadline, use durable queue for long analysis; sign all private URLs and reject cross-user/expired requests. No full channel scanning.
 
-## P3-B: durable personal storage + uploads
-- Private DB for owner profile/settings/jobs/matches; private file storage for PDF/DOCX and optional exports. No private data in publicly committed `state/`, GitHub issues, workflows or logs.
-- Signed short-lived downloads, content-type/size validation, parser timeouts, arbitrary PDF safety, upload deletion, encrypted transport, least privilege.
-- Resume versions immutable; each upload proposes extracted facts; do not auto-confirm new metrics, company claims, dates or work authorization.
-- Job/owner model isolation; migration backup and rollback, quotas and no-paid default.
+## P3-B: durable private profile/storage and basic app ledger
+- Owner-scoped private DB + private blob store for uploaded resumes, temporary PDFs, validated candidate answer drafts and job metadata. No raw resumes/citizenship details in public GitHub state or Discord embeds.
+- Add immutable `JobSnapshot`, `ResumeVersion`, `Application` and `ApplicationAttempt` scaffolds with append-only events; `saved` is not `applied`. Versioning and owner-confirmed status changes only.
+- Content-type/size checks, parser isolation, expiry/deletion, encrypted/scoped fetch links. Credential and auth integration are not assumed available; show exact setup blockers.
 
-## P3-C: evidence ledger and repo permissions
-- Parse approved Epic/HCL/Tesla résumé versions (owner uploads only; do not package private files in repo).
-- Public GitHub project candidates: Clinical Notes NLP Assistant, RegimeRadar, Relay, Drift. Preserve docs' caveats: synthetic clinical demo, real-vs-demo market data, incomplete native app, no live capital. Authorship requires source/PR evidence; README doesn't prove independent validation.
-- Private repos: default none. Owner approves exact repo allowlist and visibility scope. Read-only token; index limited necessary evidence with SHA/path/text span; never send private code externally without separately approved disclosure.
-- CandidateFact states proposed/confirmed/rejected/revoked; owner correction invalidates dependent draft caches.
+## P3-C: verified facts / GitHub evidence
+- Parse owner uploaded Epic/HCL/Tesla resumes; proposed facts require confirmation when new/ambiguous. No invented accomplishments, job titles, metrics, graduation dates.
+- Public project evidence candidates (Clinical Notes synthetic demo, RegimeRadar real/demo distinction, Relay incomplete native, Drift no live capital). Attribution to user's actual code/PR, not simply README. Private repos allowlisted per repo, read-only, not automatically published or sent to model.
+- Fact revocation invalidates derived match/resume recommendations. Keep source URLs/path/SHA and privacy scope.
 
-## P3-D: deterministic matching + optional AI explanation
-- Eligibility tri-state remains authoritative. Ranking with initial weight rubric (role 30, skill 25, geography 15, salary 10, freshness 10, company/startup preference 10); unknown dimensions are missing, not false zero.
-- Source-grounded why/why-not explanations cite job text and confirmed candidate fact IDs; "match score" NOT a hiring probability.
-- AI optional for complex cases, initial candidate Groq GPT-OSS120B subject to privacy, quota and quality benchmarks; provider adapter model-agnostic. If no LLM, basic matching works.
-- Discord private interactive search, save/feedback and guarded commands work end-to-end. No auto-submit or outbound send.
+## P3-D: transparent ranking, command search
+- Hard eligibility tri-state remains authoritative. Starting weights role 30, verified skills 25, geography 15, salary 10, freshness 10, company 10; not a hiring probability. Unknown compensation is not zero.
+- Explain `why match` / `what's missing` with candidate fact IDs and exact job source; avoid AI confabulation. Optional free-budgeted AI only for ambiguous explanations with privacy review; deterministic fallback works.
+- Add actual saved-job statuses and feedback; nothing creates an employer submission or outbound email.
 
-### Release proof
-- Authorized user command + unauthorized user rejection + replay attack; actual Discord interaction if credentials provided.
-- Private upload and deletion, redaction scan; candidate fact confirmation and revocation propagation.
-- 40 labeled opportunity fixtures with confusion matrix, unknowns/eligibility reasons, score reproducibility. Preserve Phase 1/2 independent scrape under model outage.
-- $0 quota cap and failure behavior validated. If secrets missing -> `BLOCKED_LIVE`, do not manufacture demonstration.
+### Phase 3 release gates
+Authorized and unauthorized commands tested on signed interactions; file upload/deletion and private data isolation tested; 40 source-grounded ranking fixtures; app record idempotency, no false applied status; \$0 provider limits; old 13 network webhook not broken. Owner-facing live command only if account settings permit; otherwise exact BLOCKED_LIVE.

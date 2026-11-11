@@ -4,12 +4,12 @@ Read this file and [STATUS.md](STATUS.md) before changing Jobbie. Then read [AGE
 
 ## Current state: Phase 2A release completed and merged
 - Repository: `KanujVerma/jobbie`; branch `main`.
-- Phase 2A PR #23 has been **merged to main** via squash commit `ecb553fa652750e32f5eb8ec775ae7da70285a86`.
+- Phase 2A PR #23 has been **merged to main** via squash commit `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb`.
 - Main post-merge CI https://github.com/KanujVerma/jobbie/actions/runs/42720639467 passed: **812 tests passed in 45s**, config valid, documentation continuity PASS.
 - Production status: **MERGED, NOT PRODUCTION_ENABLED**. The 2 public board example entries remain in `examples/p2a-public-boards.yaml` and disabled. `companies.yaml` maintains the original 15 configured / 13 enabled sources. No new active alerts, no database, no LLMs.
 - Real read-only smoke verified with zero state/config mutations and `discord_sent=false`.
 - Phase 1 issue #6 post-P1-E live gate is SATISFIED via scheduled run 42698015121 at descendant commit `ffc8c09bd2ec0cbcb7dd48143204c26255324bcb`.
-- As instructed, STOP after Phase 2A. Do not start Phase 2B or Phase 2C.
+- The owner subsequently approved the NEXT scoped implementation, **P2-UX1 notification layout**. Start only that [contract](phases/PHASE-2-UX.md) and [first goal](agent-prompts/PHASE-2-UX-GOAL.md). Do NOT start P2-ACT/P2-B/C/Phase 3 at the same time.
 
 ## Takeover procedure
 1. Query GitHub repo metadata, current main HEAD, PRs and open issues. Check whether Phase 2A is merged before assuming it is open.
@@ -34,9 +34,17 @@ Read this file and [STATUS.md](STATUS.md) before changing Jobbie. Then read [AGE
 ## Locked product constraints
 Personal single user; Dec 2026 UW–Madison BS CS; January 2027 target start; full-time US new-grad/SWE/related technical roles; internships excluded. $100k annual base is preferred, not a hard cutoff. SF Bay Area first, other CA/NYC/Chicago/TX/FL prioritized. US authorized without sponsorship; permanent residence is not citizenship. Original 13 network sources retain a separate UNCONFIRMED referral status. Do not add unrelated titles just to increase match counts.
 
-Private resumes, family contacts, credentials and private GitHub code never go in public commits/logs. Private repository reading requires explicit allowlist approval; reading is not outward-disclosure approval. No auto-apply, unauthorized Jobright/LinkedIn scraping, unsolicited founder emails, or unapproved paid inference. Later phases use approved evidence for matching/tailoring and exact owner approval for outbound messages.
+Private resumes, family contacts, credentials and private GitHub code never go in public commits/logs. Private repository reading requires explicit allowlist approval; reading is not outward-disclosure approval. No mass/unapproved auto-apply; future Phase 5 may submit a SINGLE owner-authorized exact job packet after separate `Approve & Apply`. No assumed dot API, unauthorized Jobright/LinkedIn scraping, unsolicited founder emails, or unapproved paid inference. Later phases use approved evidence for matching/tailoring and exact owner approval for outbound messages.
 
-## Future plan and change control
-P2-B permitted curated feeds, P2-C canonical catalogue/dedup/shadow migration, P3 private profile + Discord commands, P4 natural evidence-locked PDF/DOCX tailoring, P5 startup research/approved outreach, P6 application events/reminders/feedback. Each has a bounded phase document and PR sequence; none is deployed merely because a spec exists.
+## Approved future plan: one PR at a time
+1. **First [P2-UX1 issue #25](https://github.com/KanujVerma/jobbie/issues/25):** compact, informative truthful webhook alerts without changing source/state. [Exact scope](phases/PHASE-2-UX.md) and [first /goal](agent-prompts/PHASE-2-UX-GOAL.md).
+2. **Second [P2-ACT issue #26](https://github.com/KanujVerma/jobbie/issues/26):** source-check and owner-approve a small shortlist, then enable additional Greenhouse/Ashby boards with `discovered` status; original 13 remain star-marked.
+3. P2-B allowed feeds; P2-C catalogue/global dedup/shadow cutover.
+4. P3 private authenticated Discord commands/profile/evidence and basic application ledger.
+5. P4 role/company resume tailoring with before/after reasons, PDF/DOCX preview, owner `Approve resume` and optional UNSENT `Prepare application packet`; P5 alone adds the live `Approve & Apply` control and submission permission.
+6. P5 prove dot manual delegation before assuming programmatic trigger, then secure one-job executor/receipt, local fallback only if needed and allowed.
+7. P6 startup sourcing/outreach and follow-up optimization.
 
-EVERY functional PR updates STATUS.md, HANDOFF.md and RELEASE_LOG.md together, plus any affected contracts/architecture/security/operations. CI checks missing/deleted/empty/symlinked handoff files, HTML fixture changes and renamed source paths. The guard checks presence, not factual truth. Record exact tests, reviewer SHA, actual source/run URLs, blockers and next step; no private chat memory is required.
+The actual AUTOAPPLY executor is not implemented. A dot's inbound programmatic trigger, account access, hosting cost and site automation rules are unresolved feasibility questions; do not invent an API or auto-submit without exact approval. See [AUTO_APPLY.md](AUTO_APPLY.md), [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md), [PHASES.md](PHASES.md).
+
+Every functional PR updates STATUS/HANDOFF/RELEASE_LOG, plus impacted architecture/contracts/security/phase docs. CI checks missing/deleted/empty/symlinked handoff files, HTML fixtures and renamed source paths. Reviewer still checks truth: record exact source SHA, tests, reviewer SHA, actual live evidence, rollback and next slot. No private chat history needed.

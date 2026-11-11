@@ -1,13 +1,13 @@
 # Jobbie canonical project status
 
-**Audited:** 2026-11-09 America/Chicago. This is a snapshot, not continuous telemetry. Verify GitHub HEAD, PRs and Actions before acting.
+**Audited:** 2026-11-10 America/Chicago (planning snapshot). This is a snapshot, not continuous telemetry. Verify GitHub HEAD, PRs and Actions before acting.
 
-Canonical repository: **KanujVerma/jobbie**, ID 1339847701. Repository rename is complete. Current inspected main is `ecb553fa652750e32f5eb8ec775ae7da70285a86` (squash-merge of Phase 2A PR #23).
+Canonical repository: **KanujVerma/jobbie**, ID 1339847701. Repository rename is complete. Last verified runtime release is `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb` (Phase 2A PR #23), followed by docs merge `58b108c07e070725dbde181d4d0fb8c1b62d8917` (#24). Most recently observed `main` was state-only commit `8d05cf3474fea796a361e3809d68f5e635e1420a`; verify actual HEAD again before coding.
 
 ## Completed release: Phase 2A, PR #23
 - **PR:** https://github.com/KanujVerma/jobbie/pull/23
 - **Branch:** `feat/p2-a-public-job-boards` (merged and closed)
-- **Status:** MERGED to main at `ecb553fa652750e32f5eb8ec775ae7da70285a86`.
+- **Status:** MERGED to main at `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb`.
 - **Production Status:** MERGED, NOT PRODUCTION_ENABLED. New Greenhouse and Ashby public adapters are tested and available in codebase; sample boards in `examples/p2a-public-boards.yaml` remain disabled. Production `companies.yaml` is unchanged with the original 15 configured / 13 enabled sources.
 - **Reviewed runtime source:** `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
 - **Full CI:** Pre-merge CI passed at https://github.com/KanujVerma/jobbie/actions/runs/42342377756 and https://github.com/KanujVerma/jobbie/actions/runs/42343188762 (812 passed). Post-merge main CI passed at https://github.com/KanujVerma/jobbie/actions/runs/42720639467 — **812 passed in 45s**, Python 3.12, config validation and documentation gate passed.
@@ -29,5 +29,9 @@ The normal filter, immutable Job model, notification-payload builder, review que
 - Known limitations tracked separately: GitHub's nominal 15-minute cron has observed multi-hour gaps (run 42698015121 had a 626.5-minute gap). Plaid's known Lever 404 is an upstream endpoint failure.
 - Phases 2B/2C and 3–6 remain PLANNED. The two P2-A example boards are outside production config and disabled; no new ongoing job alerts are active.
 
-## Next steps
-Phase 2A is complete and merged. Per instructions, stop after Phase 2A. Do not start P2-B or P2-C. Any future activation of additional employers requires source-grounded verification, separate owner authorization, and isolated PRs.
+## Next coding step: P2-UX1 (PLANNED, not implemented)
+Owner approved a new rollout plan on November 10: first [P2-UX1 issue #25](https://github.com/KanujVerma/jobbie/issues/25) / [notification layout v2](phases/PHASE-2-UX.md) as a **presentation-only** PR, then separately [P2-ACT](phases/PHASE-2-ACT.md) for 3–5 source-verified owner-approved employer boards when available; only then P2-B licensed feeds and P2-C canonical catalogue. [Pasteable first /goal](agent-prompts/PHASE-2-UX-GOAL.md).
+
+**New future product scope only, NOT deployed:** Phase 3 private authenticated Discord/buttons + candidate evidence + basic application ledger; Phase 4 natural resume diff/PDF preview and UNSENT packet preparation; Phase 5 explicit `Approve & Apply` authorization and dot-first single-job execution with manual handoff first and optional local browser fallback; Phase 6 startup outreach/reminders. See [AUTO_APPLY.md](AUTO_APPLY.md) and [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md). A Jobbie-to-dot external trigger has NOT been verified; no mass submissions.
+This documentation PR changes specifications only. Live notifier/autoapply behavior, existing 13 active sources, state and job workflow remain unchanged.
+

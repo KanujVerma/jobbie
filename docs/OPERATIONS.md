@@ -87,3 +87,5 @@ Every new provider/feature behind flag and isolated from legacy polling. P2 cata
 - Plaid Lever has returned an HTTP 404 (failed source). Label it failed; do not claim the employer has no open jobs.
 - A healthy API returning 0 is separate from a failed API.
 - The scheduled cron has documented multi-hour gaps even with a 15-minute expression. Observability is not a scheduler fix; if timeliness is a new scope, introduce a measured, free, authorized scheduling alternative in its own reviewed PR, without breaking existing source polling.
+## New owner-approved delivery plan (2026-11-10)
+Before any new source activation, implement P2-UX1 source-grounded embed layout using ONLY synthetic payload fixtures and current notifier interface. Do not change `state/seen_jobs.json`, force backfill, create inert approval buttons, or claim a delivered job without a webhook result. Then source-verify and get owner approval for new boards in P2-ACT. Future private resume preview and per-job autoapplication executor are NOT deployed; follow `docs/AUTO_APPLY.md` and only permit exact one-job owner-approved submissions when Phase 5 gates pass.

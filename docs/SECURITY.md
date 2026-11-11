@@ -26,16 +26,25 @@ Adversarial job descriptions/README content may contain prompt-injection instruc
 - Redact personal details and use only necessary source excerpts; verify provider data handling and rate limits before use. No automatic paid fallback.
 - All AI-generated resume/outreach claims must be validated against approved facts and grounded company/job snapshots. Human final approval mandatory.
 
-## Outbound email (Phase 5)
+## Outbound email (Phase 6)
 - Email sender requires authenticated owner approval bound to exact recipient, subject, body SHA256, draft version, expiry and one-use nonce.
 - Message edit invalidates previous approval. Send provider receipt is authoritative for sent status. Timeout -> indeterminate, reconcile before any retry. No implied approval from "draft" or "save".
 - Never invent email addresses, impersonate referrals, bypass LinkedIn automation restrictions or send bulk unsolicited outreach. Honor opt-out/bounce feedback.
 
+## Owner-approved application automation (Phase 5)
+- Only authenticated owner may issue `Approve & Apply` for exact job/requisition, verified HTTPS employer destination, exact resume checksum and answer set version; resume approval alone is not enough. Approval nonce one use; expiry/revocation and no broadened job scope.
+- Private packet/URI can be delegated to the user's dot MANUALLY first; direct Discord/Jobbie-to-dot API cannot be assumed. Approved local browser fallback is restricted to specific allowed employer ATS origin(s). Credentials/MFA belong in authorized browser/provider sessions, never exported to GitHub or embedded in packet.
+- No bot evasion, CAPTCHA bypass, account credential exfiltration, mass apply, or platform-prohibited browser automation. Always honor site challenges, rate limits and human takeover.
+- Never invent experience, US citizenship, security clearance, demographic/EEO selection, signatures, legal consent, protected screening answers or salary commitments. Missing/unfamiliar choices pause as `needs_input`.
+- Final submission occurs only within exact per-job owner authority and permitted site functionality; require employer-side authoritative confirmation. `indeterminate` after timeout/unknown state, reconcile before retry to avoid duplicate applications.
+- Approval and resume hashes, employer URL, response receipt and state transitions are append-only and PRIVATE. No public screenshots containing personally identifying data, receipts, cookies or application confirmation codes.
+
 ## Emergency response and deletion
+
 1. Disable outgoing send/command feature flag; rotate affected token at its provider; do not put secrets in incident notes.
 2. Review scope of leakage, audit immutable action logs and revoke signed URLs/access. For compromised Discord webhook rotate URL and GitHub Actions secret.
 3. Restore from last verified backup/version; preserve evidence of data/schema changes and audit.
 4. For confirmed privacy leak, notify owner with actual facts and remediation steps; never claim deletion from third parties without evidence.
 
 ## Mandatory negative tests
-Unauthorized Discord user; forged signature; replayed nonce; PDF with misleading content; prompt injection in job description; malicious mention; long Unicode Discord field; GitHub private file accidentally selected as public proof; double-click send; changed recipient after approval; backend 429 / timeout; revoked candidate fact used in resume draft. Fail closed, preserve old alerts.
+Unauthorized Discord user; forged signature; replayed nonce; PDF with misleading content; prompt injection in job description; malicious mention; long Unicode Discord field; GitHub private file accidentally selected as public proof; double-click send; changed recipient after approval; backend 429 / timeout; revoked candidate fact used in resume draft; changed job URL/resume hash after application approval; double Submit; unsupported dot trigger; unknown EEO/legal question; employer confirmation missing; uncertain submission retry. Preserve approved packet privacy and fail closed. Fail closed, preserve old alerts.

@@ -1,9 +1,5 @@
-# Single-phase /code objective: Phase 2
+# Phase 2 agent entrypoint (revised 2026-11-10)
 
-/goal
+**Do NOT run a full Phase-2 implementation in one PR.** P2-A Greenhouse/Ashby is already MERGED and not production-enabled. Start with the first separately deliverable objective [P2-UX1](PHASE-2-UX-GOAL.md). After it is actually merged and verified, use [P2-ACT](PHASE-2-ACT-GOAL.md) to source-verify and owner-approve first new employer boards. Then complete P2-B and P2-C in separate PRs according to [PHASE-2.md](../phases/PHASE-2.md). No unauthorized source ingestion or early auto-apply.
 
-Repository: KanujVerma/jobbie if the GitHub rename is verified; else KanujVerma/job-alert. Read AGENTS.md, docs/README.md, PRODUCT.md, DECISIONS.md, CURRENT_STATE.md, PHASES.md, CONTRACTS.md, ARCHITECTURE.md, SECURITY.md, EVALS.md, OPERATIONS.md, OPEN_SOURCE.md, and docs/phases/PHASE-2.md. Inspect current main, actual Phase 1 release evidence, old adapters/tests/state and Actions. If Phase 1 is not RELEASED, stop with an explicit blocker; do not skip it.
-
-Execute ONLY Phase 2, in ordered reviewable PRs P2-A (Greenhouse/Ashby official read-only adapters), P2-B (licensed/public feed discovery with explicit source-rights review), P2-C (canonical job catalogue, cross-source dedup, shadow dual-write and rollout). Preserve 13 original NETWORK PRIORITY flags; all new companies default discovered/no referral. Do not implement AI, interactive Discord, resume upload, automatic applications or outbound sends. Do not scrape authenticated/protected Jobright/LinkedIn data.
-
-Test all existing behavior; 30+ dedup/adversarial fixtures, source failures, first-seen vs posted dates, source links, 72h shadow comparison if actually observable. Reconcile canonical IDs against old v2 state; no re-alert storm. Source rights unknown -> source remains disabled. Record source URLs, run IDs, test results, regressions, privacy checks, rollback. Review and merge PRs only when gates pass; otherwise report BLOCKED. Do not call mock data "live" or start Phase 3.
+For cold-agent context, read AGENTS.md, docs/HANDOFF.md, docs/STATUS.md, docs/PHASES.md and docs/DECISIONS.md. Never trust stale historic P2-A setup instructions as an implementation request. Update STATUS/HANDOFF/RELEASE_LOG with every functional PR. Keep original 13 Network Priority sources, saved job history, and running webhook intact.

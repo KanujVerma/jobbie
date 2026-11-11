@@ -10,7 +10,7 @@
 - Original-company `NETWORK PRIORITY` star displayed on eligible jobs. A network connection is NOT a confirmed referral; every original source defaults to `referral_status: unconfirmed`.
 - Discord outbound webhooks, company/source health records, bounded review digest, versioned seen-job history, canonical URL deduplication, and safe limited backfill.
 - Automated regression tests on PRs and main via `.github/workflows/test.yml`.
-- **P1-E corrected** bachelor's degree/tenure pathways and only marks visibly included, successfully delivered backfill jobs as alerted (PR #18, CI 716 passing tests). Its merged code must be separately observed in a subsequent scheduled production run before claiming live validation.
+- **P1-E corrected** bachelor's degree/tenure pathways and safe resumable backfill (PR #18); its post-merge scheduled workflow was verified [Actions #42698015121](https://github.com/KanujVerma/jobbie/actions/runs/42698015121). That run had 0 eligible matches, so it proves pipeline execution, not job relevance or Discord alert delivery.
 
 ## Original 13 network-priority monitored sources (verified against `companies.yaml`)
 Micron; Salesforce; CrowdStrike; Intel; Applied Materials; Western Digital; SanDisk; Plaid; Oracle; Microsoft Research; Microsoft; Amazon; Apple.
@@ -38,15 +38,15 @@ Actual alerts require the existing `DISCORD_WEBHOOK_URL` secret configured in Gi
 - **This does not mean it runs every 15 minutes.** Observed gaps have reached many hours. No near-real-time or SLA claim is justified.
 - Production job history: `state/seen_jobs.json`. **Never delete or reset it to force new alerts**; that risks lost history or spam. Follow [Operations](docs/OPERATIONS.md) for safe migration, rollback and diagnostic procedures.
 - Diagnostics distinguish a failed fetch (e.g. Plaid Lever 404) from a genuinely empty source. Source outages should not stop other company checks.
-- The app currently sends **webhooks only**. It does NOT yet receive Discord commands or resume uploads, tailor resumes, send founder emails, or manage applications.
+- The app currently sends **webhooks only**. It does NOT yet receive Discord commands or resume uploads, tailor resumes, run a dot/computer-use executor, submit employer applications, send founder emails, or manage private application records.
 
 ## Roadmap (ordered, one usable release at a time)
 1. **Phase 1 + hardening:** new-grad filtering, 13 source stars, release tests and safe backfill. Implemented; last corrective code merged at [PR #18](https://github.com/KanujVerma/jobbie/pull/18), subsequent production validation tracked in STATUS.
-2. **Phase 2:** expand verified job discovery with Greenhouse/Ashby, authorized feeds, persistent canonical catalogue. [Exact scope](docs/phases/PHASE-2.md).
-3. **Phase 3:** authenticated Discord commands, private resume/GitHub evidence, personalized matching.
-4. **Phase 4:** fact-preserving, natural role/company-specific resume tailoring, review and PDF/DOCX.
-5. **Phase 5:** startup research and *explicitly approved* outreach.
-6. **Phase 6:** application lifecycle, reminders, ranking feedback.
+2. **Phase 2A released (code only):** public Greenhouse/Ashby adapters merged in [PR #23](https://github.com/KanujVerma/jobbie/pull/23); additional boards NOT enabled. **Next: [P2-UX1 informative alerts](docs/phases/PHASE-2-UX.md), [first /goal](docs/agent-prompts/PHASE-2-UX-GOAL.md)**, then [P2-ACT owner-approved boards](docs/phases/PHASE-2-ACT.md), permitted feeds P2-B and canonical catalogue P2-C.
+3. **Phase 3 (planned):** signed Discord commands, owner-private resumes/evidence, ranking and basic application ledger.
+4. **Phase 4 (planned):** natural evidence-preserving tailoring, before/after + why, full PDF/DOCX preview and exact one-job approval packet.
+5. **Phase 5 (planned):** dot-first MANUAL application delegation/feasibility, then consent-bound single-job executor and optional local browser fallback. No verified automatic dot trigger yet.
+6. **Phase 6 (planned):** startup discovery/approved outreach plus application follow-ups/feedback. [Full plan](docs/PHASES.md) · [Safety & auto-apply design](docs/AUTO_APPLY.md).
 
 Existing public/third-party source access, license and data-rights constraints remain in force. No LinkedIn automation, unsupported resume claims, unpaid job applications or unapproved paid API activity.
 

@@ -24,7 +24,7 @@ Qualify 100% of clear disqualifiers excluded and 100% of clearly eligible fixtur
 - Shadow compare classified jobs against baseline and sampled manual labels. Record precision/recall; do not invent improvement numbers.
 
 ## Phase 2 acceptance
-Live source ATS smoke; source rights documented; minimum 30 dedup/closure/adversarial fixtures; 72h shadow count/duplicate comparison; canonical employer and original 13 flags retained.
+P2-A adapter source reads are merged and test-verified, but no additional production employer activation should be claimed. **Next P2-UX1:** snapshot realistic compact alert layout with true job-title-first hierarchy, 13 original stars/unconfirmed referrals, truthful compensation/time/source, official link, eligible vs review, Discord limits, hostile content/mentions, legacy transport compatibility and no state mutation. **P2-ACT:** require actual owner-approved source-verified board shortlist and one live controlled alert run; preserve originals. **P2-B:** permitted curated feed rights documented and employer links checked. **P2-C:** >=30 dedup/closure/adversarial fixtures, 72h shadow, canonical employer and original flags retained. No fake 15-minute cadence SLA.
 
 ## Phase 3 acceptance
 Valid and invalid signed Discord requests, replay, unauthorized owner access and privacy tests. At least 40 manually labeled job matches with per-class confusion, missing-info handling; confirmed vs proposed candidate facts; private repo read-only and scope enforcement; no public storage leak.
@@ -32,11 +32,15 @@ Valid and invalid signed Discord requests, replay, unauthorized owner access and
 ## Phase 4 acceptance
 See `RESUME_TAILORING.md`: 24 frozen jobs, zero accepted invented numbers/ownership/title/dates; 12 owner-reviewed samples with >=10 rated improved and at least as natural; all generated PDF/DOCX pass text, link, page and preserved-field checks. A single severe hallucination fails release.
 
-## Phase 5 acceptance
-20 sample company facts with source citations; contact provenance verification; unauthorized send, mismatch, double click and ambiguous timeout tests; at least one OWNER-APPROVED test email with actual provider receipt. No auto LinkedIn sends.
+## Phase 5 acceptance — explicit single-job automation
+- Dot feasibility: owner-authorized manual handoff on a verified employer application, privately transferred document and actual outcome; do not report supported direct dot API unless technically confirmed by a real test.
+- Executor: wrong recipient/domain/job, altered resume/answer version, expired/replayed nonce, unauthorized user, missing legal/EEO answer, MFA/captcha, uncertain submit, duplicate retry, inconsistent provider receipt; all fail closed or `needs_input`.
+- No fabricated application submission. First **actual** owner-approved external application and authoritative confirmation ID/page/receipt required before `LIVE_VERIFIED`; if blocked, report precise state rather than fake success.
+- Privacy scan and budget/ToS checks. Document latency, correctly filled fields, manual takeovers and failures without claiming inflated interview success.
 
-## Phase 6 acceptance
-Accurate immutable application state and attached exact resume; duplicate event handling, calendar/reminder idempotence, opt-out, private read, optional Gmail opt-in tests. User-confirmed status changes only.
+## Phase 6 acceptance — startup outreach and reminders
+At least 20 sourced company facts, zero guessed business contacts, no unsolicited or LinkedIn automated sends, exact owner-approved email and provider receipt if sending enabled; deduplicated application/reminder events, reliable privacy/export/retention, optional Gmail read classification only with consent, user-confirmed statuses. Original 13 and Phase 5 approval/receipt ledger preserved.
+
 
 ## Cost/reliability/privacy gates (each phase)
 - $0 recurring: explicitly record provider tier/limits, observed usage, API rate/429 handling, disabled paid fallback. Cannot guarantee free if usage charges may be incurred; requires spend cap or not deployed.

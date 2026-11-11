@@ -6,7 +6,7 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 |---|---|---|
 | J-001 | LOCKED | Canonical product/repository slug `jobbie` lowercase. GitHub repository rename verified (same ID 1339847701); historical `job-alert` links/remotes require migration. |
 | J-002 | LOCKED | Personal single-user Discord-first product; only owner's authenticated Discord ID may change private state. |
-| J-003 | LOCKED | Six independent, sequential phases. Phase 1 is deployable WITHOUT AI, Cloudflare, private storage, a new UI or additional job sources. |
+| J-003 | LOCKED, AMENDED 2026-11-10 | Six incremental major phases, revised sub-PR sequencing in PHASES.md; Phase 1 remains AI-free and the existing webhook must survive later private/executor outages. |
 | J-004 | LOCKED | December 2026 graduate; January 2027 preferred start; full-time new-grad/entry-level/appropriate 0–2-year roles; selected explicit stretch roles; internships excluded from alerts. |
 | J-005 | LOCKED | US employment authorization without sponsorship; green-card permanent residency is NOT citizenship. Citizenship-only / clearance requirements need exact evidence and a real eligibility check. Never assume a planned future naturalization is complete. |
 | J-006 | LOCKED | $100k BASE target is a ranking preference. Unknown compensation remains unknown; no false salary estimates. |
@@ -14,7 +14,7 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 | J-008 | LOCKED | The 13 enabled original career-site entries in PRODUCT.md carry `network_priority` forever unless owner changes it. `referral_status` separate and default unconfirmed. Disabled Snowflake and Applied Digital not in original flagged 13 by default. |
 | J-009 | LOCKED | Three recruiting tracks: traditional new grad, open startup roles, proactive startup outreach without confirmed opening. |
 | J-010 | LOCKED | Only explicitly approved PRIVATE GitHub repositories may be indexed, read-only. Approval to read is not approval to disclose externally or transmit full code to an LLM. |
-| J-011 | LOCKED | Outbound email may be sent only after exact recipient/subject/body/version approval by owner, via supported authorized integration; LinkedIn messaging remains manual. No auto-apply. |
+| J-011 | LOCKED, AMENDED 2026-11-10 | Outbound email requires exact recipient/subject/body/version approval; LinkedIn automated sends remain disallowed. Only explicit per-job approved application submission is allowed under J-026. Mass/unapproved autoapply remains prohibited. |
 | J-012 | LOCKED | Free recurring budget; paid services disabled by default, hard limits, usage observation, no claims of unlimited free service. |
 | J-013 | LOCKED | Jobright functionality may be studied via public docs and authorized manual tests; proprietary implementation, authenticated scraping, REA reverse-engineering without authorization excluded. |
 | J-014 | LOCKED | Resume tailoring may reorder/rewriter evidence but must preserve employer/title/dates/metrics/ownership and distinguish synthetic/prototype/validated/live status. Every added fact needs an approved source. |
@@ -31,6 +31,15 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 | J-023 | LOCKED | Documentation continuity: every functional source/config/test/workflow PR updates `docs/STATUS.md`, `docs/HANDOFF.md` and `docs/RELEASE_LOG.md` in the same PR; automated CI presence gate plus independent truth review. Historical state-only runtime commits are exempt. |
 | J-024 | LOCKED | No manual reset/delete/forced push of production `state/seen_jobs.json` to force notifications. Keep existing 13-source priority cohort; migrations/backfills idempotent and scoped. Repo historical notes about `rm state/seen_jobs.json` are superseded by `docs/OPERATIONS.md`. |
 
+| J-025 | LOCKED, OWNER APPROVED 2026-11-10 | Alert notification v2 is the NEXT standalone PR P2-UX1: title/company/location first, source-grounded eligibility, verified base salary or undisclosed, distinct original-13 network + unconfirmed referral, truthful posting timestamps and official link. Webhook-only: NO invented fit scores, private resume preview buttons or inert actions. |
+| J-026 | LOCKED, OWNER APPROVED 2026-11-10 | Allow **single-job application automation** ONLY when owner explicitly approves exact employer+requisition+official URL+verified answer set+immutable resume hash and final submission authority. Resume approval by itself does not authorize employer submission. No bulk applications, fabricated protected answers or blind retry when outcome uncertain. Supersedes earlier unconditional "no auto-apply" scope. |
+| J-027 | IMPLEMENTATION CHOICE WITH FEASIBILITY GATE | Prefer dot-first browser execution; actual external Discord/Jobbie-to-dot trigger is UNVERIFIED. Test manual owner-initiated dot handoff, supported inbound API if documented/available, then optional local Playwright/Stagehand fallback. Never assume dot sessions/login/permissions transfer or paid infrastructure is free. |
+| J-028 | LOCKED, OWNER APPROVED 2026-11-10 | Move minimal private Application/Attempt ledger to Phase 3; structured resume diff and packet approval to Phase 4; dot/manual+fallback executor to Phase 5; startup contact/outreach/reminders to Phase 6. Preserve three recruiting paths and future architectural isolation. |
+| J-029 | LOCKED | Controlled new-source activation after notification UX: source-verified employer board, exact company shortlist approval, non-network by default, separate PR, no state reset or forced backfill. P2-B/C source/data catalog follow as separate releases. |
+| J-030 | LOCKED | No simulated "Submitted" result: require employer confirmation page/application ID/authorized receipt; uncertain submission -> `indeterminate` and reconcile before retry; new legal/EEO/signature/MFA questions -> pause and ask owner. Private approved packets/resumes never in public GitHub or public Discord embeds. |
+
+| J-031 | IMPLEMENTATION CLARIFICATION 2026-11-10 | Phase 4 may create `Prepare application packet` ONLY as a private UNSENT draft. No `Approve & Apply` button or submission authorization until Phase 5 executor and exact per-job consent are implemented and validated. Keeps resume approval independent of application submission and prevents inert UI controls. |
+
 ## Open decisions: default actions
  (not questions to invent answers for)
 1. Referral people/contact details: UNKNOWN. Maintain `unconfirmed` for all 13 until owner supplies and confirms. Do not request names as prerequisite to Phase 1.
@@ -42,4 +51,8 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 7. GitHub repository rename COMPLETED and verified. Individual computers' local git remotes still need operator verification; do not claim they were updated.
 
 ## Change process
-New entries: `J-025` onward, date, request/justification, contracts affected, PR, migration, test delta, rollback. Never silently "resolve" two conflicting instructions. A lower-priority implementation detail may be selected with explicit rationale and tests; a LOCKED policy conflict requires owner decision.
+New entries: `J-032` onward, date, request/justification, contracts affected, PR, migration, test delta, rollback. Never silently "resolve" two conflicting instructions. A lower-priority implementation detail may be selected with explicit rationale and tests; a LOCKED policy conflict requires owner decision.
+## Decisions deliberately unresolved (do not invent)
+- Exact 3–5 additional Greenhouse/Ashby employer board names/tokens: require source checks and owner activation approval (P2-ACT), not set by this documentation PR.
+- Direct dot task invocation from a Discord button: not verified on this account. The manual user-to-dot prompt is supported only if the dot can securely access required inputs during a pilot; record actual result.
+- Browser agent provider, cloud vs local hosting, pricing/quotas, actual employer automated-form permissions, auth and protected screening choices: verify at P5 feasibility. Free-first; no automatically activated billable service.

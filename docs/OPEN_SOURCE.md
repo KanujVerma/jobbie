@@ -30,3 +30,16 @@ Groq GPT-OSS 120B initial free-tier **candidate** (not guaranteed best) for boun
 
 ## Reference engineering hierarchy
 Official employer/ATS source > verified licensed structured feed > curated public lead > unverified aggregated/social mention. Any job read from the latter tiers must be checked at employer before labeling actively open. Company/contact facts also need source time and provenance.
+## Application executor candidates (research-only, 2026-11-10)
+These all exceed 1,000 GitHub stars at observation; counts/commit and license MUST be reverified before importing or installing, and do not prove form completion quality. See [AUTO_APPLY.md](AUTO_APPLY.md) for the actual owner-approval and proof plan.
+
+| Repository | Observed stars | License | Proposed bounded use |
+|---|---:|---|---|
+| [browser-use/browser-use](https://github.com/browser-use/browser-use) | 120,596 | MIT | Agent-browser reference, constrained fallback for unfamiliar forms |
+| [browserbase/stagehand](https://github.com/browserbase/stagehand) | 25,992 | MIT | Preferred custom executor candidate for deterministic known fields + AI on unknowns |
+| [microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp) | 39,459 | Apache-2.0 | Precise browser tool calls for repeatable form fields |
+| [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser) | 49,173 | Apache-2.0 | Lightweight browser CLI alternative |
+| [feder-cr/Jobs_Applier_AI_Agent](https://github.com/feder-cr/Jobs_Applier_AI_Agent) | 32,455 | MIT | Form-workflow/receipt tracking reference; NO mass apply pattern copied by default |
+| [Skyvern-AI/skyvern](https://github.com/Skyvern-AI/skyvern) | 23,376 | AGPL-3.0 | More integrated visual workflow reference; evaluate license and hosting obligations |
+
+**Tooling order:** test owner's dot cloud-browser/manual delegation first, because no direct public dot invocation is verified; then evaluate supported trigger; only then implement self-hosted/local browser fallback if needed. Never equate OSS code cost to zero model/cloud-browser runtime cost. Follow official ATS/website terms, no captcha/account protections bypass, no unauthorized LinkedIn automation or protected data scraping.

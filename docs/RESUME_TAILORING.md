@@ -55,7 +55,9 @@ Freeze 24 legitimate job descriptions (6 per SWE/backend, applied AI/FDE, startu
 - Human owner reviews at least 12 diverse outputs before live rollout; >=10/12 must be rated more relevant AND at least as natural as baseline with no fabricated claim. Record disagreements, failed examples, and any manual corrections. This is internal product gate, NOT a proven employer/ATS advantage.
 - Multiple provider/challenger models if accessible for $0; log per-model factual fail rate, quality, latency, quota errors and context privacy.
 - Stale proposal/changed factual claim before acceptance must invalidate draft and require regeneration/revalidation.
-- No generated resume is sent to employer automatically. Only user downloads and submits.
+- `Approve resume` (Phase 4) NEVER sends a document to an employer. Phase 4 may only **Prepare application packet** privately with no submission authorization. **Only Phase 5** introduces actual per-job `Approve & Apply` and authorized dot/browser execution, where permitted. No mass/unattended blanket autoapply; see `AUTO_APPLY.md`.
 
 ## Failure handling
 If model unavailable or quota exceeded, return error with original resume safely intact. If model proposes unsupported claim, remove/reject it rather than rephrase deceptively. If PDF is two pages or unreadable, fail build and show actionable layout errors. If user didn't approve final draft, never call it submitted.
+## Private preview and approval (Phase 4)
+Show side-by-side original/proposed bullets and what job requirement each edit addresses, its supporting confirmed fact_id and why the change improves relevance. Allow owner edits/rejections, rerun validation and show full one-page PDF preview before signing the exact artifact hash. Phase 4 can **Prepare application packet** in private storage but this is an unapproved, unsent draft and NO `Approve & Apply` submission control is displayed at this stage. Phase 5 later adds a separate, authenticated one-job `Approve & Apply` action only with its executor and consent gates. Never create an inert button or treat Phase 4 packet preparation as application authorization.

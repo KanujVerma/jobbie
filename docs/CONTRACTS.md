@@ -33,10 +33,22 @@ Private repo read permission is NOT publication permission. Distinguish authored
 `ResumeProposal`: source_resume_version, target_job_snapshot, list of operations (id/path/original/replacement/evidence_fact_ids/rationale), model/version, input_digest. Every operation validated against protected fields and cited evidence; stale original text invalidates the operation.
 `ResumeArtifact`: approved_structured_version, PDF and DOCX SHA256s, render version, parser test results, page count, owner_approval_timestamp. Original immutable. Never silently substitute a new version for an already-submitted application.
 
-## Outreach and application states (Phases 5–6)
-Outreach: `draft -> reviewed -> approved -> sending -> sent | failed | indeterminate | canceled`. Approval digest binds exact destination/address, subject and body. `indeterminate` requires reconciliation; no blind retry.
-Application: `discovered -> saved -> applied -> assessment -> interview -> offer`, with alternative `rejected`, `withdrawn`, `closed` and event timestamps. May skip states with explicit user event; never auto-mark "applied" because a URL was opened, "referral submitted" because a message was drafted, or "interview" because a recruiter viewed a profile.
-Commands require authorized user, validation, rate limits and audit; feedback cannot overwrite canonical job/candidate sources.
+## Application/attempt/approval states (Phase 3 substrate; Phase 5 executor)
+**Application owner-tracking stage:** `discovered -> saved -> ready_to_apply -> applied -> assessment -> interview -> offer`, alternatives `rejected`, `withdrawn`, `closed`; append-only events and correction events. `saved` is not `applied`. Do not mark `applied` when URL opened or Submit was clicked without confirmation.
+
+**ApplicationAttempt:** `created -> approved -> delegated -> in_progress -> needs_input | submitted_confirmed | failed | indeterminate | cancelled`. Status transitions require source evidence and timestamp. Retry after `indeterminate` requires employer dashboard/email reconciliation and owner decision; never blind duplicate.
+
+**ApplicationPacket (private, immutable):** `packet_id`, schema_version, job_snapshot_id, employer_domain, original official req ID or unknown, verified apply_url, candidate_profile_version, approved answer set IDs/hash, resume_version + PDF SHA-256, signed owner identity, `submission_authorized` for ONE specific job, approved_at/expires_at, approval_digest over canonical packet, one-time nonce, attempt_id/idempotency_key and private references. Changing resume/answers/URL/job invalidates approval. No passwords, contact data or private GitHub implementation text in PUBLIC packet or logs. `Approve resume` is not submission authority.
+
+Protected application answers: work authorization/no sponsorship ≠ US citizenship; degree/grades/dates/experience always owner confirmed; EEO/self-identification, legal attestation, signatures, salary commitments, MFA/CAPTCHA -> `needs_input` if not explicitly approved. No model-only claims.
+
+A `submitted_confirmed` attempt requires employer confirmation ID/page/authorized provider receipt or verified confirmation email. Record exact receipt/time. Unknown => `indeterminate`. One active attempt per canonical owner/employer/requisition unless explicitly corrected; never submit duplicates across feeds.
+
+## Outreach (Phase 6)
+`draft -> reviewed -> approved -> sending -> sent | failed | indeterminate | canceled`. Approval digest binds exact contact/subject/body/nonce; no guessed email or auto LinkedIn DM; timeout requires reconciliation. Applications and outreach are distinct authorization scopes.
+
+Commands require authenticated owner, replay controls, private access, rate limits and audit; feedback cannot overwrite canonical source/candidate facts.
+
 
 ## Migration rules
 Every schema migration needs idempotent upgrader, backup/export, rollback note, dry-run fixtures, and no plaintext secrets. Existing `state/seen_jobs.json` contains historical alerted flags; migration may preserve but not erase it. A bounded `policy_version`-scoped backfill is the only way to surface previously seen newly eligible jobs without a notification storm.

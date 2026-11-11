@@ -7,7 +7,7 @@ Canonical repository: `KanujVerma/jobbie` (rename verified, GitHub repository ID
 ## Entry point / reading order (required for EVERY coding run)
 1. `AGENTS.md` (this file).
 2. `docs/HANDOFF.md` -> `docs/STATUS.md` -> `docs/README.md` -> `docs/DECISIONS.md`. `docs/CURRENT_STATE.md` is an explicitly archived November 4 baseline, not current status.
-3. `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/CONTRACTS.md`, `docs/SECURITY.md`.
+3. `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/CONTRACTS.md`, `docs/SECURITY.md`, `docs/NOTIFICATIONS_V2.md`, and `docs/AUTO_APPLY.md` for planned user-facing workflow.
 4. `docs/PHASES.md` and the exact phase document `docs/phases/PHASE-N.md`; `docs/RESUME_TAILORING.md` for Phase 4; `docs/OPEN_SOURCE.md` before importing code.
 5. `docs/OPERATIONS.md` and `docs/EVALS.md` for gates; read the exact phase prompt in `docs/agent-prompts/`.
 
@@ -19,7 +19,7 @@ If a referenced file is missing, stale, contradictory, or cannot be fetched, ins
 - SF Bay Area highest location preference; other CA, NYC, Chicago, Texas, Florida prioritized; other US roles can remain discoverable.
 - Work authorized in the US, no sponsorship needed; permanent resident is NOT US citizenship. Do not expose personal immigration details publicly.
 - Exactly 13 *currently enabled* original source entries qualify as `network_priority` (see `docs/DECISIONS.md`). They do NOT imply an actual referral.
-- No unsolicited external sends, application submission, source login, unauthorized scraping, or unapproved private repo disclosure. Email sends require exact-message user approval; LinkedIn sending stays manual.
+- No unsolicited external sends, **unapproved** application submission, job-board discovery logins, unauthorized scraping, or unapproved private repo disclosure. Phase 5 permits only a single owner-approved exact job application packet and employer-site actions when site policy allows. Email sends require exact-message owner approval; LinkedIn automated sending stays disallowed.
 - No unsupported metrics, employer claims, responsibilities, clinical validation, trading performance, startup traction, or readiness assertions.
 - Phase 1 has NO required AI, Cloudflare, resume upload, database, or new companies.
 - Every phase must be independently usable, independently testable, and reversible without damaging previously working features.
@@ -53,3 +53,8 @@ The primary coding assistant MUST implement the requested current phase directly
 
 ## Durable handoff / documentation ownership
 The repository is the only required work context for future agents. Begin with `docs/HANDOFF.md` and `docs/STATUS.md`; do not ask for prior chat transcripts or require private resumes to implement public-source phases. Update handoff, status, and release log in each functional PR. After merge, separately record actual merge commit and live checks when independently observed. Do not claim automatic background documentation edits; the PR CI guard verifies document changes, and operators maintain factual truth.
+## Owner-approved 2026-11-10 product scope
+- This approval updates only the ROADMAP, not current implementation. Next actual coding PR is `P2-UX1` notification layout, see `docs/phases/PHASE-2-UX.md` and `docs/agent-prompts/PHASE-2-UX-GOAL.md`. It must not introduce inert buttons, private resume UI, new employers or autoapply.
+- Future `Approve resume` is separate from owner `Approve & Apply` for ONE exact employer/requisition, approved PDF checksum and answer set. No bulk/general application authorization. Required employer confirmation, no fabricated answers, and no blind retry after uncertain submission.
+- Dot-first application execution is a FEASIBILITY PLAN, NOT a verified Jobbie-to-dot programmatic integration; do not claim or construct a nonexistent dot API. Manual user delegation is first pilot; optional local Playwright/Stagehand fallback only after proper site/privacy review.
+- Revised phase order is in `docs/PHASES.md`. Supersedes historical Phase 5/6 references in old comments, not prior verified code/release facts.

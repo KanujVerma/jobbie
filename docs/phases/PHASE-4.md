@@ -1,26 +1,24 @@
-# Phase 4 executable contract — natural, honest job-specific resume tailoring
+# Phase 4 executable contract — natural resume tailoring, preview, approval packet
 
-STATUS PLANNED. Requires Phase 3 released. Four PRs P4-A/B/C/D. `docs/RESUME_TAILORING.md` and `docs/EVALS.md` are normative. No AI may self-certify its output.
+**PLANNED.** Requires Phase 3 released. Normative [RESUME_TAILORING.md](../RESUME_TAILORING.md), [AUTO_APPLY.md](../AUTO_APPLY.md) for approval boundaries, and [EVALS.md](../EVALS.md). Four sequential PRs.
 
-## P4-A: reliable fact selection / provider challenge
-- Use confirmed CandidateFacts (from uploaded source resumes and explicitly approved GitHub evidence). Preserve exact title, employer, chronology, source version and scope. Select strongest evidence for each role.
-- Build frozen 24-case evaluation set (6 SWE/backend; 6 AI/FDE; 6 small startup/founding; 6 adjacent data/ML) with source JDs archived where rights permit, otherwise hashed metadata/short evidence excerpts.
-- Provider abstraction starting candidate Groq GPT-OSS 120B; benchmark available free alternatives and permitted zero-incremental-cost API credits WITHOUT spending unapproved money. Track model/version/input digest/latency/rate-limit/error/cost.
-- Record human naturalness judgments; avoid verbose generic phrasing. Model cannot manufacture achievements.
+## P4-A: frozen evidence and model benchmark
+- Use only confirmed CandidateFacts, approved repository ownership, original/source resume, job JD snapshot and employer sources. Benchmark 24 real role descriptions (six each SWE/backend, AI/FDE, startup/product, ML/data); read source/license constraints.
+- Start with Groq GPT-OSS 120B only as candidate free option; compare permitted challengers using blind user naturalness, authenticity, specificity, latency, data policy and free quotas. No unapproved paid spend. Freeze profiles/requirements for reproducibility.
 
-## P4-B: tailored resume planner + preservation validator
-- Model proposes list of structured operations: `replace bullet`, `reorder verified bullet/project`, `remove irrelevant content`, `reorder skill`, `rewrite concise summary`. Each operation cites fact IDs and original source text.
-- Deterministic validator checks unchanged identity/employer/role/title/date/degree; numerical quantity preservation; no unauthorized new tech/ownership/performance/validation claims. Unsupported output -> reject specific change and request owner fact confirmation.
-- At most 1 page by default, ATS-safe, no fake ATS-score optimization. Original resume immutable; revisions produce version and fine-grained diff. Explicit owner approves final.
-- Natural copy: challenge-action-result where evidence supports, no corporate filler, no em dashes, no gratuitous keyword insertion, varied sentence structure, 1 idea per bullet.
+## P4-B: structured edits and independent fact validator
+- Model proposes `replace bullet`, `reorder experience/project`, `remove irrelevant`, `reorder skills`, `rewrite concise summary` with exact before/after source span, verified fact IDs and targeted job requirement IDs.
+- Reject changes to title/date/employer/ownership and unsupported skills/metrics, invented ROI/production performance, synthetic-to-live upgrades, false citizenship. Natural one-idea-per-bullet voice, no em dashes, no ATS keyword stuffing.
 
-## P4-C: deterministic PDF/DOCX
-- Adopt pinned compatible RenderCV (MIT) or equivalent for structured PDF, plus typed DOCX output and independent text-extraction test.
-- Same canonical structured content for both; 1-page visual/layout validation, proper selectable text, working links, correct order, no clipping or hidden fields. PDF and DOCX parity.
-- Artifacts SHA256, version, model/prompt version and job_snapshot ID. Unauthorized downloads prohibited.
+## P4-C: reproducible PDF/DOCX
+- Render from one canonical structured resume via pinned RenderCV or equivalent PDF and python-docx DOCX; one-page engineering default, selectable text, correct reading order and link behavior. Source/target job artifact ID, SHA-256, render version and immutable original; verify no clipped content and PDF-DOCX parity.
+- Private short-lived preview/download URLs; don't leak resumes via Discord public channel.
 
-## P4-D: review UX and release
-- Private review page opened from Discord, side-by-side source/proposed bullet changes, accept/reject/edit, undo, page preview; stale edit detection.
-- `/resume tailor`, `/resume versions`, download links. Application records can attach exact approved file, never mutate past attached version.
-- Compare original vs tailored in blind human review; no unsupported claims in accepted output, actual PDF parsing, naturalness threshold per EVALS; provider fallback on quota without bad claims.
-- Confirm with actual sample user approved variant and document downloads; if review/approval absent, mark `BLOCKED_LIVE` instead of releasing silently.
+## P4-D: actual preview and separate approval
+- Authenticated review page linked from signed Discord command: original vs new bullet-by-bullet diff, clear JD-based *why*, what was removed, accept/reject/edit, undo, full-page PDF preview, downloadable PDF/DOCX. Revalidate after edits.
+- `Approve resume` signs exact document hash without submitting an application.
+- Phase 4 action is explicitly **`Prepare application packet`** (no submission authority). Store a private **unsent draft** binding a single verified job/requisition/official URL, confirmed candidate answer set and approved resume hash; do not generate an authorized submission nonce or mark apply-approved. Phase 5 introduces the separate live **`Approve & Apply`** consent action, nonce/expiry and executor only after validated release. No fake or inert auto-apply button in Phase 4.
+- Store exact immutable resume version attached to application record, no substitution later.
+
+### Release gates
+Zero accepted severe factual hallucinations across 24 test jobs, 12 owner-reviewed samples with ≥10 improved-and-at-least-as-natural, all PDF/DOCX parse/layout/links correct, hostile-upload and unauthorized-link tests, stale approval invalidation. One real approved preview/download where possible. No automatic employer submission.
