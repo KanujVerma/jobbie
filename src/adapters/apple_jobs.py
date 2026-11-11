@@ -144,6 +144,7 @@ class AppleJobsAdapter(BaseAdapter):
                     "Apple Jobs '%s' request failed on page %d: %s",
                     source_kind, page, exc,
                 )
+                self.record_fetch_error(exc)
                 return
 
             soup = BeautifulSoup(resp.text, "html.parser")

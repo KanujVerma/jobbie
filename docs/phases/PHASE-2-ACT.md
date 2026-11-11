@@ -1,22 +1,13 @@
-# P2-ACT executable PR — first additional source-verified employers
+# P2-ACT owner-directed company intake
 
-**Status:** PLANNED. [Tracking issue #26](https://github.com/KanujVerma/jobbie/issues/26). Start only after [P2-UX1](PHASE-2-UX.md) has merged and passed regression gates. P2-A existing Greenhouse/Ashby adapters have already merged, but NO new employer was enabled in `companies.yaml`.
+Owner amendment 2026-11-11 replaces the historical mandatory 3-5-company expansion. Status: SPECIFIED, implementation pending. Issue #26 tracks this workflow.
 
-## Why a separate PR?
-Alert presentation can be deployed and reverted without touching scraping or historical dedup. Activating employers changes production coverage, fresh-state and potential Discord volume. Do not conflate test-board connectivity with a relevant new-grad opportunity.
+Accept a versioned portable request containing company name, optional official careers URL, aliases, requested roles/locations, priority and intent `monitor` or `startup-research`. A GitHub issue form and tested CLI/agent workflow must share the same semantics. A user may manually give this request to dot; no API, automatic trigger or session transfer is assumed.
 
-## Step-by-step implementation
-1. Verify available new-grad openings and actual **official employer** public Greenhouse/Ashby board URLs for a SHORTLIST of 3–5 companies in target regions (SF Bay prioritized; other CA, NYC, Chicago, TX, FL). Verify board token/name from employer careers domain. Source URLs and retrieval times required. Start with fewer if only fewer can be verified.
-2. A company without an active eligible role may still be a legitimate future monitor if board and rate/permission are verified; label status honestly. Do not invent a current job or hiring demand.
-3. Before modifying production config, present the explicit shortlist and source evidence to the owner for approval (the owner has not authorized specific new employers by name in this plan). If no approval, publish a source-verified activation proposal and mark `BLOCKED_APPROVAL`, not active.
-4. Once approved, add only approved boards to `companies.yaml` with `enabled:true`, `network_priority:false`, `cohort:discovered` and `referral_status:unavailable`, retaining the 13 original source entries, 2 historical disabled, and exact config semantics.
-5. Run controlled read-only dry-run for ONLY new boards, verify source returned data, no state writes, no Discord sends; classify actual title, employment, locations, salary and freshness with no fabricated metadata. Record false positive/negative samples.
-6. Add source-specific adapter/config tests, before/after source counts, source health detection for 404 vs zero, dedup where employer appears in old source, rate/batch caps and a safe first-run summary or suppression if existing state would flood.
-7. Activate through reviewed PR with a flag and rollback, then observe one authorized real scheduled run with recorded counts and no duplicate storm. If source permission uncertain, do not activate.
-8. Update STATUS/HANDOFF/RELEASE_LOG, tests/review, sourced evidence and limitations.
+Before generating a config proposal, verify canonical employer/aliases, official careers-to-ATS ownership, exact provider ID, access/data permission, response health and current listed jobs. Unknown evidence stays needs_review. Reject unsafe URLs and alias/provider collisions. Research targets are not live job monitors or current hiring claims.
 
-## Scope boundaries
-Do not implement P2B feeds, P2C canonical catalogue, private profile, AI, resume review or auto-apply in this activation PR. Do not mark future discovered companies as referral priorities without explicit owner override. Preserve public state and stored job IDs; never delete/reset to force new alerts.
+Proposals are disabled and reviewable, with source URLs/retrieval time/evidence and role/location intent. New employers are `cohort: discovered`, `network_priority: false`, `referral_status: unavailable`. Never modify production config automatically. Enable an exact employer only after explicit owner approval in a separate reviewed activation PR with state-safe initial-volume, dedup and rollback proof. Preserve 13 original enabled sources and 2 historical disabled sources.
 
-## Success
-Three to five source-verified monitored employers where available and approved, transparently `DISCOVERED`, reliable public ATS links and independently measured alerts/digest; original 13 unchanged. If evidence or consent missing, safe blocker is an acceptable engineering outcome, not silently fabricated activation.
+Tests: request schema, missing optional URL, aliases and collisions, official provider/ID mismatch, missing rights/health/listings, 403/404/429, hostile URLs, startup-research separation, unconfirmed referrals and unchanged production config/state. Full pytest/config, no-mutation dry-run, independent review and exact-head CI. Update STATUS/HANDOFF/RELEASE_LOG and onboarding documentation.
+
+Missing owner requests or approval never authorizes inventing a shortlist and does not block independent P2-B/C implementation. Record BLOCKED_APPROVAL only for activation. Existing P2-A adapters stay available and examples stay disabled.

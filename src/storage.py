@@ -423,7 +423,7 @@ def _migrate_v1_to_v2(state: dict) -> dict:
     return state
 
 
-def load_state(path: str, raise_on_corrupt: bool = False) -> dict:
+def load_state(path: str, raise_on_corrupt: bool = False, *, persist_migration: bool = True) -> dict:
     """Load JSON state.
 
     If file is missing: returns empty v2 state.
@@ -464,14 +464,55 @@ def load_state(path: str, raise_on_corrupt: bool = False) -> dict:
             raise StateCorruptionError(msg)
         return _empty_state()
 
+    # Validate containers before migration or delivery code can use them. Never
+    # reinterpret a malformed existing ledger as a fresh first run.
+    malformed = data["version"] not in (1, 2)
+    for key in ("alerted_urls", "review_queue", "migrations"):
+        malformed |= key in data and not isinstance(data[key], dict)
+    malformed |= "heartbeat_history" in data and not isinstance(data["heartbeat_history"], list)
+    malformed |= data.get("last_heartbeat") is not None and not isinstance(data["last_heartbeat"], dict)
+    rows = []
+    for company in data["companies"].values():
+        if not isinstance(company, dict):
+            malformed = True
+            continue
+        if data["version"] == 1:
+            malformed |= not isinstance(company.get("seen_ids", []), list)
+        seen = company.get("seen_jobs", {})
+        if not isinstance(seen, dict):
+            malformed = True
+        else:
+            rows.extend(seen.values())
+        malformed |= "health" in company and not isinstance(company["health"], dict)
+    for key in ("alerted_urls", "review_queue", "migrations"):
+        if isinstance(data.get(key), dict):
+            rows.extend(data[key].values())
+    for row in rows:
+        if not isinstance(row, dict):
+            malformed = True
+            continue
+        for key in ("first_seen", "last_seen", "alerted_at"):
+            value = row.get(key)
+            if value is not None:
+                try:
+                    malformed |= datetime.fromisoformat(value).tzinfo is None
+                except (TypeError, ValueError):
+                    malformed = True
+    if malformed:
+        if raise_on_corrupt:
+            raise StateCorruptionError("Invalid state schema or timestamps; preserve the original for recovery")
+        logger.error("Invalid state schema or timestamps")
+        return _empty_state()
+
     if data["version"] == 1:
         logger.info("Migrating state from v1 to v2...")
         data = _migrate_v1_to_v2(data)
-        try:
-            save_state(data, path)
-            logger.info("State migration complete.")
-        except Exception as save_err:
-            logger.warning("Migration succeeded but failed to persist: %s — will re-migrate next run.", save_err)
+        if persist_migration:
+            try:
+                save_state(data, path)
+                logger.info("State migration complete.")
+            except Exception as save_err:
+                logger.warning("Migration succeeded but failed to persist: %s; will re-migrate next run.", save_err)
 
     migrate_state(data)
     return data

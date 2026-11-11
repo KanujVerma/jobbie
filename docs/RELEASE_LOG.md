@@ -78,3 +78,11 @@ Every functional PR must append a concise entry naming its PR slot, actual commi
 - Independent Sol review found a hidden review-digest eligibility blocker and an unknown verdict level overwritten by the legacy role label. Both were reproduced using `apply_filter_pipeline` and corrected; a focused re-review is required before shipping.
 - After the two review fixes: `python main.py validate-config` returned `Config is valid.`, `python -m compileall -q src scripts` exited 0, and `pytest -q` returned `826 passed in 34.03s` on Python 3.15.2. Exact-head Python 3.12 CI and live delivery remain pending.
 - Independent Sol re-review approved the changed behavior, resolved both findings, and independently ran 826 tests on Python 3.15.2. This does not substitute for hosted exact-head review or CI.
+
+## 2026-11-11: Phase 2 completion audit and P2-R1 candidate
+- Confirmed P2-UX1 #29 merged at e0346f49bd572179250fe08bed73131db0ba311a; post-merge Tests 42944213890 succeeded. Current owner scope supersedes UX-only and mandatory P2-ACT expansion.
+- Production schedule 43032487797 on da898dc: 12/13 responding, Plaid 404, 2 matched/309 review/9002 excluded, 0 job ACKs/failures, 472.9-minute gap. No verified P2-UX1 live delivery.
+- Candidate fixes reproduced legacy failure masking and dry-run v1 migration writes; adds partial-failure health, source/filter/candidate/ACK timing reports, Actions summary, corrupt-state guard and secret-safe webhook logs. Original roster/config/seen state remain unchanged. Initial focused reproduction: 26 failed/3 passed before fixes. Full final tests/review/CI/merge evidence belongs in the PR; not yet a released or live-verified claim. See evidence/P2-RELIABILITY.md.
+- Rollback code/workflow only, retain state. Remaining independent PRs: original-source repair, owner intake, OFF feeds, SQLite catalogue/shadow/search/export. Missing approval/rights/72h remain explicit gates.
+
+- P2-R1 local verification checkpoint: 869 tests passed in 32.98s (Python 3.15.2), config/compileall/diff-check passed. Full no-webhook dry-run exited 0; production config and seen-state SHA-256s unchanged. This proves read-only execution, not live delivery. PR CI/review/merge pending.

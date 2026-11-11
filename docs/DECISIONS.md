@@ -40,6 +40,8 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 
 | J-031 | IMPLEMENTATION CLARIFICATION 2026-11-10 | Phase 4 may create `Prepare application packet` ONLY as a private UNSENT draft. No `Approve & Apply` button or submission authorization until Phase 5 executor and exact per-job consent are implemented and validated. Keeps resume approval independent of application submission and prevents inert UI controls. |
 
+| J-032 | LOCKED, OWNER APPROVED 2026-11-11 | Finish all feasible remaining Phase 2 across scoped PRs. Mandatory P2-ACT expansion is replaced by owner-directed issue/CLI intake and disabled reviewed proposals. Company/feed expansion is opt-in; missing approval/rights does not block independent implementation. Preserve 13 enabled original sources plus 2 historical disabled. SQLite catalogue remains behind legacy delivery authority until >=72h real shadow, reconciliation, rollback proof, explicit cutover approval and an observed post-cutover scheduled run. |
+
 ## Open decisions: default actions
  (not questions to invent answers for)
 1. Referral people/contact details: UNKNOWN. Maintain `unconfirmed` for all 13 until owner supplies and confirms. Do not request names as prerequisite to Phase 1.
@@ -53,6 +55,6 @@ Dated 2026-11-04. "Locked" means an agent cannot change it without explicit owne
 ## Change process
 New entries: `J-032` onward, date, request/justification, contracts affected, PR, migration, test delta, rollback. Never silently "resolve" two conflicting instructions. A lower-priority implementation detail may be selected with explicit rationale and tests; a LOCKED policy conflict requires owner decision.
 ## Decisions deliberately unresolved (do not invent)
-- Exact 3–5 additional Greenhouse/Ashby employer board names/tokens: require source checks and owner activation approval (P2-ACT), not set by this documentation PR.
+- Additional employer names/tokens are owner-directed requests, not a required expansion cohort. Exact activation still requires verified ownership/rights and owner approval.
 - Direct dot task invocation from a Discord button: not verified on this account. The manual user-to-dot prompt is supported only if the dot can securely access required inputs during a pilot; record actual result.
 - Browser agent provider, cloud vs local hosting, pricing/quotas, actual employer automated-form permissions, auth and protected screening choices: verify at P5 feasibility. Free-first; no automatically activated billable service.

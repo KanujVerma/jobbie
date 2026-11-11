@@ -105,6 +105,9 @@ jobs:
         run: python main.py run
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: Publish source and delivery health snapshot
+        if: always()
+        run: python main.py health --format markdown >> "$GITHUB_STEP_SUMMARY"
       - name: Commit state
         timeout-minutes: 3
         run: |

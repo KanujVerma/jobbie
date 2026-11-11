@@ -274,9 +274,10 @@ class Notifier:
                 # Retry once
                 resp = requests.post(self._url, json=payload, timeout=10)
             if resp.ok:
+                logger.info("Discord webhook acknowledged (HTTP %d)", resp.status_code)
                 return True
-            logger.warning(f"Discord webhook error {resp.status_code}: {resp.text[:200]}")
+            logger.warning("Discord webhook error (HTTP %d)", resp.status_code)
             return False
         except requests.RequestException as e:
-            logger.warning(f"Discord webhook request failed: {e}")
+            logger.warning("Discord webhook request failed (%s)", type(e).__name__)
             return False

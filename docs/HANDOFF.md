@@ -1,56 +1,26 @@
-# Agent restart handoff: complete context without chat history
+# Jobbie agent handoff
 
-Read this file and [STATUS.md](STATUS.md) before changing Jobbie. Then read [AGENTS.md](../AGENTS.md), [DECISIONS.md](DECISIONS.md), [PRODUCT.md](PRODUCT.md), [PHASES.md](PHASES.md), the active phase, [CONTRACTS.md](CONTRACTS.md), [SECURITY.md](SECURITY.md), [OPERATIONS.md](OPERATIONS.md), [EVALS.md](EVALS.md) and [OPEN_SOURCE.md](OPEN_SOURCE.md). Current runtime and future architecture are intentionally separate in IMPLEMENTED_ARCHITECTURE.md and ARCHITECTURE.md.
+Read STATUS.md, AGENTS.md, DECISIONS.md, PHASES.md, the exact phase spec, CONTRACTS.md, SECURITY.md, OPERATIONS.md and EVALS.md. GitHub plus committed files is sufficient context. Never require private resumes for Phase 2.
 
-## P2-UX1 handoff at candidate authoring
+## Current scope and verified starting point
 
-The P2-UX1 candidate modifies only alert/digest presentation and its local smoke assertion, plus tests and documentation. Inspect the current PR head, CI and reviews for actual status. Synthetic examples are in [P2-UX1-synthetic-previews.json](evidence/P2-UX1-synthetic-previews.json), not sent messages. No production source, state or workflow configuration is changed by this candidate. Live delivery remains unverified. Preserve the existing state and revert the presentation PR to roll back.
+Owner instruction 2026-11-11: full-send ALL remaining Phase 2 across scoped PRs, with independent reviews and exact-head CI before authorized merges. Main inspected at `9779cd0`; P2-A #23 and P2-UX1 #29 are merged. The old instructions to stop at UX or require a mandatory expansion cohort are superseded. The [durable implementation plan](superpowers/plans/2026-11-11-phase-2-completion.md) gives files, tests, migrations and rollback.
 
-The old Job model cannot establish true first observation or precise legacy posting times; the card labels these as observation and source date respectively. Unproven base compensation and legacy employer-link provenance stay unknown. Digest links longer than 200 UTF-16 units are omitted. Existing webhook success still controls acknowledgement even if an unsafe individual link was omitted from display. The exact next activation gate is P2-UX1 merge/review/CI and its documented live verification, followed by separately source-verifying and obtaining owner approval for the exact P2-ACT employer shortlist. Do not start that work during P2-UX1.
+Original production roster is 13 enabled Network Priority sources, referral unconfirmed, plus 2 historical disabled. No specific additional employer/feed or production catalogue activation is authorized. Company requests default discovered and never imply referral. Startup research must remain separate from monitoring/live openings. Dot-compatible means a portable request document, not an invented API or automatic trigger.
 
-## Current state: Phase 2A release completed and merged
-- Repository: `KanujVerma/jobbie`; branch `main`.
-- Phase 2A PR #23 has been **merged to main** via squash commit `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb`.
-- Main post-merge CI https://github.com/KanujVerma/jobbie/actions/runs/42720639467 passed: **812 tests passed in 45s**, config valid, documentation continuity PASS.
-- Production status: **MERGED, NOT PRODUCTION_ENABLED**. The 2 public board example entries remain in `examples/p2a-public-boards.yaml` and disabled. `companies.yaml` maintains the original 15 configured / 13 enabled sources. No new active alerts, no database, no LLMs.
-- Real read-only smoke verified with zero state/config mutations and `discord_sent=false`.
-- Phase 1 issue #6 post-P1-E live gate is SATISFIED via scheduled run 42698015121 at descendant commit `ffc8c09bd2ec0cbcb7dd48143204c26255324bcb`.
-- The owner subsequently approved the NEXT scoped implementation, **P2-UX1 notification layout**. Start only that [contract](phases/PHASE-2-UX.md) and [first goal](agent-prompts/PHASE-2-UX-GOAL.md). Do NOT start P2-ACT/P2-B/C/Phase 3 at the same time.
+## Production evidence and active candidate
 
-## Takeover procedure
-1. Query GitHub repo metadata, current main HEAD, PRs and open issues. Check whether Phase 2A is merged before assuming it is open.
-2. Fetch origin, inspect working tree; never discard local work.
-3. Inspect `git diff origin/main...HEAD -- companies.yaml state/seen_jobs.json .github/workflows/job-alerts.yml`. The implementation must not alter these production files.
-4. Run `python main.py validate-config`, `python -m compileall -q src scripts`, `pytest -q`, and `python scripts/check_handoff_docs.py --base origin/main --head HEAD` on the actual checkout using Python 3.12 and requirements-dev.txt.
-5. All functional PRs must update STATUS.md, HANDOFF.md, and RELEASE_LOG.md together.
+Scheduled [run 43032487797](https://github.com/KanujVerma/jobbie/actions/runs/43032487797) on da898dc: 12/13 responding, Plaid Lever 404, Oracle/SanDisk empty API responses, 2 matched, 309 review, 9002 excluded, 0 job ACKs, 0 job send failures, 472.9-minute finish-to-next-start gap. P2-UX1 delivered-message proof remains unestablished. See [audit](evidence/P2-RELIABILITY.md). Do not call empty adapters proof of no openings or workflow success proof of delivery.
 
-## As-built code map
-| Area | Files | Invariant |
-|---|---|---|
-| Legacy poll orchestration | main.py, companies.yaml, src/config.py | 13 enabled original companies; dry-run no state writes/webhooks |
-| Employer fetch | src/adapters/*.py | BaseAdapter + shared HTTPClient; failures are not fabricated empty success |
-| New public boards | greenhouse.py, ashby.py, public_board.py | GET-only fixed endpoints; listed jobs, safe IDs/URLs, bounded reads |
-| Source facts | src/models.py | frozen Job, optional fields preserve old constructors; explicit salary units |
-| Eligibility | filtering.py, eligibility.py, experience.py | tri-state; required qualifications and source employment override title guesses |
-| Delivery | notifier.py, storage.py, backfill.py | accurate date labels, canonical URL dedup, acknowledge only delivered visible links |
-| Health | src/health.py | actual failed/empty distinction and scheduler gap evidence |
-| P2-A tests | tests/test_public_board_adapters.py, test_public_board_html.py | 85 new cases plus existing 727-suite baseline (812 total) |
-| Read-only live check | scripts/verify_public_boards.py, examples/p2a-public-boards.yaml | no production config enabling, no Notifier calls, hashes before/after |
+P2-R1 is an unmerged candidate at authoring: source query errors remain visible while preserving partial observations, dry-run v1 migration no longer writes, health/report counters and Actions summary are additive, failed webhook logs redact sensitive data. Next: finish verification, Sol-loop and hosted exact-head review, CI, merge, record actual evidence. No source activation/state edits occur in P2-R1. Rollback code while retaining production state.
 
-## Locked product constraints
-Personal single user; Dec 2026 UW–Madison BS CS; January 2027 target start; full-time US new-grad/SWE/related technical roles; internships excluded. $100k annual base is preferred, not a hard cutoff. SF Bay Area first, other CA/NYC/Chicago/TX/FL prioritized. US authorized without sponsorship; permanent residence is not citizenship. Original 13 network sources retain a separate UNCONFIRMED referral status. Do not add unrelated titles just to increase match counts.
+Then implement P2-ACT owner intake/proposals, P2-B bounded OFF feeds with rights evidence, P2-C SQLite pre-filter catalogue and search/export. Complete independent work despite rights/approval/shadow blockers. Canonical cutover requires >=72h real dual-write comparison, identity/alert reconciliation, proven rollback, explicit approval and an observed scheduled run after cutover. Existing state stays delivery authority until then.
 
-Private resumes, family contacts, credentials and private GitHub code never go in public commits/logs. Private repository reading requires explicit allowlist approval; reading is not outward-disclosure approval. No mass/unapproved auto-apply; future Phase 5 may submit a SINGLE owner-authorized exact job packet after separate `Approve & Apply`. No assumed dot API, unauthorized Jobright/LinkedIn scraping, unsolicited founder emails, or unapproved paid inference. Later phases use approved evidence for matching/tailoring and exact owner approval for outbound messages.
+## Verification and handoff discipline
 
-## Approved future plan: one PR at a time
-1. **First [P2-UX1 issue #25](https://github.com/KanujVerma/jobbie/issues/25):** compact, informative truthful webhook alerts without changing source/state. [Exact scope](phases/PHASE-2-UX.md) and [first /goal](agent-prompts/PHASE-2-UX-GOAL.md).
-2. **Second [P2-ACT issue #26](https://github.com/KanujVerma/jobbie/issues/26):** source-check and owner-approve a small shortlist, then enable additional Greenhouse/Ashby boards with `discovered` status; original 13 remain star-marked.
-3. P2-B allowed feeds; P2-C catalogue/global dedup/shadow cutover.
-4. P3 private authenticated Discord commands/profile/evidence and basic application ledger.
-5. P4 role/company resume tailoring with before/after reasons, PDF/DOCX preview, owner `Approve resume` and optional UNSENT `Prepare application packet`; P5 alone adds the live `Approve & Apply` control and submission permission.
-6. P5 prove dot manual delegation before assuming programmatic trigger, then secure one-job executor/receipt, local fallback only if needed and allowed.
-7. P6 startup sourcing/outreach and follow-up optimization.
+Use the existing virtual environment (`.venv/bin/python`, `.venv/bin/pytest` locally; CI uses Python 3.12). Run full pytest, validate-config, compileall, docs continuity, safe read-only source checks and a dry-run with an empty webhook environment. Preserve before/after state/config hashes. No unapproved test send, reset, forced backfill, expensive infrastructure or private data in logs/commits. Every functional PR updates STATUS/HANDOFF/RELEASE_LOG and impacted specs. Record actual PR/head/merge/review/CI/run evidence, not agent activity as progress.
 
-The actual AUTOAPPLY executor is not implemented. A dot's inbound programmatic trigger, account access, hosting cost and site automation rules are unresolved feasibility questions; do not invent an API or auto-submit without exact approval. See [AUTO_APPLY.md](AUTO_APPLY.md), [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md), [PHASES.md](PHASES.md).
+After Phase 2 gates, next exact major goal is P3-A signed allowlisted Discord interactions, followed by private profile/resume upload/evidence and matching. Phase 4 tailors resumes; Phase 5 alone executes a single separately approved application. No application or outreach sends are in the current task.
 
-Every functional PR updates STATUS/HANDOFF/RELEASE_LOG, plus impacted architecture/contracts/security/phase docs. CI checks missing/deleted/empty/symlinked handoff files, HTML fixtures and renamed source paths. Reviewer still checks truth: record exact source SHA, tests, reviewer SHA, actual live evidence, rollback and next slot. No private chat history needed.
+## P2-R1 verification checkpoint (2026-11-11)
+Branch feat/p2-reliability, base 9779cd08b3c0a7e40fb3fda6cd53bae1e5a0d908. Local `.venv/bin/pytest -q`: 869 passed in 32.98s; validate-config/compileall/diff-check passed. Full no-webhook dry-run exited 0 with unchanged companies.yaml/seen-state/workflow hashes; see the audit receipt. All candidate work is unmerged until PR CI/review/merge evidence is recorded. Next concrete action: Sol-loop review of the base-to-working-tree diff, then hosted Codex review/CI and authorized merge. Continue P2-R2 and other scoped components afterward.

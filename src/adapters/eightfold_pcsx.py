@@ -125,9 +125,11 @@ class EightfoldPCSXAdapter(BaseAdapter):
                     "EightfoldPCSXAdapter[%s]: search failed at start=%d: %s",
                     self.company, start, exc,
                 )
+                self.record_fetch_error(exc)
                 return
 
             if not isinstance(payload, dict):
+                self.record_fetch_error("INVALID_RESPONSE")
                 logger.error(
                     "EightfoldPCSXAdapter[%s]: expected a JSON object, got %s",
                     self.company, type(payload).__name__,
@@ -141,6 +143,7 @@ class EightfoldPCSXAdapter(BaseAdapter):
             # eightfold.py adapter bail on healthy responses.
             data = payload.get("data")
             if not isinstance(data, dict):
+                self.record_fetch_error("MISSING_DATA")
                 logger.error(
                     "EightfoldPCSXAdapter[%s]: response carried no `data` object "
                     "(got %s) at start=%d.",
@@ -150,6 +153,8 @@ class EightfoldPCSXAdapter(BaseAdapter):
 
             positions = data.get("positions")
             if not isinstance(positions, list) or not positions:
+                if not isinstance(positions, list) or pages_read > 0:
+                    self.record_fetch_error("INCOMPLETE_POSITIONS")
                 if pages_read == 0:
                     logger.warning(
                         "EightfoldPCSXAdapter[%s]: search returned no positions.",

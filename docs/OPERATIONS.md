@@ -67,7 +67,7 @@ GitHub repository is already renamed and verified to `jobbie` (same ID 133984770
   - Review Queue & Daily Digest: Ambiguous roles requiring review are stored in `state["review_queue"]` and batched into a daily summary digest (capped at 10) instead of being dropped silently.
 - **Scheduler Reality & Cron Drift:**
   - GitHub Actions runs the workflow on `cron: '*/15 * * * *'`.
-  - Public repository runners experience significant queue latency; actual intervals between runs regularly stretch from 15 minutes to multiple hours during peak GitHub Actions load.
+  - Observed schedule intervals stretch from the 15-minute target to multiple hours. The run evidence establishes gaps; it does not establish which part of GitHub scheduling or runner allocation caused them.
   - Run heartbeats record start/finish, elapsed duration, and detect scheduler gaps (>45 minutes), logging clear warnings without promising sub-15-minute real-time latency.
   - Manual Trigger: Trigger an immediate scrape pass using GitHub Actions UI or `gh workflow run job-alerts.yml`.
 - **Rollback Protocol:**
@@ -89,3 +89,10 @@ Every new provider/feature behind flag and isolated from legacy polling. P2 cata
 - The scheduled cron has documented multi-hour gaps even with a 15-minute expression. Observability is not a scheduler fix; if timeliness is a new scope, introduce a measured, free, authorized scheduling alternative in its own reviewed PR, without breaking existing source polling.
 ## New owner-approved delivery plan (2026-11-10)
 Before any new source activation, implement P2-UX1 source-grounded embed layout using ONLY synthetic payload fixtures and current notifier interface. Do not change `state/seen_jobs.json`, force backfill, create inert approval buttons, or claim a delivered job without a webhook result. Then source-verify and get owner approval for new boards in P2-ACT. Future private resume preview and per-job autoapplication executor are NOT deployed; follow `docs/AUTO_APPLY.md` and only permit exact one-job owner-approved submissions when Phase 5 gates pass.
+
+## Phase 2 health and opt-in rollout (2026-11-11)
+P2-UX1 #29 is merged; live delivery remains unverified. P2-R1 adds `python main.py health` (JSON) or `python main.py health --format markdown`. This command reads the existing snapshot without network, sender construction or state migration writes. Missing counters stay unknown; snapshot age is visible. Actions appends this report to its summary even after a failed step. Inspect failed/empty sources against official careers pages, not only Actions conclusion. Successful webhook responses log HTTP acknowledgement without payload/URL; failures omit response bodies and secret-bearing exception strings.
+
+Legacy query errors remain visible while partial observations survive. They do not count as healthy scans or recovery. Original adapters can still have bounded searches, missing qualification fields or incomplete provider coverage; health is not recall certification. Filter reasons, candidates, acknowledgements and timings support diagnosis of zero alerts without relaxing eligibility. A dry-run loads old v1 state in memory only. Malformed state fails closed; preserve the original file for repair.
+
+Company intake and optional feeds produce disabled proposals; no mandatory employer count. Activation requires exact owner approval and source permission. Catalogue shadow/cutover is separately gated; no state reset or forced backfill. Follow the current Phase 2 plan instead of historical UX-only/shortlist instructions. Rollback P2-R1 by reverting code/workflow, preserving state/config.

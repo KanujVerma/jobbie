@@ -129,12 +129,14 @@ class AmazonJobsAdapter(BaseAdapter):
                     "Amazon Jobs pass '%s' HTTP error at offset %d: %s",
                     pass_label, offset, exc,
                 )
+                self.record_fetch_error(exc)
                 return
             except requests.RequestException as exc:
                 logger.warning(
                     "Amazon Jobs pass '%s' request failed at offset %d: %s",
                     pass_label, offset, exc,
                 )
+                self.record_fetch_error(exc)
                 return
 
             try:
@@ -144,9 +146,11 @@ class AmazonJobsAdapter(BaseAdapter):
                     "Amazon Jobs pass '%s' invalid JSON at offset %d: %s",
                     pass_label, offset, exc,
                 )
+                self.record_fetch_error(exc)
                 return
 
             if data.get("error"):
+                self.record_fetch_error("SOURCE_ERROR")
                 logger.warning(
                     "Amazon Jobs pass '%s' returned error: %s",
                     pass_label, data["error"],

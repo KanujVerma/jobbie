@@ -45,6 +45,7 @@ class SmartRecruitersAdapter(BaseAdapter):
                     offset,
                     exc,
                 )
+                self.record_fetch_error(exc)
                 return
 
             if total_found is None:

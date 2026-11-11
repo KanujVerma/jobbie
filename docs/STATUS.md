@@ -1,45 +1,25 @@
 # Jobbie canonical project status
 
-**Audited:** 2026-11-10 America/Chicago (planning snapshot). This is a snapshot, not continuous telemetry. Verify GitHub HEAD, PRs and Actions before acting.
+Audited 2026-11-11. This is a snapshot. Verify current main, PRs and Actions before acting.
 
-Canonical repository: **KanujVerma/jobbie**, ID 1339847701. Repository rename is complete. Last verified runtime release is `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb` (Phase 2A PR #23), followed by docs merge `58b108c07e070725dbde181d4d0fb8c1b62d8917` (#24). Most recently observed `main` was state-only commit `8d05cf3474fea796a361e3809d68f5e635e1420a`; verify actual HEAD again before coding.
+## Released code and live limits
 
-## P2-UX1 candidate: PARTIAL, live delivery unverified
+Canonical repository: KanujVerma/jobbie, numeric ID 1339847701. Main inspected at `9779cd0` (state-only successor of `da898dc`), with P2-A #23 merged at `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb` and P2-UX1 #29 merged at `e0346f49bd572179250fe08bed73131db0ba311a`. P2-UX1 post-merge [Tests run 42944213890](https://github.com/KanujVerma/jobbie/actions/runs/42944213890) succeeded. Synthetic cards are not delivered messages.
 
-At PR authoring, the P2-UX1 branch is based on `1d943c9b105d7309b04acf9c44ea3e641cc00c56`. The source change is a title-first webhook card and bounded review digest; merge, exact-head CI and independent review must be checked on the PR. [Synthetic payloads](evidence/P2-UX1-synthetic-previews.json) are fixtures, not live messages. No new source was enabled. No live webhook smoke was authorized or sent: **LIVE_DELIVERY_UNVERIFIED**.
+Production configuration remains 15 source entries: exactly 13 enabled original Network Priority sources and 2 historical disabled sources (Snowflake, Applied Digital). Greenhouse/Ashby example boards are disabled. No optional feeds, catalogue, private profile, AI or application executor is production enabled.
 
-The source model does not retain a true first-seen timestamp for individual cards, so the fallback says `Observed by Jobbie`. Legacy source dates lack reliable time precision and are shown as source dates; Workday relative dates use observation instead. Only Ashby normalized Salary components with an explicit currency and period are shown as base. Other legacy and Greenhouse amounts remain undisclosed in the card until their base and period can be established. Legacy URL provenance is labeled unverified. Digest links over 200 UTF-16 units are omitted from the message. The existing send and acknowledgement contracts are unchanged; an unsafe individual URL is displayed as unavailable, and a successful webhook response is still acknowledged under existing behavior.
+[Scheduled Job Alerts run 43032487797](https://github.com/KanujVerma/jobbie/actions/runs/43032487797), at `da898dc817e4e8da23e14dfecede74d98657e981`, completed successfully on 2026-11-11: 12/13 adapters responding, Plaid Lever HTTP 404, SanDisk and Oracle empty responses, 2 matched, 309 review, 9002 excluded, 0 job sends acknowledged and 0 failed job sends. The gap after the previous finish was 28373.03 seconds (472.9 minutes), versus a configured 15-minute target. A successful workflow is not source health, a no-openings claim, or evidence of P2-UX1 webhook delivery: **LIVE_DELIVERY_UNVERIFIED**.
 
-Rollback is a revert of the P2-UX1 presentation change; preserve state and configuration. Do not activate P2-ACT until P2-UX1 is merged, reviewed and has its required live verification, and a separate exact employer shortlist has been source-verified and owner-approved.
+## Active Phase 2 completion work: PARTIAL
 
-## Completed release: Phase 2A, PR #23
-- **PR:** https://github.com/KanujVerma/jobbie/pull/23
-- **Branch:** `feat/p2-a-public-job-boards` (merged and closed)
-- **Status:** MERGED to main at `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb`.
-- **Production Status:** MERGED, NOT PRODUCTION_ENABLED. New Greenhouse and Ashby public adapters are tested and available in codebase; sample boards in `examples/p2a-public-boards.yaml` remain disabled. Production `companies.yaml` is unchanged with the original 15 configured / 13 enabled sources.
-- **Reviewed runtime source:** `5e56bc668a6615002b5ac0fbe8592b2a84987162`.
-- **Full CI:** Pre-merge CI passed at https://github.com/KanujVerma/jobbie/actions/runs/42342377756 and https://github.com/KanujVerma/jobbie/actions/runs/42343188762 (812 passed). Post-merge main CI passed at https://github.com/KanujVerma/jobbie/actions/runs/42720639467 — **812 passed in 45s**, Python 3.12, config validation and documentation gate passed.
-- **Live public reads:** Actions run https://github.com/KanujVerma/jobbie/actions/runs/42342377775 (19 Greenhouse + 73 Ashby) and re-verified locally on merge prep (20 Greenhouse + 76 Ashby). All classified excluded on these provider-owned smoke boards. These counts are source connectivity/normalization proof, NOT new-grad matches.
-- **Side effects:** receipts verify identical `companies.yaml` and `state/seen_jobs.json` hashes before/after; no Discord sender was constructed or called; examples remain disabled.
-- **Independent review:** Codex completed review of `5e56bc6` with `has_any_findings=false`, `has_unresolved_findings=false`. Receipt: https://github.com/KanujVerma/jobbie/pull/23#issuecomment-6702690334 .
-- **Durable evidence:** [P2-A verification record](evidence/P2-A-VERIFICATION.md), [unaltered live JSON](evidence/P2-A-live-2026-11-07.json), and [P1-E production verification](evidence/P1-E-PRODUCTION-VERIFICATION.md).
+The 2026-11-11 owner instruction replaces mandatory P2-ACT expansion with owner-directed company intake. No automatic 3-5-employer expansion. Company and feed activation are opt-in and never prerequisites to completing independent implementation. See [delivery plan](superpowers/plans/2026-11-11-phase-2-completion.md).
 
-## Implemented P2-A functionality
-`GreenhouseAdapter` and `AshbyAdapter` use official public GET endpoints and the existing HTTPClient/registry. Shared validation bounds response size/job count/detail requests, prevents arbitrary endpoints/redirects and preserves unknown fields. Prospect/unlisted jobs are excluded. Posting IDs, descriptions, location options, explicit employment, published-versus-updated dates and salary units retain their source meaning. HTML inline formatting cannot disconnect years from an experience requirement. Structured non-full-time types and incomplete descriptions cannot become verified new-grad alerts just because of a title.
+P2-R1 candidate fixes reproduced swallowed request errors in original adapters and v1 state writes during dry-run. Partial observations remain usable but the scan is failed, not healthy. Adds fetch timing, filter-reason/candidate/ACK counters, a read-only `health` command and an Actions summary; failed send logs omit webhook URLs/response bodies. Existing eligibility, dedup, alert caps, rate limiting and backfill remain authoritative. Exact test, dry-run and review evidence is recorded in the PR and [audit](evidence/P2-RELIABILITY.md). Candidate is not yet a merged or live-verified release.
 
-The normal filter, immutable Job model, notification-payload builder, review queue, config validator and dry-run pipeline are integrated. `scripts/verify_public_boards.py` produces metadata-only read receipts without calling the notification loop. No database, LLM, private documents, feed scraping or application submission was added.
+Remaining scoped implementation: P2-ACT request/proposal workflow, P2-B disabled lawful-feed capability, P2-C SQLite catalogue with legacy delivery authority, shadow comparison and rollback. No production employer is approved by this task. Missing rights remain **BLOCKED_SOURCE_RIGHTS**; activation and cutover remain **BLOCKED_APPROVAL**; the required 72-hour shadow is **BLOCKED_72H_EVIDENCE** until actually observed.
 
-## Existing production system and constraints
-- The original Python GitHub Actions monitor remains unchanged in production configuration: 15 configured sources, original 13 enabled, 2 disabled.
-- Original network priority: Micron, Salesforce, CrowdStrike, Intel, Applied Materials, Western Digital, SanDisk, Plaid, Oracle, Microsoft Research, Microsoft, Amazon, Apple. Network priority does not mean a referral has been submitted.
-- Phase 1 A/B/C (#12–14), D1/D2/D3 (#15–17), E (#18) code is merged. P1-E source commit is `9c9365ae5f3d936b20fc8a90c7ac22a5e0c6ff42`.
-- **Phase 1 issue #6 post-P1-E production verification is SATISFIED:** Scheduled `Job Alerts` run #42698015121 (job 129434952835) completed on 2026-11-09 at source commit `ffc8c09bd2ec0cbcb7dd48143204c26255324bcb`, which is a verified descendant of P1-E (`9c9365ae`). Heartbeat metrics: duration=666.83s, adapters=12/13 (zero=2), matched=0, review=277, excluded=8844, alerted=0. Zero matches proves filter execution and safe non-delivery; it is not proof that no suitable jobs exist.
-- Known limitations tracked separately: GitHub's nominal 15-minute cron has observed multi-hour gaps (run 42698015121 had a 626.5-minute gap). Plaid's known Lever 404 is an upstream endpoint failure.
-- Phases 2B/2C and 3–6 remain PLANNED. The two P2-A example boards are outside production config and disabled; no new ongoing job alerts are active.
+## Next major phase
 
-## Next coding step: P2-UX1 (candidate; release gates pending)
-Owner approved a new rollout plan on November 10: first [P2-UX1 issue #25](https://github.com/KanujVerma/jobbie/issues/25) / [notification layout v2](phases/PHASE-2-UX.md) as a **presentation-only** PR, then separately [P2-ACT](phases/PHASE-2-ACT.md) for 3–5 source-verified owner-approved employer boards when available; only then P2-B licensed feeds and P2-C canonical catalogue. [Pasteable first /goal](agent-prompts/PHASE-2-UX-GOAL.md).
+After Phase 2 implementation and its operational gates, execute P3-A signed, allowlisted Discord interactions, then private resume/profile storage, owner-confirmed evidence and deterministic matching. Resume tailoring and owner artifact approval remain Phase 4. Application submission remains Phase 5 and requires a separately approved exact packet. No dot API or trigger has been verified.
 
-**New future product scope only, NOT deployed:** Phase 3 private authenticated Discord/buttons + candidate evidence + basic application ledger; Phase 4 natural resume diff/PDF preview and UNSENT packet preparation; Phase 5 explicit `Approve & Apply` authorization and dot-first single-job execution with manual handoff first and optional local browser fallback; Phase 6 startup outreach/reminders. See [AUTO_APPLY.md](AUTO_APPLY.md) and [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md). A Jobbie-to-dot external trigger has NOT been verified; no mass submissions.
-The earlier roadmap documentation PR changed specifications only. This P2-UX1 candidate changes notifier presentation; autoapply, the 13 active sources, state and job workflow are outside its scope.
-
+Historical release evidence: [P2-A](evidence/P2-A-VERIFICATION.md), [P1-E](evidence/P1-E-PRODUCTION-VERIFICATION.md), [RELEASE_LOG](RELEASE_LOG.md). Preserve the existing production state; never force backfill or reset it to generate proof.

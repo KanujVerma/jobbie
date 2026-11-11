@@ -25,8 +25,8 @@ Add Greenhouse, Ashby and specifically authorized public/curated feeds; every so
 
 Catalogue likely moves to a small database (evaluate D1 free limits) after dual-write parity. Do not delete or reset `state/seen_jobs.json` until reconciliation and rollback are demonstrated. Each source can fail independently with bounded retries/backoff.
 
-## P2-UX1/P2-ACT (upcoming small bridge releases)
-Redesign only the existing Discord embed formatter first, with synthetic snapshot tests and no changes to state/delivery semantics. Then source-verify and owner-approve a small Greenhouse/Ashby employer shortlist in a separate config PR. P2-B feeds/P2-C catalogue follow; preserve original 13.
+## Phase 2 bridge and completion (owner amendment 2026-11-11)
+P2-UX1 #29 is merged, with live delivery unverified. Original-source reliability fixes and actionable health precede owner-directed company intake. P2-ACT generates disabled reviewed proposals, replacing mandatory expansion. Optional P2-B feeds require data rights and official-link verification. P2-C selects standard-library SQLite with no hosted service charge, stores normalized jobs before filtering and retains legacy delivery authority through measured >=72h shadow and approved cutover. Expansion approvals do not block independent implementation; preserve original 13 plus 2 historical disabled.
 
 ## Phase 3: personal services
 Discord application command endpoint (HTTP interactions) -> signature verification, timestamp replay protection, allowlisted USER ID, minimal immediate response -> durable work queue -> Python task worker. Cloudflare Worker/D1/private R2 are proposed, not mandatory without free-tier feasibility check. Command inputs and PDFs live in private storage; public repository may contain ONLY redacted test fixtures. No message-content scanning. Generated result links must be authorized, short-lived and scoped.

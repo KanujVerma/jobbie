@@ -24,6 +24,19 @@ class BaseAdapter(ABC):
         self.config = config
         self.http = http
         self.browser = browser
+        # Some legacy adapters make several independent queries. Keep useful
+        # partial observations, but never report those scans as healthy.
+        self.fetch_errors: list[str] = []
+
+    def record_fetch_error(self, error: Exception | str) -> None:
+        """Expose a failed query without retaining response bodies or URLs."""
+        response = getattr(error, "response", None)
+        status = getattr(response, "status_code", None)
+        label = f"HTTP {status}" if isinstance(status, int) else (
+            type(error).__name__ if isinstance(error, Exception) else error
+        )
+        if label not in self.fetch_errors:
+            self.fetch_errors.append(label)
 
     @abstractmethod
     def fetch(self) -> Iterator[Job]:
@@ -33,5 +46,5 @@ class BaseAdapter(ABC):
         - Include official job ID if source provides one.
         - Populate raw_text from public source evidence; bounded detail fallbacks allowed.
         - Source failures should propagate to the caller for failed-vs-empty health.
-        - Legacy adapters may still log and return; new adapters must not mask errors.
+        - Multi-query adapters may record_fetch_error and retain partial results.
         """

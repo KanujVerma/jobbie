@@ -429,7 +429,8 @@ companies:
             # Stale outage notification must be sent for the failing company!
             assert mock_send_summary.called
             summary_kwargs = mock_send_summary.call_args[1]
-            assert "No postings" in summary_kwargs.get("title", "")
+            assert "Source needs attention" in summary_kwargs.get("title", "")
+            assert "failed or partial" in summary_kwargs.get("description", "")
             assert "Salesforce" in summary_kwargs.get("description", "")
 
         # State records both the health alert and the diagnostic error
