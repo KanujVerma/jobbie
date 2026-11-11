@@ -109,3 +109,5 @@ P2-R2 local candidate checkpoint, NOT merged: dependent branch feat/p2-source-re
 
 ## 2026-11-11: P2-R2 candidate verification (unmerged)
 Amazon request-shape fix and Plaid's source-verified Ashby migration are isolated from roster expansion. Silent source_revision baseline keeps alerted=false plus an explicit suppression reason, preserves original history and reports pending/completed truthfully. Local suite 900 passed in 35.71s, config/compileall/diff passed. Read-only source 143 unique rows; guarded dry-run 0 matched/8 review/135 excluded/0 sends and unchanged state/config hashes. Independent review, exact-head CI/hosted review, merge and real schedule remain pending. See evidence/P2-R2-VERIFICATION.md; rollback reverts code/config together without state reset.
+
+P2-R2 local Sol review approved implementation e09dc61b7e377d336b11a91c905781daf8c2d6f4 in one round, independently passing 900 tests in 33.27s. No findings. PR/hosted review/CI/merge and actual production observation remain pending; no live delivered-message claim. See evidence/P2-R2-REVIEW.md.
