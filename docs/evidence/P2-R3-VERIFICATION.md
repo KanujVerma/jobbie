@@ -61,3 +61,16 @@ Rollback config and code together, keeping all source/history/ACK state and rest
 
 ## Local review correction S1
 At eda6d416d5c147fa1538952e538cab0a124baf59 Sol found that partly overlapping pages could reach the raw row total with missing unique IDs. Parent reproduced [1,2]/[2,3] advertised total4, observed no error/incorrect baseline completion, and fixed duplicate-ID detection to retain useful unique partial rows while reporting failure. Baseline completion now remains pending; a later complete [1,2]/[3,4] scan silently includes ID4. Regression failed before fix; full suite 938 passed in35.08s. Fresh independent re-check pending.
+
+## Parent integration
+ParentPR31 is merged9317c73. Oracle functional patch ID before/after rebase is76c6409fe877a5fac07570fb78aa05916a71fc1e. Current production state is inherited from main without edits. Fresh combined tests and current-head CI/hosted review are required; old local937/938 results are historical.
+
+```json
+{
+  "old_oracle_patch_id": "76c6409fe877a5fac07570fb78aa05916a71fc1e",
+  "rebased_oracle_patch_id": "76c6409fe877a5fac07570fb78aa05916a71fc1e",
+  "identical": true
+}
+```
+
+Oracle integration verification: rebase onto merged9317c73 retains functional patch76c6409fe877a5fac07570fb78aa05916a71fc1e. Combined full990tests passed36.78s; config/compileall/diff pass, current main seen-state retained unchanged. Local Oracle behavior was independently approved atb7112bc with938tests before base integration; own current-head hosted review/CI/merge remain required.

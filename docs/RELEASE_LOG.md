@@ -126,3 +126,8 @@ P2-R3 local review S1 correction: overlapping pages [1,2]/[2,3] with advertised 
 New real operational evidence: scheduled Job Alerts 43100310762 on merged R1 614b3ed ran 21:07:18-21:14:55Z. Two individual Amazon candidates received HTTP204 ACKs at21:14:30Z, and state commit f3deaae persisted them. This establishes ordinary webhook acceptance, not visual-client or employer-eligibility verification. R2/R3 remain unmerged and unobserved in production.
 
 P2-R3 Sol round2 approved b7112bcf4b30d277050a1556858f4e049093a62c with S1 resolved and no new findings. Independent full938tests passed in35.35s, source38passed; config/diff passed. The source branch is published for GitHub handoff while parentPR31 CI remains queued. It is not a production release or own PR/CI/hosted-review pass. Rebase onto merged parent before filing the scoped Oracle PR.
+
+## 2026-11-11: P2-R2 merged; Oracle integration candidate
+PR31 merged9317c73b1971d6c7bb19dcb22a6be76876ad7369 after exact-head81524a6 CI/hosted review; post-merge Tests43116984772 passed, merge tree equals reviewed tree. Ordinary Plaid production baseline PENDING_LIVE: no qualifying post-merge schedule exists at check. Oracle rebased onto this parent, functional patch unchanged from its local approval; own PR/CI/review/live gates pending.
+
+Oracle integration verification: rebase onto merged9317c73 retains functional patch76c6409fe877a5fac07570fb78aa05916a71fc1e. Combined full990tests passed36.78s; config/compileall/diff pass, current main seen-state retained unchanged. Local Oracle behavior was independently approved atb7112bc with938tests before base integration; own current-head hosted review/CI/merge remain required.
