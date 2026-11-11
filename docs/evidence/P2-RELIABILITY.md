@@ -82,3 +82,51 @@ SHA-256 before and after matched exactly:
   "mode": "dry-run"
 }
 ```
+
+## Independent review correction S1 and final local checks
+
+Sol round 1 on 4c3af988687b95e5f51ede5a7f3baf2a0eb08e3a found that malformed health timestamps/counters could crash after an earlier source sent, losing its unsaved ACK. Parent reproduced all six two-source cases before the fix (6 failed). State loading now validates these fields before any sender can be constructed. The same cases pass and preserve original file bytes. The docs README and UX status were also reconciled (S2).
+
+Latest full `.venv/bin/pytest -q`: **875 passed in 32.59s**, Python 3.15.2. Config validation, compileall, diff-check and read-only health loading of the actual production snapshot passed. Final guarded-state dry-runs with empty webhook environment: SanDisk exit 0 (empty API response), Plaid exit 1 (sole selected source is 404). Both preserve configuration and seen-state hashes; no sender or sends. These targeted checks supplement the earlier full scan; neither proves live delivery. Candidate Python 3.12 CI and hosted review still pending.
+
+```json
+{
+  "checks": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "main.py",
+        "run",
+        "--company",
+        "SanDisk",
+        "--dry-run",
+        "--verbose"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "main.py",
+        "run",
+        "--company",
+        "Plaid",
+        "--dry-run",
+        "--verbose"
+      ],
+      "exit_code": 1
+    }
+  ],
+  "before": {
+    "companies.yaml": "077cf59d2e2a5a6eb9889ad79b54b96d0e97183f28d33ac84ddb39bea8c971d4",
+    "state/seen_jobs.json": "2588081d4ca27f33ed6135ac541e6e8be275d32cbb803de8f22e1a200e2235e3"
+  },
+  "after": {
+    "companies.yaml": "077cf59d2e2a5a6eb9889ad79b54b96d0e97183f28d33ac84ddb39bea8c971d4",
+    "state/seen_jobs.json": "2588081d4ca27f33ed6135ac541e6e8be275d32cbb803de8f22e1a200e2235e3"
+  },
+  "unchanged": true,
+  "webhook_environment": "empty",
+  "source_reads_only": true
+}
+```

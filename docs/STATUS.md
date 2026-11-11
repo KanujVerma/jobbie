@@ -23,3 +23,5 @@ Remaining scoped implementation: P2-ACT request/proposal workflow, P2-B disabled
 After Phase 2 implementation and its operational gates, execute P3-A signed, allowlisted Discord interactions, then private resume/profile storage, owner-confirmed evidence and deterministic matching. Resume tailoring and owner artifact approval remain Phase 4. Application submission remains Phase 5 and requires a separately approved exact packet. No dot API or trigger has been verified.
 
 Historical release evidence: [P2-A](evidence/P2-A-VERIFICATION.md), [P1-E](evidence/P1-E-PRODUCTION-VERIFICATION.md), [RELEASE_LOG](RELEASE_LOG.md). Preserve the existing production state; never force backfill or reset it to generate proof.
+
+P2-R1 review checkpoint: S1's malformed-health ACK-loss path reproduced (6 failing two-source cases), then fixed with pre-delivery validation; S2 stale onboarding rows corrected. Latest full local suite: 875 passed in 32.59s; config/compileall/health/diff checks passed. Final SanDisk/Plaid no-webhook dry-runs returned 0/1 respectively (empty/404) with unchanged state/config hashes. Sol round 2, candidate CI/hosted review and merge remain pending.

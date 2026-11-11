@@ -24,3 +24,5 @@ After Phase 2 gates, next exact major goal is P3-A signed allowlisted Discord in
 
 ## P2-R1 verification checkpoint (2026-11-11)
 Branch feat/p2-reliability, base 9779cd08b3c0a7e40fb3fda6cd53bae1e5a0d908. Local `.venv/bin/pytest -q`: 869 passed in 32.98s; validate-config/compileall/diff-check passed. Full no-webhook dry-run exited 0 with unchanged companies.yaml/seen-state/workflow hashes; see the audit receipt. All candidate work is unmerged until PR CI/review/merge evidence is recorded. Next concrete action: Sol-loop review of the base-to-working-tree diff, then hosted Codex review/CI and authorized merge. Continue P2-R2 and other scoped components afterward.
+
+P2-R1 review checkpoint: S1's malformed-health ACK-loss path reproduced (6 failing two-source cases), then fixed with pre-delivery validation; S2 stale onboarding rows corrected. Latest full local suite: 875 passed in 32.59s; config/compileall/health/diff checks passed. Final SanDisk/Plaid no-webhook dry-runs returned 0/1 respectively (empty/404) with unchanged state/config hashes. Sol round 2, candidate CI/hosted review and merge remain pending.

@@ -86,3 +86,5 @@ Every functional PR must append a concise entry naming its PR slot, actual commi
 - Rollback code/workflow only, retain state. Remaining independent PRs: original-source repair, owner intake, OFF feeds, SQLite catalogue/shadow/search/export. Missing approval/rights/72h remain explicit gates.
 
 - P2-R1 local verification checkpoint: 869 tests passed in 32.98s (Python 3.15.2), config/compileall/diff-check passed. Full no-webhook dry-run exited 0; production config and seen-state SHA-256s unchanged. This proves read-only execution, not live delivery. PR CI/review/merge pending.
+
+P2-R1 review checkpoint: S1's malformed-health ACK-loss path reproduced (6 failing two-source cases), then fixed with pre-delivery validation; S2 stale onboarding rows corrected. Latest full local suite: 875 passed in 32.59s; config/compileall/health/diff checks passed. Final SanDisk/Plaid no-webhook dry-runs returned 0/1 respectively (empty/404) with unchanged state/config hashes. Sol round 2, candidate CI/hosted review and merge remain pending.

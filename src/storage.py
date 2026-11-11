@@ -484,6 +484,12 @@ def load_state(path: str, raise_on_corrupt: bool = False, *, persist_migration: 
         else:
             rows.extend(seen.values())
         malformed |= "health" in company and not isinstance(company["health"], dict)
+        health = company.get("health")
+        if isinstance(health, dict):
+            rows.append(health)
+            malformed |= "first_tracked_at" in health and health["first_tracked_at"] is None
+            failures = health.get("consecutive_failures", 0)
+            malformed |= type(failures) is not int or failures < 0
     for key in ("alerted_urls", "review_queue", "migrations"):
         if isinstance(data.get(key), dict):
             rows.extend(data[key].values())
@@ -491,7 +497,8 @@ def load_state(path: str, raise_on_corrupt: bool = False, *, persist_migration: 
         if not isinstance(row, dict):
             malformed = True
             continue
-        for key in ("first_seen", "last_seen", "alerted_at"):
+        for key in ("first_seen", "last_seen", "alerted_at", "first_tracked_at",
+                    "last_nonempty_at", "last_success_at"):
             value = row.get(key)
             if value is not None:
                 try:

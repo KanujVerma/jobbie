@@ -153,3 +153,53 @@ def test_all_legacy_query_failures_fail_the_run(monkeypatch):
     assert main.do_run(SimpleNamespace(config='unused', dry_run=True)) == 1
     assert state['last_heartbeat']['adapters_failed'] == 1
     assert state['first_run_completed_at'] is None
+
+
+@pytest.mark.parametrize('bad_health', [
+    {'first_tracked_at': 'not-a-date'},
+    {'first_tracked_at': None},
+    {'last_nonempty_at': 'not-a-date'},
+    {'last_nonempty_at': '2026-11-11T00:00:00'},
+    {'consecutive_failures': 'one'},
+    {'consecutive_failures': -1},
+])
+def test_corrupt_later_source_health_aborts_before_any_sender(tmp_path, monkeypatch, bad_health):
+    """Reject the whole ledger before an earlier source can send and lose its ACK."""
+    import dataclasses
+    import main
+    from src.config import Config
+    from src.storage import _empty_state, POLICY_VERSION
+    from tests.test_main_exit_code import _make_job
+    from types import SimpleNamespace
+
+    class Stub:
+        def __init__(self, name, *args, **kwargs):
+            self.name = name
+        def fetch(self):
+            if self.name == 'Later':
+                raise requests.ConnectionError('outage')
+            return iter([dataclasses.replace(_make_job(), company=self.name)])
+
+    path = tmp_path / 'state.json'
+    state = _empty_state()
+    state['first_run_completed_at'] = datetime.now(timezone.utc).isoformat()
+    state['policy_version'] = POLICY_VERSION
+    state['migrations'] = {POLICY_VERSION: {'backfill_completed': True}}
+    state['companies']['Later'] = {'seen_jobs': {}, 'health': bad_health}
+    path.write_text(json.dumps(state))
+    before = path.read_bytes()
+    config = Config(defaults={'state_path': str(path), 'request_delay_seconds': [0, 0]},
+                    filters={'freshness_hours': 48}, companies=[
+                        {'name': name, 'adapter': 'stub', 'config': {}} for name in ('Earlier', 'Later')])
+    sender = MagicMock()
+    factory = MagicMock(return_value=sender)
+    monkeypatch.setattr(main, 'load_config', lambda _: config)
+    monkeypatch.setattr(main, 'ADAPTER_REGISTRY', {'stub': Stub})
+    monkeypatch.setattr(main, 'HTTPClient', MagicMock())
+    monkeypatch.setattr(main, 'Notifier', factory)
+    monkeypatch.setattr(main, 'apply_filter_pipeline', lambda job, *args: (job, []))
+    monkeypatch.setenv('DISCORD_WEBHOOK_URL', 'https://discord.com/api/webhooks/synthetic')
+    assert main.do_run(SimpleNamespace(config='unused', dry_run=False)) == 1
+    factory.assert_not_called()
+    sender.send_job_alert.assert_not_called()
+    assert path.read_bytes() == before
