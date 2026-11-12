@@ -39,6 +39,9 @@ class FeedLead:
     official_req_id: str | None = None
     confirmation_status: str = 'lead'
     employer_posted_at: None = None
+    # Permission/approval claims supplied by the reviewed source configuration.
+    # This records evidence, never automatically proves legal rights or ownership.
+    rights_metadata: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -189,7 +192,11 @@ def fetch_feed(source, state, *, http=None, now=None, allow_network=True):
             leads.append(FeedLead(lead_id=f'{sid}:{identity}',source_id=sid,source_url=endpoint,
                 source_record_id=identifier,employer=fingerprint[1],title=title,
                 location=location,url=url,observed_at=now,source_blob_sha256=digest,
-                feed_updated_at=updated,reported_posted_at=instant,reported_posted_date=calendar,official_req_id=req))
+                feed_updated_at=updated,reported_posted_at=instant,reported_posted_date=calendar,official_req_id=req,
+                rights_metadata={'status':rights['status'],'url':rights['url'],'basis':rights['basis'],
+                    'checked_at':rights['checked_at'],'owner_reference':approval['reference'],
+                    'owner_approved_at':approval['approved_at'],'approved_endpoint':approval['endpoint'],
+                    'evidence_kind':'reviewed_configuration_claim'}))
         report.update(status='ok' if leads else 'empty',returned_count=len(leads),blob_sha256=digest,
                       observed_at=now.isoformat(),feed_updated_at=updated.isoformat() if updated else None)
         state[sid].update(last_success_at=now.isoformat(),blob_sha256=digest)

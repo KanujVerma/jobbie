@@ -20,7 +20,9 @@ from pathlib import Path
 from src.job_identity import canonical_job_url
 from src.models import Job, CompensationRange
 
-SCHEMA_VERSION = 1
+from src.catalogue_history import ObservationHistory, HISTORY_SCHEMA, HISTORY_COLUMNS, pack_members
+
+SCHEMA_VERSION = 2
 MAX_PAYLOAD = 512 * 1024
 MAX_SCAN_ROWS = 50000
 MAX_DB_BYTES = 256 * 1024 * 1024
@@ -121,7 +123,7 @@ CREATE TABLE scans(run_id TEXT NOT NULL REFERENCES runs,source_id TEXT NOT NULL,
  observed_at TEXT NOT NULL,returned_count INTEGER NOT NULL,rejected_count INTEGER NOT NULL,PRIMARY KEY(run_id,source_id));
 CREATE INDEX scan_chronology ON scans(source_id,employer,status,observed_at);
 CREATE TABLE source_state(job_id TEXT NOT NULL REFERENCES jobs,source_id TEXT NOT NULL,source_record_id TEXT NOT NULL,status TEXT NOT NULL,
- observed_at TEXT NOT NULL,PRIMARY KEY(job_id,source_id,source_record_id));
+ observed_at TEXT NOT NULL,latest_observation_id INTEGER REFERENCES observations,last_listing_at TEXT,adapter_posted_at TEXT,PRIMARY KEY(job_id,source_id,source_record_id));
 CREATE TABLE status_events(id INTEGER PRIMARY KEY,job_id TEXT NOT NULL REFERENCES jobs,status TEXT NOT NULL,source_id TEXT NOT NULL,
  evidence_kind TEXT NOT NULL,evidence TEXT NOT NULL,observed_at TEXT NOT NULL);
 CREATE INDEX status_evidence_lookup ON status_events(job_id,source_id,evidence_kind,observed_at);
@@ -135,9 +137,23 @@ CREATE TABLE lead_history(id INTEGER PRIMARY KEY,source_id TEXT NOT NULL,lead_id
  payload TEXT NOT NULL,observed_at TEXT NOT NULL);
 '''
 
+_SHADOW_SCHEMA='''
+CREATE TABLE shadow_runs(run_id TEXT PRIMARY KEY REFERENCES runs,config_sha TEXT NOT NULL,before_sha TEXT NOT NULL,
+ after_sha TEXT,result TEXT NOT NULL,status TEXT NOT NULL);
+CREATE TABLE shadow_sources(run_id TEXT NOT NULL REFERENCES runs,source_id TEXT NOT NULL,result TEXT NOT NULL,
+ PRIMARY KEY(run_id,source_id));
+CREATE TABLE shadow_delivery(id INTEGER PRIMARY KEY,run_id TEXT NOT NULL REFERENCES runs,source_id TEXT NOT NULL,
+ legacy_id TEXT NOT NULL,job_id TEXT REFERENCES jobs,outcome TEXT NOT NULL,observed_at TEXT NOT NULL);
+CREATE TABLE legacy_history(sha TEXT PRIMARY KEY,payload BLOB NOT NULL,observed_at TEXT NOT NULL,ledger_sha TEXT NOT NULL);
+CREATE INDEX observation_snapshot ON observations(snapshot_sha);
+CREATE INDEX snapshot_legacy_id ON snapshots(json_extract(payload,'$.company'),json_extract(payload,'$.id'));
+'''
+_SCHEMA+=_SHADOW_SCHEMA+HISTORY_SCHEMA
 
-class Catalogue:
-    def __init__(self,path,*,create=False,readonly=False):
+
+class Catalogue(ObservationHistory):
+    error_class=CatalogueError
+    def __init__(self,path,*,create=False,readonly=False,migrate=False):
         self.path=Path(path).absolute();self.readonly=readonly;self.db=None
         if self.path.is_symlink() or not self.path.parent.is_dir():
             raise CatalogueError('unsafe or missing catalogue path')
@@ -163,15 +179,37 @@ class Catalogue:
                 self.db.execute(f'PRAGMA user_version={SCHEMA_VERSION}')
                 self.db.commit()
             version=self.db.execute('PRAGMA user_version').fetchone()[0]
+            if version==1 and migrate and not readonly:
+                base_tables={'meta','runs','jobs','claims','snapshots','observations','scans','source_state',
+                             'status_events','conflicts','classifications','leads','lead_history'}
+                actual={r[0] for r in self.db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+                if actual!=base_tables or self.db.execute('PRAGMA quick_check').fetchone()[0]!='ok' or self.db.execute('PRAGMA foreign_key_check').fetchone():
+                    raise CatalogueError('v1 schema/integrity verification failed')
+                metadata=dict(self.db.execute('SELECT key,value FROM meta'))
+                uuid.UUID(metadata['catalogue_uuid'])
+                if metadata.get('identity_version')!='1':raise CatalogueError('unsupported v1 identity format')
+                # Explicit additive migration, retaining a private SQLite backup.
+                backup=self.path.with_name(self.path.name+'.v1-backup')
+                fd=os.open(backup,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600);os.close(fd)
+                with sqlite3.connect(backup) as target:self.db.backup(target)
+                self.db.executescript('BEGIN IMMEDIATE;\n'+_SHADOW_SCHEMA+HISTORY_SCHEMA+HISTORY_COLUMNS)
+                self._backfill_history()
+                self.db.execute(f'PRAGMA user_version={SCHEMA_VERSION}')
+                self.db.commit()
+                version=SCHEMA_VERSION
             if version!=SCHEMA_VERSION or self.db.execute('PRAGMA quick_check').fetchone()[0]!='ok':
                 raise CatalogueError('unsupported or corrupt catalogue; no reset performed')
             if self.db.execute('PRAGMA foreign_key_check').fetchone() is not None:
                 raise CatalogueError('catalogue referential integrity failure')
             expected={'meta','runs','jobs','claims','snapshots','observations','scans','source_state',
-                      'status_events','conflicts','classifications','leads','lead_history'}
+                      'status_events','conflicts','classifications','leads','lead_history',
+                      'shadow_runs','shadow_sources','shadow_delivery','legacy_history','observation_spans','scan_memberships'}
             actual={r[0] for r in self.db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             if actual!=expected:
                 raise CatalogueError('unsupported catalogue schema')
+            columns={r[1] for r in self.db.execute('PRAGMA table_info(source_state)')}
+            if not {'latest_observation_id','last_listing_at','adapter_posted_at'}<=columns:
+                raise CatalogueError('unsupported source history layout')
             metadata=dict(self.db.execute('SELECT key,value FROM meta'))
             uuid.UUID(metadata['catalogue_uuid'])
             if metadata.get('identity_version')!='1':raise CatalogueError('unsupported identity version')
@@ -183,6 +221,19 @@ class Catalogue:
     def __exit__(self,*_):self.close()
     def close(self):
         if self.db is not None:self.db.close()
+    @classmethod
+    def memory(cls,source=None):
+        """A dry-run copy owns no persistent file and cannot mutate its source."""
+        result=object.__new__(cls);result.path=None;result.readonly=False
+        result.db=sqlite3.connect(':memory:');result.db.row_factory=sqlite3.Row
+        result.db.execute('PRAGMA foreign_keys=ON')
+        if source is not None:source.db.backup(result.db)
+        else:
+            result.db.executescript(_SCHEMA)
+            result.db.execute('INSERT INTO meta VALUES(?,?)',('catalogue_uuid',str(uuid.uuid4())))
+            result.db.execute('INSERT INTO meta VALUES(?,?)',('identity_version','1'))
+            result.db.execute(f'PRAGMA user_version={SCHEMA_VERSION}');result.db.commit()
+        return result
     def _write(self):
         if self.readonly:raise CatalogueError('read-only catalogue')
     def _rows(self,sql,args=()):return [dict(r) for r in self.db.execute(sql,args)]
@@ -265,23 +316,28 @@ class Catalogue:
         self._write();text(source_id,512,nullable=False)
         if status not in {'complete','partial','failed'} or len(jobs)>MAX_SCAN_ROWS:raise CatalogueError('invalid/bounded source scan')
         when=stamp(observed_at);employer=employer_key(config);rejected=0;observed=0;seen={};present=set()
-        before=self.stats()['conflicts']
+        before=self.stats()['conflicts'];member_ids=[];member_context=[]
         with self.db:
             if self.db.execute('SELECT 1 FROM scans WHERE run_id=? AND source_id=?',(run_id,source_id)).fetchone():
                 raise CatalogueError('source scan already recorded')
             for job in jobs:
                 try:data=normalized_snapshot(job,config)
-                except (CatalogueError,TypeError,ValueError):
-                    rejected+=1;self._conflict(run_id,source_id,None,'REJECTED_NORMALIZED_ROW',{'ordinal':observed+rejected-1},when);continue
+                except (CatalogueError,TypeError,ValueError) as error:
+                    identifier=getattr(job,'id',None)
+                    if not isinstance(identifier,str) or len(identifier)>512 or any(ord(c)<32 for c in identifier):identifier=None
+                    rejected+=1;self._conflict(run_id,source_id,identifier,'REJECTED_NORMALIZED_ROW',
+                        {'ordinal':observed+rejected-1,'error_type':type(error).__name__},when);continue
+                adapter=data['adapter_posted_at']
+                data=dict(data)
+                if data['posted_precision']!='instant':data['adapter_posted_at']=None
                 payload=compact(data);sha=hashlib.sha256(payload.encode()).hexdigest();record=data['source_record_id']
                 if record in seen and seen[record]!=sha:
                     self._conflict(run_id,source_id,record,'CONFLICTING_SOURCE_ROWS',{'snapshot_sha256':sha,'earlier_sha256':seen[record]},when)
                 seen[record]=sha
                 identity=self._identity(run_id,source_id,employer,data,when);present.add((identity,record))
                 self.db.execute('INSERT OR IGNORE INTO snapshots VALUES(?,?)',(sha,payload))
-                self.db.execute('INSERT INTO observations(run_id,source_id,source_record_id,job_id,snapshot_sha,observed_at) VALUES(?,?,?,?,?,?)',
-                                (run_id,source_id,record,identity,sha,when))
-                self.db.execute("INSERT INTO source_state VALUES(?,?,?,'open',?) ON CONFLICT(job_id,source_id,source_record_id) DO UPDATE SET status='open',observed_at=excluded.observed_at WHERE excluded.observed_at>=source_state.observed_at",(identity,source_id,record,when))
+                identifier=self._physical_observation(run_id,source_id,record,identity,sha,when,adapter)
+                member_ids.append(identifier);member_context.append(adapter)
                 # A historical alias may be imported only after this posting's
                 # explicit closure. Apply that retained evidence before deriving
                 # status, so the old listing cannot manufacture a reopen.
@@ -292,11 +348,10 @@ class Catalogue:
                 self._status(identity,source_id,'listed','Official adapter returned normalized listing',when)
                 # A newly imported historical record may not yet have a source
                 # head, even though newer complete absences are already stored.
-                absence=self.db.execute('''SELECT sc.observed_at,sc.run_id FROM scans sc
-                    WHERE sc.source_id=? AND sc.employer=? AND sc.status='complete' AND sc.observed_at>=?
-                    AND NOT EXISTS (SELECT 1 FROM observations o WHERE o.run_id=sc.run_id
-                        AND o.source_id=sc.source_id AND o.job_id=? AND o.source_record_id=?)
-                    ORDER BY sc.observed_at DESC LIMIT 1''',(source_id,employer,when,identity,record)).fetchone()
+                absence=None
+                for candidate in self.db.execute("SELECT observed_at,run_id FROM scans WHERE source_id=? AND employer=? AND status='complete' AND observed_at>=? ORDER BY observed_at DESC",(source_id,employer,when)):
+                    if not self._scan_has(candidate['run_id'],source_id,identity,record):
+                        absence=candidate;break
                 if absence:
                     changed=self.db.execute("UPDATE source_state SET status='unknown',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=? AND status='open' AND observed_at<=?",(absence['observed_at'],identity,source_id,record,absence['observed_at'])).rowcount
                     if changed:
@@ -311,37 +366,43 @@ class Catalogue:
                         self.db.execute("UPDATE source_state SET status='unknown',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=?",(when,row['job_id'],source_id,row['source_record_id']))
                         self._status(row['job_id'],source_id,'complete_scan_absence','Not observed in this complete scan; closure unknown',when)
             self.db.execute('INSERT INTO scans VALUES(?,?,?,?,?,?,?)',(run_id,source_id,employer,effective,when,len(jobs),rejected))
+            self.db.execute('INSERT INTO scan_memberships VALUES(?,?,?)',(run_id,source_id,pack_members(member_ids,member_context)))
         return {'status':effective,'observed':observed,'rejected':rejected,'conflicts':conflicts}
 
     def record_closed(self,identity,source_id,record_id,when,*,evidence_url,evidence):
         self._write();when=stamp(when)
         if not canonical_job_url(evidence_url) or not text(evidence,2048,nullable=False):raise CatalogueError('explicit public closure evidence required')
         with self.db:
-            latest=self.db.execute('SELECT s.payload FROM observations o JOIN snapshots s ON s.sha=o.snapshot_sha WHERE o.job_id=? AND o.source_id=? AND o.source_record_id=? ORDER BY o.observed_at DESC,o.id DESC LIMIT 1',(identity,source_id,record_id)).fetchone()
+            latest=self.db.execute('SELECT s.payload FROM source_state ss JOIN observations o ON o.id=ss.latest_observation_id JOIN snapshots s ON s.sha=o.snapshot_sha WHERE ss.job_id=? AND ss.source_id=? AND ss.source_record_id=?',(identity,source_id,record_id)).fetchone()
             if latest is None or json.loads(latest[0])['canonical_url']!=canonical_job_url(evidence_url):raise CatalogueError('closure URL does not match observed posting')
             changed=self.db.execute("UPDATE source_state SET status='closed',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=? AND observed_at<=?",(when,identity,source_id,record_id,when)).rowcount
             if changed!=1:raise CatalogueError('closure must reference an observed source record')
             # URL-derived and later native IDs can be aliases of this same
             # official posting. Preserve observations; close only matching URL
             # aliases that have no newer positive evidence.
-            aliases=self._rows('SELECT ss.source_record_id FROM source_state ss WHERE ss.job_id=? AND ss.source_id=? AND ss.observed_at<=? AND ?=(SELECT json_extract(s.payload,\'$.canonical_url\') FROM observations o JOIN snapshots s ON o.snapshot_sha=s.sha WHERE o.job_id=ss.job_id AND o.source_id=ss.source_id AND o.source_record_id=ss.source_record_id ORDER BY o.observed_at DESC,o.id DESC LIMIT 1)',(identity,source_id,when,canonical_job_url(evidence_url)))
+            aliases=self._rows("SELECT ss.source_record_id FROM source_state ss JOIN observations o ON o.id=ss.latest_observation_id JOIN snapshots s ON s.sha=o.snapshot_sha WHERE ss.job_id=? AND ss.source_id=? AND ss.observed_at<=? AND json_extract(s.payload,'$.canonical_url')=?",(identity,source_id,when,canonical_job_url(evidence_url)))
             for alias in aliases:
                 self.db.execute("UPDATE source_state SET status='closed',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=?",(when,identity,source_id,alias['source_record_id']))
             self._status(identity,source_id,'explicit_closed',compact({'url':evidence_url,'evidence':evidence}),when)
 
     def stats(self):
-        return {table:self.db.execute(f'SELECT count(*) FROM {table}').fetchone()[0]
-                for table in ('jobs','snapshots','observations','conflicts','leads','runs')}
+        result={table:self.db.execute(f'SELECT count(*) FROM {table}').fetchone()[0]
+                for table in ('jobs','snapshots','conflicts','leads','runs')}
+        result['observations']=self.db.execute('SELECT coalesce(sum(returned_count-rejected_count),0) FROM scans').fetchone()[0]
+        return result
     def conflicts(self):return self._rows('SELECT * FROM conflicts ORDER BY id')
     def status_history(self,job_id=None):
         return self._rows('SELECT * FROM status_events'+(' WHERE job_id=?' if job_id else '')+' ORDER BY id',(job_id,) if job_id else ())
     def history(self,job_id=None,*,limit=5000):
         self._limit(limit)
-        rows=self._rows('SELECT o.*,s.payload FROM observations o JOIN snapshots s ON o.snapshot_sha=s.sha'+
-                        (' WHERE o.job_id=?' if job_id else '')+' ORDER BY o.id LIMIT ?',((job_id,) if job_id else ())+(limit,))
-        for row in rows:
-            row['snapshot']=json.loads(row.pop('payload'));row['snapshot']['_observed_at']=row['observed_at']
-        return rows
+        result=[]
+        for scan in self.db.execute('SELECT run_id,source_id FROM scans ORDER BY rowid'):
+            for row in self.scan_rows(scan['run_id'],scan['source_id'],job_id=job_id):
+                row['snapshot']=json.loads(row.pop('payload'));row['snapshot']['_observed_at']=row['observed_at']
+                result.append(row)
+                if len(result)>=limit:return result
+        return result
+
     @staticmethod
     def _limit(limit):
         if type(limit) is not int or not 1<=limit<=5000:raise ValueError('limit must be 1..5000')
@@ -356,14 +417,16 @@ class Catalogue:
         if text is not None:
             pattern='%'+text.replace('\\','\\\\').replace('%','\\%').replace('_','\\_')+'%'
             clauses.append("(json_extract(s.payload,'$.title') LIKE ? ESCAPE '\\' OR json_extract(s.payload,'$.location') LIKE ? ESCAPE '\\')");args.extend([pattern,pattern])
-        rows=self._rows('SELECT j.*,o.source_id,o.source_record_id,o.snapshot_sha,o.observed_at,s.payload FROM jobs j '
-            'JOIN observations o ON o.id=(SELECT id FROM observations WHERE job_id=j.job_id ORDER BY observed_at DESC,id DESC LIMIT 1) '
+        rows=self._rows('SELECT j.*,o.source_id,o.source_record_id,o.snapshot_sha,ss.last_listing_at AS observed_at,ss.adapter_posted_at AS context_adapter,s.payload FROM jobs j '
+            'JOIN source_state ss ON ss.rowid=(SELECT rowid FROM source_state WHERE job_id=j.job_id ORDER BY last_listing_at DESC,latest_observation_id DESC LIMIT 1) JOIN observations o ON o.id=ss.latest_observation_id '
             'JOIN snapshots s ON o.snapshot_sha=s.sha'+(' WHERE '+' AND '.join(clauses) if clauses else '')+
             ' ORDER BY j.job_id LIMIT ? OFFSET ?',(*args,limit,offset))
         for row in rows:
             row['snapshot']=json.loads(row.pop('payload'));row['snapshot']['_observed_at']=row['observed_at']
+            if row['snapshot']['posted_precision']!='instant':row['snapshot']['adapter_posted_at']=row['context_adapter']
+            row.pop('context_adapter')
             row['title']=row['snapshot']['title'];row['canonical_url']=row['snapshot']['canonical_url']
-            row['sources']=self._rows('SELECT source_id,source_record_id,min(observed_at) AS first_observed_at,max(observed_at) AS last_observed_at FROM observations WHERE job_id=? GROUP BY source_id,source_record_id ORDER BY source_id,source_record_id',(row['job_id'],))
+            row['sources']=self._rows('SELECT o.source_id,o.source_record_id,min(sp.first_observed_at) AS first_observed_at,max(sp.last_observed_at) AS last_observed_at FROM observations o JOIN observation_spans sp ON sp.observation_id=o.id WHERE o.job_id=? GROUP BY o.source_id,o.source_record_id ORDER BY o.source_id,o.source_record_id',(row['job_id'],))
             row['network_priority']=bool(self.db.execute("SELECT 1 FROM observations o JOIN snapshots s ON s.sha=o.snapshot_sha WHERE o.job_id=? AND json_extract(s.payload,'$.network_priority')=1 LIMIT 1",(row['job_id'],)).fetchone())
             row['referral_status']='unconfirmed' if row['network_priority'] else 'unavailable'
             row['classification']=None
@@ -388,7 +451,9 @@ class Catalogue:
         with self.db:
             for row in self.db.execute('SELECT sha,payload FROM snapshots ORDER BY sha'):
                 data=json.loads(row['payload'])
-                data['_observed_at']=self.db.execute('SELECT max(observed_at) FROM observations WHERE snapshot_sha=?',(row['sha'],)).fetchone()[0]
+                span=self.db.execute('SELECT sp.last_observed_at,sp.adapter_posted_at FROM observations o JOIN observation_spans sp ON sp.observation_id=o.id WHERE snapshot_sha=? ORDER BY sp.last_observed_at DESC,o.id DESC LIMIT 1',(row['sha'],)).fetchone()
+                data['_observed_at']=span['last_observed_at']
+                if data['posted_precision']!='instant':data['adapter_posted_at']=span['adapter_posted_at']
                 result=classifier(data)
                 if not isinstance(result,dict) or set(result)-{'status','reasons'} or result.get('status') not in {'eligible','needs_review','excluded'}:
                     raise CatalogueError('invalid public deterministic classification')
@@ -429,7 +494,7 @@ class Catalogue:
         row=self.db.execute('SELECT payload FROM leads WHERE source_id=? AND lead_id=?',(source_id,lead_id)).fetchone()
         if row is None:raise CatalogueError('lead missing')
         lead=json.loads(row[0]);identity=next(iter(matches))
-        official=self.db.execute('SELECT s.payload,o.observed_at FROM observations o JOIN snapshots s ON o.snapshot_sha=s.sha WHERE o.job_id=? AND o.source_id=? AND o.source_record_id=? ORDER BY o.observed_at DESC,o.id DESC LIMIT 1',(identity,official_source,official_record)).fetchone()
+        official=self.db.execute('SELECT s.payload,ss.last_listing_at AS observed_at FROM source_state ss JOIN observations o ON o.id=ss.latest_observation_id JOIN snapshots s ON o.snapshot_sha=s.sha WHERE ss.job_id=? AND ss.source_id=? AND ss.source_record_id=?',(identity,official_source,official_record)).fetchone()
         data=json.loads(official[0])
         source_state=self.db.execute('SELECT status FROM source_state WHERE job_id=? AND source_id=? AND source_record_id=?',(identity,official_source,official_record)).fetchone()
         age=(when-datetime.fromisoformat(official['observed_at'])).total_seconds()

@@ -9,3 +9,5 @@ No new production employer/feed without exact owner approval, no production rese
 Current checkpoint: #30/#32/#31/#33 are merged. Reuse their code and source receipts; do not reimplement. P2-B candidate and rights record are in PUBLIC_FEEDS.md and evidence/P2-B-*.md; all candidates remain OFF. Finish its current-head gates, then the full SQLite catalogue and safely deployed shadow. STATUS/HANDOFF contain live proof limits.
 
 P2-C implementation plan is docs/superpowers/plans/2026-11-12-p2-c-catalogue.md. Finish both C1 store/query and C2 persistent pre-filter shadow/parity/rollback, not merely a local helper. Real>=72h/approval gates must remain explicit; never invent a completed window/cutover.
+
+C1 #35 merged1614d804; source baselines are actually verified in43140198821. C2 implementation is no longer a stub: compact logical history, shadow replay/parity/ACKs and encrypted cache workflow are local candidate code. Finish its actual merge/release/live verification, provision private key without disclosure, and observe an ordinary shadow run. Never count capacity fixtures as72h evidence or enable canonical authority without exact owner approval.

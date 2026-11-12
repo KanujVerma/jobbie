@@ -52,6 +52,9 @@ from src.scheduler import run_loop
 from src.source_migration import apply_source_baseline, validate_source_revision
 from src.public_feeds import collect_feeds, confirm_lead, build_official_index
 from src.catalogue_cli import add_catalogue_parser, cmd_catalogue
+from src.catalogue_shadow import ShadowBridge, ack_ids
+from src.catalogue_operations import add_shadow_parser, cmd_shadow
+from contextlib import ExitStack
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -119,6 +122,11 @@ def cmd_test_discord(args) -> int:
 
 
 def do_run(args) -> int:
+    with ExitStack() as resources:
+        return _do_run(args, resources)
+
+
+def _do_run(args, resources) -> int:
     load_dotenv()
     logger = logging.getLogger(__name__)
     run_start = datetime.now(timezone.utc)
@@ -142,6 +150,9 @@ def do_run(args) -> int:
     except StateCorruptionError as e:
         logger.error(f"Failed to load state: {e}. Aborting run to prevent alert storm.")
         return 1
+
+    shadow = ShadowBridge(config, state, run_start, dry_run=getattr(args, "dry_run", False))
+    resources.callback(shadow.close)
 
     first_run = is_first_run(state)
     is_new_policy_migration = False
@@ -194,6 +205,7 @@ def do_run(args) -> int:
         feed_leads, feed_reports = collect_feeds(feed_manifest, feed_state, http=http)
         if isinstance(feed_state, dict) and feed_state:
             state["feed_health"] = feed_state
+    shadow.leads(feed_leads)
 
     alerted_urls: set[str] = set()
 
@@ -242,12 +254,14 @@ def do_run(args) -> int:
                 fetch_error = ", ".join(query_errors)
             any_company_succeeded = any_company_succeeded or adapter_succeeded
             fetch_duration = round(time.monotonic() - fetch_start, 2)
+            shadow.observe(company_cfg, fetched, adapter_succeeded)
             if feed_leads:
                 official_index = build_official_index(fetched, company_cfg)
                 for lead in feed_leads:
                     confirmation = confirm_lead(lead, official_index, company_cfg)
                     if confirmation is not None:
                         feed_confirmations.add((confirmation.source_id, confirmation.lead_id))
+                        shadow.confirm(lead, company_cfg, confirmation)
 
             # Adapter health. Keyed on pre-filter count.
             company_state = state["companies"].setdefault(
@@ -402,21 +416,25 @@ def do_run(args) -> int:
             # Classify against first_seen state for individual alerts
             freshness_hours = float(config.filters.get("freshness_hours", 48))
             now = loop_now
+            projection = shadow.project(company_cfg, fetched, matched, state, freshness_hours, now)
             alert_candidates = classify_jobs(
                 matched, cname, state, freshness_hours, now,
                 verbose=getattr(args, "verbose", False),
             )
+            shadow.compare(company_cfg, matched, alert_candidates, projection, state)
 
             actually_alerted: list = []
             cap_suppressed_jobs: list = []
             alerted = 0
 
             for job in alert_candidates:
+                delivery_outcome = "skipped"
                 if notify and not getattr(args, "dry_run", False):
                     if not cap_hit:
                         if alert_count >= max_alerts:
                             cap_hit = True
                             cap_suppressed_jobs.append(job)
+                            delivery_outcome = "capped"
                             if notifier:
                                 notifier.send_summary(
                                     title="⚠️ Alert Cap Reached",
@@ -430,6 +448,7 @@ def do_run(args) -> int:
                                     cname, job.title, job.url,
                                 )
                                 actually_alerted.append(job)
+                                delivery_outcome = "dedup"
                             else:
                                 if notifier is None:
                                     logger.warning(
@@ -445,6 +464,7 @@ def do_run(args) -> int:
                                         sent = False
 
                                 if sent:
+                                    delivery_outcome = "ack"
                                     if url_key:
                                         alerted_urls.add(url_key)
                                         record_alerted_url(job.url, cname, job.id, state, now)
@@ -452,11 +472,14 @@ def do_run(args) -> int:
                                     alerted += 1
                                     actually_alerted.append(job)
                                 else:
+                                    delivery_outcome = "failed"
                                     alert_failures += 1
                     else:
+                        delivery_outcome = "capped"
                         cap_suppressed_jobs.append(job)
                 elif summary_mode:
                     summary_jobs.append(job)
+                shadow.delivery(company_cfg, job, delivery_outcome, now)
 
             # Persist first_seen state (always) and alert status (only when not dry-run)
             mark_alerted(actually_alerted, cname, state)
@@ -517,6 +540,7 @@ def do_run(args) -> int:
 
     # One bounded, resumable page per run. Never acknowledge a posting whose
     # direct link was not included in a successfully delivered summary.
+    summary_ack_count = set()
     if is_new_policy_migration:
         if getattr(args, "dry_run", False):
             preview_urls = {normalize_url(j.url) for j in backfill_jobs if normalize_url(j.url)}
@@ -525,7 +549,9 @@ def do_run(args) -> int:
                 "would send up to 10 links, leaving remainder pending."
             )
         elif any_company_succeeded:
+            before_summary_acks = ack_ids(state)
             result = deliver_backfill_batch(backfill_jobs, state, notifier)
+            summary_ack_count = ack_ids(state) - before_summary_acks
             logger.info(
                 "Backfill batch: acknowledged=%d pending=%d completed=%s delivery_attempted=%s",
                 result.delivered, result.remaining, result.completed, result.attempted,
@@ -549,11 +575,16 @@ def do_run(args) -> int:
 
     # Compute diagnostics and record heartbeat
     run_finish = datetime.now(timezone.utc)
+    shadow_report = shadow.finish(state, run_finish, summary_ack_count)
     cadence_min = int(config.defaults.get("schedule_minutes", 15))
     diag = compute_run_diagnostics(
         state, run_start, run_finish, cadence_min, company_stats, alert_count, alert_failure_count=alert_failures
     )
     record_run_heartbeat(state, diag)
+    if shadow.requested:
+        diag["catalogue_shadow"] = shadow_report
+        if getattr(args, "verbose", False):
+            print("Catalogue shadow: " + json.dumps(shadow_report, sort_keys=True))
     if feed_manifest:
         diag["optional_feeds"] = feed_reports
         diag["feed_lead_count"] = len(feed_leads)
@@ -582,7 +613,9 @@ def do_run(args) -> int:
     if not getattr(args, "dry_run", False):
         try:
             save_state(state, state_path)
+            shadow.legacy_saved(True)
         except Exception as e:
+            shadow.legacy_saved(False)
             logger.error(f"Failed to save state: {e}")
             return 1
 
@@ -730,6 +763,7 @@ def main():
     feed_parser.add_argument("--manifest", default="public-feeds.yaml")
     feed_parser.add_argument("--allow-network", action="store_true")
     add_catalogue_parser(subparsers)
+    add_shadow_parser(subparsers)
 
     # needs-browser
     subparsers.add_parser(
@@ -802,6 +836,8 @@ def main():
         sys.exit(cmd_feed_check(args))
     elif args.command == "catalogue":
         sys.exit(cmd_catalogue(args))
+    elif args.command == "catalogue-shadow":
+        sys.exit(cmd_shadow(args))
     elif args.command == "run":
         sys.exit(cmd_run(args))
     elif args.command == "daemon":

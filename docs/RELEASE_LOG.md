@@ -166,3 +166,19 @@ C1 H4 correction: historical alias ingestion respects later explicit closure wit
 Run43140198821, state d4724df: Plaid143/Oracle2113silent complete baselines with0new job ACKs, all257prior seen ACK flags/10URL entries retained.13successful responses/1empty SanDisk;600.08s/301.43minute gap. No manual seed/reset/dispatch. Source baselines VERIFIED_LIVE; catalogue shadow/cutover not deployed. C1 refreshes current-head gates after retaining this new production state.
 
 C1 rebased onto actual ordinary state d4724df, preserving baseline/ACK history exactly. Full1118tests pass; permitted local source/CLI/dry-run byte proof repeated on new state. New head CI/hosted review required.
+
+C2 WIP checkpoint only: pre-filter shadow comparison/ACK/memory dry-run and encrypted checkpoint helpers/CLI, optional crypto boundary and feed rights claims.30focused/1137fulltests passed42.13s on C1 ce304905 base. Not deployed or ready for PR: efficient logical scan membership, persistent workflow, primary receipt audit and final gates remain required. No activation/cutover/source-state reset.
+
+C1 PR35 merged1614d804 after exact0be562f CI/clean hosted review; postmerge43148218676 passed. C2 local candidate now has efficient exact logical history, shadow comparisons/ACK receipts, encrypted bounded roundtrip custody workflow and optional-dependency isolation. Full1163passed40.76s before own rebase. No key/deployment/72h/cutover success claim. Capacity before/after fixtures committed separately from live source evidence.
+
+C2 projection compression preserves ledger provenance without repeat-size inflation; mismatch reports include exact ledger hash/ID samples and audit checks current config/code/job head. Pending final rebased release gates and ordinary shadow evidence.
+
+C2 first live shadow rejection stopped later source capture; legacy dry-run/no-mutation still passed. Failed evidence preserved. Corrected rejection isolation full1168passed43.52s, new full-source read underway. Private generated transport key/repository secret provisioned, value never published; unused by current main, not deployment/cutover evidence.
+
+C2 corrected permitted full13read:527.29s,11582normalized stored observations,0rejects/conflicts/filter/candidate/ACK differences,0sends; config/state/input DB retained. Actual initial memory52.7MBraw/10.2MBcompressed. Preserve first failed shadow receipt. Projected ledger volume requires64/96MiB transport caps + retained current/parent/four newest redundant copies, no canonical history pruning. Not deployment/72hevidence.
+
+C2 final local candidate1170tests38.85s/config/diff/docs/actionlint and corrected full13read pass. Pin for independent review; no release/deployment/72h/cutover assertion yet.
+
+C2 local independent review approved55785e8 in one round,1170independent tests41.53s/no findings. Source proof remains separate; final-head CI/hosted review and ordinary deployment evidence still required.
+
+C2 hosted audit correction: recent96hevidence window is independent of retained catalogue history; reproduced1000-receipt exhaustion, preserved all historical data. Fresh current-head tests/CI/hosted review required.

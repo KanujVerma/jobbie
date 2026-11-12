@@ -3,13 +3,13 @@ import json
 import sys
 from datetime import datetime,timezone
 
-from src.catalogue import Catalogue,CatalogueError
+from src.catalogue import Catalogue,CatalogueError,SCHEMA_VERSION
 
 
 def add_catalogue_parser(subparsers):
     parser=subparsers.add_parser('catalogue',help='Local source catalogue; no delivery/cutover authority')
     commands=parser.add_subparsers(dest='catalogue_command',required=True)
-    for name in ['init','stats','query','history','export','reclassify']:
+    for name in ['init','migrate','stats','query','history','export','reclassify']:
         command=commands.add_parser(name)
         command.add_argument('--db',required=True,help='Explicit private local SQLite path')
         if name in {'query','export'}:
@@ -24,10 +24,10 @@ def add_catalogue_parser(subparsers):
 
 def cmd_catalogue(args):
     try:
-        write=args.catalogue_command in {'init','reclassify'}
-        with Catalogue(args.db,create=args.catalogue_command=='init',readonly=not write) as db:
+        write=args.catalogue_command in {'init','migrate','reclassify'}
+        with Catalogue(args.db,create=args.catalogue_command=='init',readonly=not write,migrate=args.catalogue_command=='migrate') as db:
             action=args.catalogue_command
-            if action in {'init','stats'}:result={'schema_version':1,**db.stats()}
+            if action in {'init','migrate','stats'}:result={'schema_version':SCHEMA_VERSION,**db.stats()}
             elif action=='history':result=db.history(args.job_id,limit=args.limit)
             elif action in {'query','export'}:
                 query={key:getattr(args,key) for key in ['text','employer','status','policy','limit','offset']}
