@@ -144,7 +144,7 @@ CREATE TABLE shadow_sources(run_id TEXT NOT NULL REFERENCES runs,source_id TEXT 
  PRIMARY KEY(run_id,source_id));
 CREATE TABLE shadow_delivery(id INTEGER PRIMARY KEY,run_id TEXT NOT NULL REFERENCES runs,source_id TEXT NOT NULL,
  legacy_id TEXT NOT NULL,job_id TEXT REFERENCES jobs,outcome TEXT NOT NULL,observed_at TEXT NOT NULL);
-CREATE TABLE legacy_history(sha TEXT PRIMARY KEY,payload TEXT NOT NULL,observed_at TEXT NOT NULL,ledger_sha TEXT NOT NULL);
+CREATE TABLE legacy_history(sha TEXT PRIMARY KEY,payload BLOB NOT NULL,observed_at TEXT NOT NULL,ledger_sha TEXT NOT NULL);
 CREATE INDEX observation_snapshot ON observations(snapshot_sha);
 CREATE INDEX snapshot_legacy_id ON snapshots(json_extract(payload,'$.company'),json_extract(payload,'$.id'));
 '''

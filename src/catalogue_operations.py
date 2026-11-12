@@ -11,7 +11,7 @@ from pathlib import Path
 from src.catalogue import Catalogue,CatalogueError,compact
 from src.catalogue_checkpoint import (EPOCH,_read,_write,read_checkpoint,seal,unseal,publish_checkpoint,
     rollback_check,cache_budget,code_sha,MAX_METADATA_BYTES,MAX_CIPHER_BYTES)
-from src.catalogue_shadow import evidence_gate,digest
+from src.catalogue_shadow import evidence_gate,digest,config_fingerprint
 
 
 def add_shadow_parser(subparsers):
@@ -72,9 +72,11 @@ def _audit(cp,cipher,key,approval_id):
     run_number=cp['run_id'].split('.')[0]
     if not run_number.isdigit():jobs={'jobs':[]}
     else:jobs=_primary(f'repos/KanujVerma/jobbie/actions/runs/{run_number}/jobs',{'per_page':100})
+    run_receipt=next((r for r in receipts if str(r.get('id'))==run_number),{})
     published=cp.get('cache_roundtrip_verified') is True and any(
         step.get('name')=='Publish verified catalogue checkpoint' and step.get('conclusion')=='success'
-        for job in jobs.get('jobs',[]) for step in job.get('steps',[]))
+        for job in jobs.get('jobs',[]) if job.get('head_sha')==run_receipt.get('head_sha') and job.get('head_sha')
+        for step in job.get('steps',[]))
     stored=[]
     for row in rows:
         report=json.loads(row['result'])
@@ -95,6 +97,9 @@ def _audit(cp,cipher,key,approval_id):
         rollback_proof=cp.get('rollback_verified') is True,target=target)
     if cp['code_sha256']!=code_sha():
         result['gates'].append('BLOCKED_CODE_CHANGE');result['cutover_ready']=False
+    from src.config import load_config
+    if cp['config_sha256']!=config_fingerprint(load_config()):
+        result['gates'].append('BLOCKED_CONFIG_CHANGE');result['cutover_ready']=False
     result.update(target=target,activation_performed=False,delivery_authority='legacy_json',
                   verified_by='primary_github_receipts_and_exact_encrypted_checkpoint')
     return result

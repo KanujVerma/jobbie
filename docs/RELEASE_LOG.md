@@ -170,3 +170,5 @@ C1 rebased onto actual ordinary state d4724df, preserving baseline/ACK history e
 C2 WIP checkpoint only: pre-filter shadow comparison/ACK/memory dry-run and encrypted checkpoint helpers/CLI, optional crypto boundary and feed rights claims.30focused/1137fulltests passed42.13s on C1 ce304905 base. Not deployed or ready for PR: efficient logical scan membership, persistent workflow, primary receipt audit and final gates remain required. No activation/cutover/source-state reset.
 
 C1 PR35 merged1614d804 after exact0be562f CI/clean hosted review; postmerge43148218676 passed. C2 local candidate now has efficient exact logical history, shadow comparisons/ACK receipts, encrypted bounded roundtrip custody workflow and optional-dependency isolation. Full1163passed40.76s before own rebase. No key/deployment/72h/cutover success claim. Capacity before/after fixtures committed separately from live source evidence.
+
+C2 projection compression preserves ledger provenance without repeat-size inflation; mismatch reports include exact ledger hash/ID samples and audit checks current config/code/job head. Pending final rebased release gates and ordinary shadow evidence.

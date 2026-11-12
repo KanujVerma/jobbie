@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import zlib
 from datetime import datetime,timezone
 from pathlib import Path
 
@@ -71,7 +72,15 @@ class Shadow:
         if self.owns_store:self.store.close()
     def _retain_legacy(self,state,when):
         payload=compact(legacy_snapshot(state));sha=hashlib.sha256(payload.encode()).hexdigest()
-        with self.store.db:self.store.db.execute('INSERT OR IGNORE INTO legacy_history VALUES(?,?,?,?)',(sha,payload,stamp(when),sha))
+        if len(payload.encode())>8*1024*1024:raise CatalogueError('bounded legacy projection exceeds limit')
+        with self.store.db:self.store.db.execute('INSERT OR IGNORE INTO legacy_history VALUES(?,?,?,?)',(sha,zlib.compress(payload.encode(),6),stamp(when),sha))
+    def retained_legacy(self,sha):
+        row=self.store.db.execute('SELECT payload FROM legacy_history WHERE sha=?',(sha,)).fetchone()
+        if row is None:raise CatalogueError('legacy projection evidence missing')
+        decoder=zlib.decompressobj();raw=decoder.decompress(row[0],8*1024*1024+1)
+        if len(raw)>8*1024*1024 or not decoder.eof or decoder.unused_data or hashlib.sha256(raw).hexdigest()!=sha:
+            raise CatalogueError('corrupt bounded legacy evidence')
+        return json.loads(raw)
     def _save_source(self,key):
         with self.store.db:self.store.db.execute('INSERT INTO shadow_sources VALUES(?,?,?) ON CONFLICT(run_id,source_id) DO UPDATE SET result=excluded.result',(self.run_id,key,compact(self.sources[key])))
     def observe(self,config,jobs,*,status,observed_at):
@@ -132,6 +141,7 @@ class Shadow:
     def project(self,config,matched,state,*,freshness_hours,now):
         """SQL identities + legacy ledger facts, independent candidate algorithm."""
         snapshot=legacy_snapshot(state);before=digest(snapshot);company=config['name']
+        self.sources[source_key(config)]['legacy_projection_sha256']=before
         seen=snapshot['companies'].get(company,{}).get('seen_jobs',{})
         # Canonical ACK aliases are linked through stored observations, not titles.
         known_acks=ack_ids(snapshot);acked_identities=set()
@@ -157,6 +167,8 @@ class Shadow:
         mismatch=len(actual^set(projection));key=source_key(config)
         self.sources[key].update(legacy_candidates=len(legacy_candidates),legacy_effective_groups=len(actual),
             canonical_candidates=len(projection),candidate_mismatches=mismatch,
+            only_legacy_candidate_ids=sorted(actual-set(projection))[:50],
+            only_canonical_candidate_ids=sorted(set(projection)-actual)[:50],
             duplicate_candidate_records=len(effective)-len(actual),comparison_complete=True)
         if mismatch:self.gates.add('BLOCKED_PARITY')
         self._save_source(key);return self.sources[key]

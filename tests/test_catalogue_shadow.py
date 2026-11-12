@@ -308,3 +308,13 @@ def test_prior_failed_window_does_not_fabricate_or_permanently_block_new_real_wi
     assert result['shadow_hours']>=72 and result['window_first_run_id']=='3'
     assert result['gates']==['BLOCKED_APPROVAL']
     assert result['invalid_run_ids']==['1','2']
+
+
+def test_legacy_projection_history_is_lossless_and_compact(shadow):
+    from src.catalogue_shadow import legacy_snapshot,digest,compact
+    value=state();value['companies']['Example Labs']={'seen_jobs':{
+        str(i):{'first_seen':NOW.isoformat(),'last_seen':NOW.isoformat(),'alerted':False,'baseline_suppressed':True} for i in range(1000)}}
+    shadow._retain_legacy(value,NOW);sha=digest(legacy_snapshot(value))
+    assert shadow.retained_legacy(sha)==legacy_snapshot(value)
+    stored=shadow.store.db.execute('SELECT length(payload) FROM legacy_history WHERE sha=?',(sha,)).fetchone()[0]
+    assert stored<len(compact(legacy_snapshot(value)).encode())//4
