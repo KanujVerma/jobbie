@@ -59,3 +59,6 @@ Manual supplied evidence is labeled for review and cannot authorize production. 
 
 ## P2-R3 Oracle public-source boundary
 Finder values, numeric IDs, provider origin/path, page limits and official careers root are validated; reads are bounded and do not follow arbitrary source URLs. ExternalURL cannot override the fixed official requisition link. Descriptions are sanitized source text, never instructions. Date-only values do not gain fabricated timestamps; missing qualification/employment evidence remains unknown. Tests cover hostile config/links, malformed rows, 403/404/429 and a narrow explicit required-citizenship clause with optional negatives. No candidate immigration information is added by these synthetic tests.
+
+## P2-B public feed boundary
+Only fixed public raw.githubusercontent.com JSON endpoints, bounded2MiB/5000records/text, no redirects/auth/custom hosts or arbitrary lead-URL requests. Source values are data, never code/authority. Explicit data permission and exact owner endpoint approval are independent gates; current candidates remain blocked. Confirmation uses already fetched approved employer records and cannot activate companies or approve applications. No private candidate processing or paid fallback. Errors redact exception bodies/URLs; default runtime has no manifest configured.

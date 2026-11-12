@@ -46,3 +46,6 @@ All 812 tests passed in main CI run #42720639467. The adapters are available but
 disabled in production (examples in `examples/p2a-public-boards.yaml`). Original 15
 configured / 13 enabled Network Priority production sources remain unchanged.
 
+
+## P2-B candidate interface
+See PUBLIC_FEEDS.md: feed-check plus an optional default-OFF manifest hook, bounded public JSON leads, provenance/health/dedup and exact confirmation using approved employer records. Current candidates are all OFF/BLOCKED_SOURCE_RIGHTS with no owner feed approval. Metadata/policy and synthetic tests are not dataset coverage. Missing rights does not block the independent catalogue; legacy JSON remains delivery authority.
