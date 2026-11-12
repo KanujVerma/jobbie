@@ -300,3 +300,25 @@ def test_incomplete_optional_manifest_does_not_raise_or_reset_health(tmp_path):
     state={'retained':{'last_attempt_at':NOW.isoformat()}};before=copy.deepcopy(state)
     leads,reports=collect_feeds(str(path),state)
     assert not leads and reports[0]['status']=='invalid_manifest' and state==before
+
+
+@pytest.mark.parametrize('platform', ['greenhouse','ashby','oracle_careers'])
+def test_official_source_posting_id_confirmation_and_conflict(platform):
+    from dataclasses import replace
+    leads,_=fetch_feed(source(),{},http=http_for({'jobs':[row(official_req_id='123')]}),now=NOW)
+    job=replace(official_job(),source_platform=platform,source_job_id='123')
+    cfg={'name':'Example Labs','enabled':True}
+    assert confirm_lead(leads[0],[job],cfg,now=NOW) is not None
+    assert confirm_lead(replace(leads[0],official_req_id='456'),[job],cfg,now=NOW) is None
+
+
+@pytest.mark.parametrize('dates', [('2026-11-01','2026-11-10'),('2026-11-10','2026-11-01')])
+def test_conflicting_same_source_id_posting_dates_fail_in_both_orders(dates):
+    leads,r=fetch_feed(source(),{},http=http_for({'jobs':[row(posted_at=d) for d in dates]}),now=NOW)
+    assert not leads and r['status']=='failed'
+
+
+def test_equivalent_posting_instants_are_identical_duplicates():
+    leads,r=fetch_feed(source(),{},http=http_for({'jobs':[
+        row(posted_at='2026-11-10T12:00:00Z'),row(posted_at='2026-11-10T07:00:00-05:00')]}),now=NOW)
+    assert len(leads)==1 and r['duplicate_count']==1

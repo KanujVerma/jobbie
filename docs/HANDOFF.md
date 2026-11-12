@@ -27,3 +27,7 @@ Finish P2-B gates and merge, then implement P2-C SQLite pre-filter catalogue/his
 Every functional PR updates STATUS/HANDOFF/RELEASE_LOG and affected contracts/specs/prompts/issue7. Full pytest/config, permitted read-only checks and no-mutation dry-run, local Sol review then exact-head CI/hosted review before full-send squash merge. Revert optional helpers/hooks without touching legacy state for rollback. Repository is the canonical handoff, including blockers and actual run evidence.
 
 After Phase2, exact next major goal is P3-A signed private Discord interactions, private profile/resume upload/evidence and deterministic matching. No applications or private candidate features belong in this Phase2 work.
+
+P2-B local Sol round1 returned2findings, reproduced then fixed directly: consult supported source posting IDs for confirmation, and fail conflicting normalized duplicate dates in both orders. Six focused cases prove fixes; ledger evidence/P2-B-REVIEW.md. Current-head full CI/hosted review is still required, not inferred from earlier local review.
+
+Corrected P2-B candidate full1039passed37.12s/focused44; repeated config/OFF feed-check/Plaid dry-run preserved state/config. Proceed own PR/hosted review/CI, then catalogue plan docs/superpowers/plans/2026-11-12-p2-c-catalogue.md in the independent checkout.

@@ -174,20 +174,21 @@ def fetch_feed(source, state, *, http=None, now=None, allow_network=True):
             identity=identifier or hashlib.sha256(canonical.encode()).hexdigest()
             req=_text(str(field('official_req_id')),128) if field('official_req_id') is not None else None
             title,location=_text(field('title')),_text(field('location'))
-            fingerprint=(canonical,_text(field('company'),160),req,title,location)
-            if identity in seen:
-                if seen[identity]!=fingerprint:raise ValueError('conflicting feed source ID')
-                report['duplicate_count']+=1;continue
-            seen[identity]=fingerprint
             posted=field('posted_at');calendar=None
             if isinstance(posted,str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}',posted):
                 from datetime import date
                 try:calendar=date.fromisoformat(posted).isoformat()
                 except ValueError:pass
+            instant=_time(posted)
+            fingerprint=(canonical,_text(field('company'),160),req,title,location,instant,calendar)
+            if identity in seen:
+                if seen[identity]!=fingerprint:raise ValueError('conflicting feed source ID')
+                report['duplicate_count']+=1;continue
+            seen[identity]=fingerprint
             leads.append(FeedLead(lead_id=f'{sid}:{identity}',source_id=sid,source_url=endpoint,
                 source_record_id=identifier,employer=fingerprint[1],title=title,
                 location=location,url=url,observed_at=now,source_blob_sha256=digest,
-                feed_updated_at=updated,reported_posted_at=_time(posted),reported_posted_date=calendar,official_req_id=req))
+                feed_updated_at=updated,reported_posted_at=instant,reported_posted_date=calendar,official_req_id=req))
         report.update(status='ok' if leads else 'empty',returned_count=len(leads),blob_sha256=digest,
                       observed_at=now.isoformat(),feed_updated_at=updated.isoformat() if updated else None)
         state[sid].update(last_success_at=now.isoformat(),blob_sha256=digest)
@@ -233,6 +234,6 @@ def confirm_lead(lead, official_jobs, company_config, *, now=None):
     if len({j.id for j in matches})!=1:return None
     job=matches[0]
     req=getattr(job,'official_req_id',None)
-    if job.source_platform=='oracle_careers':req=job.source_job_id
+    if job.source_platform in {'greenhouse','ashby','oracle_careers'}:req=job.source_job_id
     if lead.official_req_id and req!=lead.official_req_id:return None
     return LeadConfirmation(lead.source_id,lead.lead_id,job.id,canonical_job_url(job.url),company_config['name'],now or datetime.now(timezone.utc))

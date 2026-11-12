@@ -28,3 +28,7 @@ P2-B implements bounded OFF JSON leads, source provenance/health/dedup and exact
 P2-C remains to implement: SQLite pre-filter normalized catalogue, identities/provenance/dates/unknowns, history/dedup/reclassification/query/export, crash-safe shadow and reconciliation/rollback. Actual >=72h shadow has not started. Keep legacy delivery authority until parity/rollback proof and exact owner cutover approval. Missing evidence/approval stays BLOCKED_72H_EVIDENCE/BLOCKED_APPROVAL, while independent code proceeds.
 
 Phase2 is PARTIAL, not complete. Next major goal is P3-A signed allowlisted private Discord interactions, profile/resume upload with evidence, and deterministic matching. Tailoring is Phase4; exact one-job approved application execution is Phase5. No dot API/trigger is verified.
+
+P2-B local Sol review found2reproduced defects (supported posting-ID confirmation and conflicting duplicate posting dates); parent fixed both with6focused cases. See evidence/P2-B-REVIEW.md; fresh full checks and hosted exact-head independent review remain release gates.
+
+P2-B corrected candidate: full1039passed37.12s, focused44passed; repeated config/OFF CLI/Plaid no-webhook check preserved bytes. No feed activated.
