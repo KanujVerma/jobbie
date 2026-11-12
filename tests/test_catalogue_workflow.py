@@ -39,3 +39,12 @@ def test_crypto_install_is_optional_and_budget_probe_is_readonly():
     seal=values[names.index('Seal bounded catalogue checkpoint')]
     assert 'actions/cache/usage' in seal['run']
     assert 'storage-limit' not in seal['run']
+
+
+def test_retention_waits_for_remote_custody_commit_and_has_no_record_deletion():
+    values=steps();names=[x.get('name') for x in values]
+    retention=values[names.index('Retain bounded redundant catalogue transports')]
+    assert names.index('Commit catalogue custody metadata')<names.index('Retain bounded redundant catalogue transports')
+    assert "catalogue_commit.outcome == 'success'" in retention['if']
+    assert 'prune-transport' in retention['run']
+    assert retention['continue-on-error'] is True

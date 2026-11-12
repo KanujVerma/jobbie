@@ -322,8 +322,11 @@ class Catalogue(ObservationHistory):
                 raise CatalogueError('source scan already recorded')
             for job in jobs:
                 try:data=normalized_snapshot(job,config)
-                except (CatalogueError,TypeError,ValueError):
-                    rejected+=1;self._conflict(run_id,source_id,None,'REJECTED_NORMALIZED_ROW',{'ordinal':observed+rejected-1},when);continue
+                except (CatalogueError,TypeError,ValueError) as error:
+                    identifier=getattr(job,'id',None)
+                    if not isinstance(identifier,str) or len(identifier)>512 or any(ord(c)<32 for c in identifier):identifier=None
+                    rejected+=1;self._conflict(run_id,source_id,identifier,'REJECTED_NORMALIZED_ROW',
+                        {'ordinal':observed+rejected-1,'error_type':type(error).__name__},when);continue
                 adapter=data['adapter_posted_at']
                 data=dict(data)
                 if data['posted_precision']!='instant':data['adapter_posted_at']=None

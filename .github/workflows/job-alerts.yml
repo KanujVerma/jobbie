@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write
-  actions: read
+  actions: write
 
 concurrency:
   group: job-alerts
@@ -209,6 +209,7 @@ jobs:
             cat state/catalogue_shadow_health.json >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Commit catalogue custody metadata
+        id: catalogue_commit
         if: ${{ !cancelled() && (steps.scan.outcome == 'success' || steps.scan.outcome == 'failure') }}
         continue-on-error: true
         timeout-minutes: 3
@@ -217,3 +218,10 @@ jobs:
             if [ -f "$file" ]; then git add "$file"; fi
           done
           git diff --cached --quiet || (git commit -m "state: catalogue custody $(date -u +%FT%TZ)" && git pull --rebase origin main && git push)
+      - name: Retain bounded redundant catalogue transports
+        if: ${{ !cancelled() && steps.catalogue_publish.outcome == 'success' && steps.catalogue_commit.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python main.py catalogue-shadow prune-transport
+        env:
+          GH_TOKEN: ${{ github.token }}

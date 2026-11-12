@@ -109,12 +109,22 @@ class Shadow:
         identities={row['job_id'] for row in rows}
         if len(identities)!=1:raise CatalogueError('missing or ambiguous normalized observation')
         return rows[0]
+    def _mapped_row(self,config,job):
+        try:return self._row(config,job)
+        except CatalogueError:
+            source=self.sources[source_key(config)]
+            if not (source['rejected'] or source['identity_conflicts']):raise
+            source['unmapped_lookups']=source.get('unmapped_lookups',0)+1
+            self.gates.add('BLOCKED_IDENTITIES')
+            return None
     def replay_filter(self,config,fetched,matched):
         """Re-evaluate retained snapshots, independently of caller match booleans."""
         from src.filtering import apply_filter_pipeline
         actual={(j.id,canonical_job_url(j.url)) for j in matched};replayed=set()
         for job in fetched:
-            row=self._row(config,job);data={**row['data'],'_observed_at':row['observed_at']}
+            row=self._mapped_row(config,job)
+            if row is None:continue
+            data={**row['data'],'_observed_at':row['observed_at']}
             restored=self.store.job_from_snapshot(data)
             passed,_=apply_filter_pipeline(restored,self.filters,config.get('config',{}))
             if passed is not None:replayed.add((job.id,canonical_job_url(job.url)))
@@ -151,7 +161,9 @@ class Shadow:
         canonical_urls={canonical_job_url(url) for url in snapshot['alerted_urls']}
         result=set()
         for job in matched:
-            row=self._row(config,job);identity=row['job_id'];entry=seen.get(job.id)
+            row=self._mapped_row(config,job)
+            if row is None:continue
+            identity=row['job_id'];entry=seen.get(job.id)
             if identity in acked_identities or canonical_job_url(job.url) in canonical_urls:continue
             if entry:
                 if entry.get('alerted') or entry.get('baseline_suppressed'):continue
@@ -163,8 +175,12 @@ class Shadow:
     def compare(self,config,matched,legacy_candidates,projection,*,state=None):
         # Legacy raw candidate counts and final canonical groups are both visible.
         effective=[j for j in legacy_candidates if state is None or normalize_url(j.url) not in state.get('alerted_urls',{})]
-        actual={self._row(config,j)['job_id'] for j in effective}
-        mismatch=len(actual^set(projection));key=source_key(config)
+        actual=set();unmapped=0
+        for job in effective:
+            row=self._mapped_row(config,job)
+            if row is None:unmapped+=1
+            else:actual.add(row['job_id'])
+        mismatch=len(actual^set(projection))+unmapped;key=source_key(config)
         self.sources[key].update(legacy_candidates=len(legacy_candidates),legacy_effective_groups=len(actual),
             canonical_candidates=len(projection),candidate_mismatches=mismatch,
             only_legacy_candidate_ids=sorted(actual-set(projection))[:50],
@@ -174,9 +190,9 @@ class Shadow:
         self._save_source(key);return self.sources[key]
     def delivery(self,config,job,outcome,when):
         if outcome not in {'ack','failed','dedup','capped','skipped'}:raise CatalogueError('invalid delivery evidence')
-        row=self._row(config,job)
+        row=self._mapped_row(config,job)
         with self.store.db:self.store.db.execute('INSERT INTO shadow_delivery(run_id,source_id,legacy_id,job_id,outcome,observed_at) VALUES(?,?,?,?,?,?)',
-            (self.run_id,source_key(config),job.id,row['job_id'],outcome,stamp(when)))
+            (self.run_id,source_key(config),job.id,row['job_id'] if row else None,outcome,stamp(when)))
         self.outcomes[outcome]+=1
     def finish(self,state,when,*,summary_acks=0):
         for pair in list(self.feed_confirmations):

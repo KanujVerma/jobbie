@@ -1,0 +1,31 @@
+{
+  "tier": "synthetic_projection_volume_using_existing_ledger_not_live_window",
+  "simulated_runs": 288,
+  "samples": [
+    {
+      "simulated_runs": 1,
+      "db_bytes": 274432,
+      "compressed_bytes": 78562
+    },
+    {
+      "simulated_runs": 48,
+      "db_bytes": 3756032,
+      "compressed_bytes": 2435242
+    },
+    {
+      "simulated_runs": 96,
+      "db_bytes": 7311360,
+      "compressed_bytes": 4830365
+    },
+    {
+      "simulated_runs": 192,
+      "db_bytes": 14417920,
+      "compressed_bytes": 9700625
+    },
+    {
+      "simulated_runs": 288,
+      "db_bytes": 21536768,
+      "compressed_bytes": 14529748
+    }
+  ]
+}

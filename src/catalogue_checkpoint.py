@@ -15,8 +15,8 @@ from pathlib import Path
 from src.catalogue import Catalogue,CatalogueError,SCHEMA_VERSION,MAX_DB_BYTES,compact
 
 EPOCH='p2-c2-v2-20261112'
-MAX_COMPRESSED_BYTES=16*1024*1024
-MAX_CIPHER_BYTES=24*1024*1024
+MAX_COMPRESSED_BYTES=64*1024*1024
+MAX_CIPHER_BYTES=96*1024*1024
 MAX_METADATA_BYTES=16384
 CACHE_BUDGET_BYTES=8*1024**3  # Below the documented included10GiB; never opt into paid settings.
 _FIELDS={'schema_version','epoch','catalogue_uuid','run_id','config_sha256','code_sha256','complete_run',
@@ -170,3 +170,33 @@ def rollback_check(cp,cipher_path,key,legacy_path):
     return {'cipher_roundtrip':True,'legacy_unchanged':before==file_sha(legacy_path),
             'delivery_authority':'legacy_json','catalogue_uuid':uid,'stats':stats,
             'legacy_sha256':before,'cache_custody_claimed':False}
+
+
+def redundant_transport_ids(cp,caches):
+    """Retain current, parent and four newest complete-history transport copies.
+
+    This never deletes a listing/observation/ledger record from SQLite, or an
+    unrelated dependency/browser cache. The current verified snapshot contains
+    all prior append-only history; older cache copies are redundant transport.
+    """
+    validate_checkpoint(cp)
+    if cp.get('cache_roundtrip_verified') is not True or cp.get('rollback_verified') is not True:
+        raise CatalogueError('verified published history is required before transport retention')
+    prefix='jobbie-catalogue-v2-'+cp['catalogue_uuid']+'-'
+    pattern=re.compile(re.escape(prefix)+r'[A-Za-z0-9_.-]{1,128}-[0-9a-f]{16}')
+    owned=[]
+    for row in caches:
+        if row.get('ref')!='refs/heads/main' or not isinstance(row.get('key'),str) or not pattern.fullmatch(row['key']):continue
+        if type(row.get('id')) is not int or row['id']<=0:raise CatalogueError('invalid owned transport ID')
+        try:
+            created=datetime.fromisoformat(row['created_at'].replace('Z','+00:00'))
+            if created.tzinfo is None:raise ValueError('naive cache time')
+        except (KeyError,TypeError,ValueError):raise CatalogueError('invalid owned transport receipt')
+        owned.append((created,row))
+    if not any(row['key']==cp['cache_key'] for _,row in owned):raise CatalogueError('current transport missing; nothing may be pruned')
+    owned.sort(key=lambda item:(item[0],item[1]['id']),reverse=True)
+    keep={row['id'] for _,row in owned[:4]}
+    parent=cp['parent_cipher_sha256']
+    for _,row in owned:
+        if row['key']==cp['cache_key'] or (parent and row['key'].endswith('-'+parent[:16])):keep.add(row['id'])
+    return [row['id'] for _,row in owned if row['id'] not in keep]

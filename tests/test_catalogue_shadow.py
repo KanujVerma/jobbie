@@ -318,3 +318,43 @@ def test_legacy_projection_history_is_lossless_and_compact(shadow):
     assert shadow.retained_legacy(sha)==legacy_snapshot(value)
     stored=shadow.store.db.execute('SELECT length(payload) FROM legacy_history WHERE sha=?',(sha,)).fetchone()[0]
     assert stored<len(compact(legacy_snapshot(value)).encode())//4
+
+
+def test_rejected_source_row_does_not_stop_other_valid_source_capture(tmp_path,monkeypatch):
+    import main,src.filtering
+    from src.config import Config
+    path=tmp_path/'seen.json';path.write_text(json.dumps(state()))
+    database=tmp_path/'db.sqlite'
+    with Catalogue(database,create=True):pass
+    other={**CFG,'name':'Other Labs'}
+    class Adapter:
+        def __init__(self,name,*a,**kw):self.name=name
+        def fetch(self):
+            if self.name==CFG['name']:return [job(),job('bad',url='http://example.com/invalid')]
+            return [replace(job('other'),company=self.name)]
+    config=Config(defaults={'state_path':str(path),'request_delay_seconds':[0,0]},filters={},companies=[CFG,other])
+    monkeypatch.setattr(main,'load_config',lambda _:config);monkeypatch.setattr(main,'ADAPTER_REGISTRY',{'fixture':Adapter})
+    monkeypatch.setattr(main,'HTTPClient',MagicMock());monkeypatch.setattr(main,'apply_filter_pipeline',lambda *a:(None,['excluded']))
+    monkeypatch.setattr(src.filtering,'apply_filter_pipeline',lambda *a:(None,['excluded']))
+    monkeypatch.setenv('JOBBIE_CATALOGUE_MODE','shadow');monkeypatch.setenv('JOBBIE_CATALOGUE_DB',str(database))
+    monkeypatch.setenv('DISCORD_WEBHOOK_URL','')
+    assert main.do_run(SimpleNamespace(config='fixture',dry_run=False))==0
+    with Catalogue(database,readonly=True) as store:
+        assert store.stats()['jobs']==2
+        report=json.loads(store.db.execute('SELECT result FROM shadow_runs').fetchone()[0])
+        assert len(report['sources'])==2 and 'BLOCKED_STORAGE' not in report['gates']
+        assert 'BLOCKED_IDENTITIES' in report['gates']
+
+
+def test_rejected_candidate_keeps_legacy_delivery_receipt_without_fabricated_job(shadow):
+    invalid=job('invalid',url='http://example.com/unsafe')
+    capture(shadow,[invalid])
+    projected=shadow.project(CFG,[invalid],state(),freshness_hours=48,now=NOW)
+    compared=shadow.compare(CFG,[invalid],[invalid],projected)
+    assert compared['candidate_mismatches']==1
+    shadow.delivery(CFG,invalid,'ack',NOW)
+    final=state();final['companies'][CFG['name']]={'seen_jobs':{invalid.id:{'first_seen':NOW.isoformat(),'last_seen':NOW.isoformat(),'alerted':True}}}
+    shadow.finish(final,NOW)
+    assert shadow.store.db.execute('SELECT job_id FROM shadow_delivery').fetchone()[0] is None
+    assert shadow.report()['ack_count']==1 and shadow.report()['ack_mismatches']==0
+    assert 'BLOCKED_STORAGE' not in shadow.report()['gates']

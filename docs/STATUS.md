@@ -1,41 +1,40 @@
 # Jobbie canonical project status
 
-Snapshot refreshed after ordinary run43140198821 on2026-11-12UTC. Inspect current GitHub HEAD/Actions before acting.
+Snapshot2026-11-12UTC; verify live HEAD/PRs/Actions before acting. Phase2 remains PARTIAL. [Requirement audit](PHASE-2-ACCEPTANCE.md).
 
-## Released components
+## Merged components
 
-| Scope | Merged PR / full merge SHA | Evidence and remaining limits |
+| Scope | PR / merge commit | Proof |
 | --- | --- | --- |
-| Public ATS | #23 / ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb | Existing adapter contracts retained. |
-| Discord layout | #29 / e0346f49bd572179250fe08bed73131db0ba311a | Ordinary run43100310762 accepted2individual HTTP204 job sends; human receipt/client rendering unverified. |
-| Reliability | #30 /614b3edc14e86d952579a0c57db0eb68669c08d9 | Exact-head CI and hosted review clean; pre-send corrupt-state guards and partial-run ACK persistence. |
-| Owner intake | #32 /f46625845577f158da31974d927aa5748d0c3642 | Exact-head CI/review clean; postmerge43114825827 passed. Disabled proposals only; no employer activated. |
-| Plaid/Amazon | #31 /9317c73b1971d6c7bb19dcb22a6be76876ad7369 | Exact-head81524a6 CI/review clean; postmerge43116984772 passed. Plaid silent baseline VERIFIED_LIVE in43140198821. |
-| Oracle | #33 /4eb83f454e2671e8e06d7cb10f4b079ab98fcf90 | Exact-head e976032 CI/review clean; postmerge43125554558 passed. Full995tests before merge. Oracle silent baseline VERIFIED_LIVE in43140198821. |
-| Optional feeds | #34 /f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb | Full1041tests; exact-head2ef45e1 CI/review and postmerge43128988343 passed. All3feeds remain OFF/rightsblocked. |
+| Direct ATS | #23 ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb | Adapter fixtures/permitted source checks |
+| Discord layout | #29 e0346f49bd572179250fe08bed73131db0ba311a | Ordinary43100310762 accepted2individual HTTP204job sends; human receipt/rendering unverified |
+| Reliability | #30 614b3edc14e86d952579a0c57db0eb68669c08d9 | Corrupt-state/pre-send/dry-run/partial ACK safety, exact CI/reviews |
+| Owner intake | #32 f46625845577f158da31974d927aa5748d0c3642 | Portable issue/CLI/manual evidence, disabled proposals,928local/independent tests |
+| Plaid/Amazon | #31 9317c73b1971d6c7bb19dcb22a6be76876ad7369 | Exact-head gates; first repaired ordinary baseline verified below |
+| Oracle | #33 4eb83f454e2671e8e06d7cb10f4b079ab98fcf90 | Correct finder/site/location/inner pagination/dates; first ordinary baseline verified below |
+| Optional feeds OFF | #34 f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb |1041tests, exact2ef45e1 CI/hosted review, postmerge43128988343 |
+| Catalogue core | #35 1614d804001edbf1d1fe10f33d661b6331c8961a |1118tests; exact0be562f test43147233493/public-read43147233507 and hosted clean; postmerge43148218676 |
 
-Production retains exactly13 enabled original Network Priority sources with unconfirmed referrals, plus Snowflake/Applied Digital disabled. No employer/feed/profile/application is activated. Legacy seen/URL state, eligibility, dedup, backfill, rate limits and ACKs remain authoritative. Never reset/seed state or force a send to manufacture proof.
+All13original enabled Network Priority source entries/unconfirmed referrals and2historicaldisabled remain. No employer/feed/private profile/application is activated. Legacy JSON/URL delivery authority is preserved.
 
-## Actual production evidence
+## Actual source production evidence
 
-[Run43140198821](https://github.com/KanujVerma/jobbie/actions/runs/43140198821) on f3a61f4 automatically scanned13sources successfully,1empty(SanDisk). Plaid143and Oracle2113completed their first silent provider baselines:0new individual job ACKs, delivery_acknowledged=false, all2256new baseline records suppressed/alerted=false. State d4724df3e3f70b17762f123c32216a1a671e8bfb retained all257legacy seen ACK flags/10URL entries with0lost. [Receipt](evidence/P2-R2-R3-LIVE-2026-11-12.md). No dispatch/seed/reset/forced backfill/test send.
+[Ordinary43140198821](https://github.com/KanujVerma/jobbie/actions/runs/43140198821), head f3a61f4, state d4724df3e3f70b17762f123c32216a1a671e8bfb:13successful responses/1empty SanDisk;11569fetched,2matched/356review/11211excluded;0new job ACKs/0job send failures.600.08s duration/301.43minute gap. Plaid143/Oracle2113complete silent baselines, delivery_acknowledged=false and all2256baseline entries alerted=false. All257prior legacy seen ACK flags/10URL ACK entries retained,0lost. These flags are ledger assertions, not257repeated HTTP deliveries. [Receipt](evidence/P2-R2-R3-LIVE-2026-11-12.md).
 
-11569fetched,2matched/356review/11211excluded,0new job ACKs/0job send failures;600.08s duration,301.43minute scheduler gap. Successful responses do not establish13healthy employer catalogues or no openings. SanDisk replacement406remains BLOCKED_SOURCE_ACCESS; no bypass. Cron is best effort. Prior run43100310762 separately established2individual Amazon HTTP204ACKs and persisted them; human receipt/client rendering remains unverified.
+Source baseline gates VERIFIED_LIVE. No manual dispatch, seed/reset, forced backfill or test send. Complete responses are within configured scope and do not prove no openings. SanDisk replacement406 remains BLOCKED_SOURCE_ACCESS; current empty response is not a no-openings result. Cron remains best effort. Earlier43100310762 remains the separate2individual HTTP204job proof; human client receipt/rendering unverified.
 
-## Catalogue implementation and remaining Phase2
+## C2 release candidate
 
-P2-C1 local store/query PR35 is under final gates. Source code from reviewed9add133 is unchanged while rebasing onto the real production state d4724df; repeat combined full checks/new-head CI/hosted review before merge.77focused/full1118tests passed39.68s before this state-only rebase. SQLite identities/snapshots/history/unknown closure/reopen, versioned reclassification and bounded query/export are implemented. Local/hosted findings and one failed intermediate attempt are truthfully retained in evidence/P2-C1-REVIEW.md. No failed or stale head is merge evidence.
+C2 implements pre-filter shadow capture, compact exact logical observation history/context, independent filter/canonical-candidate/ACK comparisons, immutable reclassification/query/export, explicit v1 backup migration, bounded encrypted checkpoint/rollback tools and optional transport workflow. Original ACK state commits before optional cache transport; publication requires a fresh exact-key restore/digest. Missing crypto/custody/storage leaves original alerts independent. No automatic cutover.
 
-C2 draft feat/p2-c-shadow is public for handoff, no PR/key/deployment yet. Shadow hooks/filter-candidate-ACK comparisons, optional lead rights/provenance, memory-only dry-run, encrypted checkpoint/rollback helpers/CLI and optional crypto dependency are implemented locally. An intermediate base passed30focused/1137fulltests; after C1 integration107focused passed. These are local/code facts, not production evidence. Synthetic capacity testing requires compact logical scan membership/timestamp context before safe deployment; workflow/audit/remaining full gates are unfinished. [Plan](superpowers/plans/2026-11-12-p2-c-catalogue.md), [guide](CATALOGUE.md).
+Local full1164passed43.12s after integrating onto actual C1 merge. Current permitted original13memory-only no-webhook dry-run/capacity verification is in progress; do not call it production shadow. Synthetic1000rows×3scans retained3000logical/1000physical with8KiB repeat growth, not actual72h proof. Own independent review/current-head CI/hosted review/merge/key provisioning/ordinary shadow observation remain release gates. [Guide](CATALOGUE.md), [plan](superpowers/plans/2026-11-12-p2-c-catalogue.md).
 
-All3optional feeds remain OFF/BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL;0datasets fetched, actual feed coverage/freshness NOT_MEASURED. Intake proposals stay disabled/discovered/networkfalse/referralunavailable; no new employer activated. Preserve13enabled original Network Priority sources/unconfirmed referrals and2historicaldisabled; legacy seen/URL delivery authority remains.
+All3evaluated feeds remain OFF/BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL;0datasets fetched and real coverage/freshness NOT_MEASURED. [Rights](evidence/P2-B-SOURCE-RIGHTS.json), [feed guide](PUBLIC_FEEDS.md). Owner onboarding is [COMPANY_INTAKE.md](COMPANY_INTAKE.md); requested monitors default discovered/networkfalse/referralunavailable and stay disabled until separate exact approval.
 
-Actual>=72h catalogue shadow has not started. Production cutover needs exact owner approval, parity/reconciliation and rollback proof, then a real scheduled run. BLOCKED_72H_EVIDENCE/BLOCKED_APPROVAL remain; complete independent code meanwhile. Phase2 PARTIAL, not complete. Exact next goal: P3-A signed allowlisted private Discord interactions, profile/resume upload/evidence and deterministic matching. Tailoring Phase4, exact one-job approved application execution Phase5. No verified dot API/trigger.
+Actual>=72h catalogue shadow has not started. Cutover requires exact owner approval, parity/identity/ACK reconciliation and rollback proof, then an ordinary scheduled run. BLOCKED_72H_EVIDENCE/BLOCKED_APPROVAL remain; finish independent code/release work meanwhile. Exact next major goal: P3-A signed allowlisted private Discord interactions, private profile/resume upload/evidence and deterministic matching. Tailoring Phase4; exact one-job approved applications Phase5. No verified dot API/trigger.
 
-C1 production-state rebase verification: unchanged source implementation, full1118passed on the current d4724dfstate base. Repeated permitted Plaid local capture/CLI/no-webhook dry-run preserved config and new production state SHA256e1967067a69c86c5e39b8ac49e3c206aeb2193b17387aea4bf1dfa6885c7cdd6. Fresh current-head CI/hosted review still required.
+C2 rejection-isolation correction passes full1168tests43.52s; first failed live shadow receipt remains preserved, never a passing claim. Corrected original13memory-only read is still in progress. Optional repository secret CATALOGUE_SHADOW_KEY was provisioned2026-11-12T04:07:35Z from a new private owner-only recovery file; value withheld. Current main does not consume it, so this is preparation, not shadow deployment or cutover.
 
-C2 development checkpoint, NOT deployed: feat/p2-c-shadow starts from C1 ce304905 (PR35 still pending later hosted fixes; rebase own C2 commits onto actual C1 merge before filing). Normal pre-filter hooks, independent filter/candidate/ACK comparison, failed-send/summary receipts, memory-only dry-run, optional lead history/rights metadata, encrypted bounded checkpoint/rollback helpers and operations CLI are implemented locally.30focused/1137fulltests passed42.13s on this intermediate base, config valid. Original alerts can start without the optional crypto package. No production key, C2 PR, source/feed activation or live shadow. Synthetic capacity test found repeated per-row observations too large for the72h target; compact logical scan membership is mandatory before deployment. Workflow/audit/retention/capacity correction/full final gates remain unfinished.
+Corrected local original13shadow read passed527.29s:11582stored rows,0rejects/identity/filter/candidate/ACK mismatches,0sends/feeds, config/state/input-DB hashes unchanged. Normalized memory DB52.7MBraw/10.2MBcompressed. Failed predecessor remains explicitly failed. Later transport caps/guarded duplicate-copy retention are separate tested changes, not a real72hwindow. See evidence/P2-C2-VERIFICATION.md and live read receipt.
 
-C1 actual release: PR35 merged1614d804001edbf1d1fe10f33d661b6331c8961a after exact-head0be562f CI/test43147233493/public-read43147233507 and clean hosted review. Postmerge Tests43148218676 passed. C2 now implements compact logical memberships/context, independent pre-filter shadow/ACK comparison, explicit v1 migration, optional crypto/transport workflow and actual-receipt gate. Current pre-rebase full1163passed40.76s. Synthetic1000-row repeats retain3000logical/1000physical observations with8192bytes additional storage over2repeats; not live72h proof. C2 review/CI/rebase/full live-read gates/deployment remain pending. See CATALOGUE.md.
-
-C2 also compresses exact legacy projection evidence and records each comparison's ledger hash/mismatch IDs; no historical facts are pruned. Primary audit binds workflow job head and current code/config, not caller timestamps. Final checks/rebase/live source proof still pending.
+C2 final local checks: full1170passed38.85s, config/diff/docs/actionlint passed. Real original13no-mutation shadow read passed with0mismatches. Candidate is pinned for independent review, not merged/deployed; real72h and cutover approval remain blocked.

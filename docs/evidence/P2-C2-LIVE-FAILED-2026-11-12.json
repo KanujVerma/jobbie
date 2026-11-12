@@ -1,0 +1,69 @@
+{
+  "tier": "permitted_local_read_only_live_not_scheduled_shadow",
+  "before": {
+    "companies.yaml": "8afbe552edb59566e6bedf604510337bf5d1e3a6cc02c02f1b8161dd0ece12f0",
+    "state/seen_jobs.json": "e1967067a69c86c5e39b8ac49e3c206aeb2193b17387aea4bf1dfa6885c7cdd6"
+  },
+  "db_before": "8cf603860f6102414fc5b8ffeefda29f1b2c23ade7e0c8fa6ef588da7d63845f",
+  "exit_code": 0,
+  "elapsed_seconds": 528.39,
+  "after": {
+    "companies.yaml": "8afbe552edb59566e6bedf604510337bf5d1e3a6cc02c02f1b8161dd0ece12f0",
+    "state/seen_jobs.json": "e1967067a69c86c5e39b8ac49e3c206aeb2193b17387aea4bf1dfa6885c7cdd6"
+  },
+  "db_after": "8cf603860f6102414fc5b8ffeefda29f1b2c23ade7e0c8fa6ef588da7d63845f",
+  "stats": {
+    "jobs": 2897,
+    "snapshots": 2897,
+    "conflicts": 1,
+    "leads": 0,
+    "runs": 1,
+    "observations": 2897
+  },
+  "report": {
+    "run_id": "local-928bee3c463e476a92554856dac7f7f8",
+    "delivery_authority": "legacy_json",
+    "sources": {
+      "Micron:workday:3aecf5e4fd609298": {
+        "company": "Micron",
+        "scan_status": "partial",
+        "returned_count": 2898,
+        "observed": 2897,
+        "rejected": 1,
+        "identity_conflicts": 1,
+        "candidate_mismatches": 0,
+        "filter_mismatches": 0,
+        "comparison_complete": false
+      }
+    },
+    "ack_count": 0,
+    "ack_mismatches": 0,
+    "gates": [
+      "BLOCKED_IDENTITIES",
+      "BLOCKED_PARITY",
+      "BLOCKED_SOURCE_ROSTER",
+      "BLOCKED_SOURCE_SCAN",
+      "BLOCKED_STORAGE"
+    ],
+    "notifier_ack_count": 0,
+    "failed_send_count": 0,
+    "deduplicated_ack_links": 0,
+    "cap_suppressed_count": 0,
+    "summary_ack_count": 0,
+    "feed_lead_count": 0,
+    "feed_confirmed_count": 0,
+    "feed_confirmation_needs_review_count": 0,
+    "code_sha256": "5900ffe8912cc70e20dbc93ea0faa0a7ec0d975ed0f0756fb338aaee3fc5dd3e",
+    "config_sha256": "dcce4cba78b1a1259860b6e12dfea4b3ffa88feee922733a652afd4b82374c29",
+    "parity_ok": false,
+    "cutover_approved": false,
+    "error_type": "CatalogueError",
+    "mode": "shadow",
+    "dry_run": true
+  },
+  "memory_db_bytes": 12210176,
+  "compressed_db_bytes": 2397467,
+  "unchanged": true,
+  "agent_sends": 0,
+  "feed_reads": 0
+}

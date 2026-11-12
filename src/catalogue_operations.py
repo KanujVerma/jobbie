@@ -1,5 +1,6 @@
 """Explicit shadow transport/verification CLI. No sends or automatic cutover."""
 import argparse
+import base64
 import json
 import os
 import subprocess
@@ -10,7 +11,7 @@ from pathlib import Path
 
 from src.catalogue import Catalogue,CatalogueError,compact
 from src.catalogue_checkpoint import (EPOCH,_read,_write,read_checkpoint,seal,unseal,publish_checkpoint,
-    rollback_check,cache_budget,code_sha,MAX_METADATA_BYTES,MAX_CIPHER_BYTES)
+    rollback_check,cache_budget,code_sha,MAX_METADATA_BYTES,MAX_CIPHER_BYTES,redundant_transport_ids,validate_checkpoint)
 from src.catalogue_shadow import evidence_gate,digest,config_fingerprint
 
 
@@ -20,7 +21,7 @@ def add_shadow_parser(subparsers):
 
 
 def _arguments(parser):
-    parser.add_argument('operation',choices=['plan','restore','seal','probe-prepare','publish','rollback','audit'])
+    parser.add_argument('operation',choices=['plan','restore','seal','probe-prepare','publish','rollback','audit','prune-transport'])
     parser.add_argument('--directory',default='state/catalogue-shadow')
     parser.add_argument('--checkpoint',default='state/catalogue_shadow_checkpoint.json')
     parser.add_argument('--legacy',default='state/seen_jobs.json')
@@ -117,6 +118,29 @@ def cmd_shadow(args):
         if operation=='probe-prepare':
             if not cipher.is_file() or (directory/'probe-retained.bin').exists():raise CatalogueError('invalid owned probe state')
             cipher.rename(directory/'probe-retained.bin');return 0
+        if operation=='prune-transport':
+            cp=read_checkpoint(checkpoint)
+            remote=_primary('repos/KanujVerma/jobbie/contents/state/catalogue_shadow_checkpoint.json',{'ref':'main'})
+            content=remote.get('content','')
+            if remote.get('encoding')!='base64' or len(content)>32768:raise CatalogueError('invalid published checkpoint receipt')
+            published=validate_checkpoint(json.loads(base64.b64decode(content)))
+            if published!=cp:raise CatalogueError('published checkpoint changed; retention skipped')
+            copies=[]
+            for page in range(1,11):
+                response=_primary('repos/KanujVerma/jobbie/actions/caches',{'ref':'refs/heads/main',
+                    'key':'jobbie-catalogue-v2-'+cp['catalogue_uuid']+'-','per_page':100,'page':page})
+                batch=response.get('actions_caches')
+                if not isinstance(batch,list):raise CatalogueError('invalid transport listing')
+                copies.extend(batch)
+                if len(batch)<100:break
+            else:raise CatalogueError('bounded transport listing incomplete')
+            ids=redundant_transport_ids(cp,copies)
+            for identifier in ids:
+                subprocess.run(['gh','api','--method','DELETE',f'repos/KanujVerma/jobbie/actions/caches/{identifier}'],
+                    capture_output=True,timeout=30,check=True)
+            print(compact({'redundant_transport_copies_removed':len(ids),'canonical_records_removed':0,
+                           'current_checkpoint':cp['cipher_sha256']}))
+            return 0
         key=os.getenv('JOBBIE_CATALOGUE_KEY','')
         if not key:raise CatalogueError('BLOCKED_SECRET')
         from cryptography.fernet import Fernet
