@@ -1,3 +1,5 @@
+> HISTORICAL COMPLETED SCOPE: UX #29 and intake #32 are merged. Do not restart this work. Current objective: [remaining Phase2](PHASE-2-CODE.md); current evidence: STATUS/HANDOFF.
+
 # Copy/paste first /goal: Phase 2-UX1 (notification card redesign)
 
 /goal

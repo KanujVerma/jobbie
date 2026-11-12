@@ -1,3 +1,5 @@
+> HISTORICAL COMPLETED SCOPE: UX #29 and intake #32 are merged. Do not restart this work. Current objective: [remaining Phase2](PHASE-2-CODE.md); current evidence: STATUS/HANDOFF.
+
 # P2-ACT owner-directed intake goal
 
 Read AGENTS, HANDOFF/STATUS, PHASES, DECISIONS, CONTRACTS, SECURITY, OPERATIONS, EVALS, docs/phases/PHASE-2-ACT.md and docs/COMPANY_INTAKE.md. Inspect live main/PRs/CI/issues and actual request schema/code before acting. Preserve original13 enabled/unconfirmed sources plus2historical disabled.

@@ -182,3 +182,5 @@ C2 final local candidate1170tests38.85s/config/diff/docs/actionlint and correcte
 C2 local independent review approved55785e8 in one round,1170independent tests41.53s/no findings. Source proof remains separate; final-head CI/hosted review and ordinary deployment evidence still required.
 
 C2 hosted audit correction: recent96hevidence window is independent of retained catalogue history; reproduced1000-receipt exhaustion, preserved all historical data. Fresh current-head tests/CI/hosted review required.
+
+Documentation reconciliation candidate: completed UX/intake/source baselines/C1 releases replace stale "next UX"/"intake unmerged"/"not implemented" entrypoints. Historical scoped prompts are explicitly completed and point to the active remaining Phase2 goal. As-built map separates merged main from C2 #36 hosted release gates; no deployment/72h/cutover assertion.

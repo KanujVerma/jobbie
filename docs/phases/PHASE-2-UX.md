@@ -2,7 +2,7 @@ Status update 2026-11-11: P2-UX1 merged in #29 at e0346f49bd572179250fe08bed7313
 
 # P2-UX1 executable PR — make existing Discord alerts informative
 
-**Status:** PLANNED. [Tracking issue #25](https://github.com/KanujVerma/jobbie/issues/25). This is the next smallest user-visible coding milestone after P2-A merged in [PR #23](https://github.com/KanujVerma/jobbie/pull/23) and its documentation PR #24. It is one REVIEWABLE PR, not a broad Phase 2 rewrite or a promise of personal matching. Normative specification: [NOTIFICATIONS_V2.md](../NOTIFICATIONS_V2.md).
+**Status:** Historical scope, code merged in #29. [Tracking issue #25](https://github.com/KanujVerma/jobbie/issues/25). This was the scoped user-visible coding milestone after P2-A merged in [PR #23](https://github.com/KanujVerma/jobbie/pull/23) and its documentation PR #24. It is one REVIEWABLE PR, not a broad Phase 2 rewrite or a promise of personal matching. Normative specification: [NOTIFICATIONS_V2.md](../NOTIFICATIONS_V2.md).
 
 ## Scope
 - Present job title prominently, followed by actual company/location and known full-time/early-career attributes.
@@ -26,7 +26,7 @@ Status update 2026-11-11: P2-UX1 merged in #29 at e0346f49bd572179250fe08bed7313
 
 ## Explicitly out of scope
 - No candidate profile/AI fit %, saved application state, authenticated Discord interactions, buttons to tailor/resume preview/apply, automatic submissions or background dot tasks.
-- No new Greenhouse/Ashby employers and no changes to planned feed/data catalogue. See [P2-ACT](PHASE-2-ACT.md) for activation.
+- No new Greenhouse/Ashby employers and no changes to planned feed/data catalogue. See [P2-ACT](PHASE-2-ACT.md) for the merged owner-request workflow and separate activation gate.
 - No provider billable calls, no claim of guaranteed 15-minute cron or fixes to Plaid's 404.
 
 ## Acceptance & rollback
