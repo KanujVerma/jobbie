@@ -124,6 +124,7 @@ CREATE TABLE source_state(job_id TEXT NOT NULL REFERENCES jobs,source_id TEXT NO
  observed_at TEXT NOT NULL,PRIMARY KEY(job_id,source_id,source_record_id));
 CREATE TABLE status_events(id INTEGER PRIMARY KEY,job_id TEXT NOT NULL REFERENCES jobs,status TEXT NOT NULL,source_id TEXT NOT NULL,
  evidence_kind TEXT NOT NULL,evidence TEXT NOT NULL,observed_at TEXT NOT NULL);
+CREATE INDEX status_evidence_lookup ON status_events(job_id,source_id,evidence_kind,observed_at);
 CREATE TABLE conflicts(id INTEGER PRIMARY KEY,run_id TEXT NOT NULL,source_id TEXT NOT NULL,source_record_id TEXT,code TEXT NOT NULL,
  detail TEXT NOT NULL,observed_at TEXT NOT NULL);
 CREATE TABLE classifications(snapshot_sha TEXT NOT NULL REFERENCES snapshots,policy TEXT NOT NULL,result TEXT NOT NULL,classified_at TEXT NOT NULL,
@@ -281,6 +282,13 @@ class Catalogue:
                 self.db.execute('INSERT INTO observations(run_id,source_id,source_record_id,job_id,snapshot_sha,observed_at) VALUES(?,?,?,?,?,?)',
                                 (run_id,source_id,record,identity,sha,when))
                 self.db.execute("INSERT INTO source_state VALUES(?,?,?,'open',?) ON CONFLICT(job_id,source_id,source_record_id) DO UPDATE SET status='open',observed_at=excluded.observed_at WHERE excluded.observed_at>=source_state.observed_at",(identity,source_id,record,when))
+                # A historical alias may be imported only after this posting's
+                # explicit closure. Apply that retained evidence before deriving
+                # status, so the old listing cannot manufacture a reopen.
+                for closure in self._rows("SELECT evidence,observed_at FROM status_events WHERE job_id=? AND source_id=? AND evidence_kind='explicit_closed' AND observed_at>=? ORDER BY observed_at DESC,id DESC",(identity,source_id,when)):
+                    if canonical_job_url(json.loads(closure['evidence']).get('url'))==data['canonical_url']:
+                        self.db.execute("UPDATE source_state SET status='closed',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=? AND observed_at<=?",(closure['observed_at'],identity,source_id,record,closure['observed_at']))
+                        break
                 self._status(identity,source_id,'listed','Official adapter returned normalized listing',when)
                 # A newly imported historical record may not yet have a source
                 # head, even though newer complete absences are already stored.

@@ -46,3 +46,5 @@ Evidence correction: a654434 prematurely recorded the H1 test run as passing. Ac
 Final C1 H1 candidate:69focusedpassed3.83s/full1110passed37.69s after correcting weak URL claim compatibility. Repeated permitted live/no-mutation proof passes. Earlier a654434 is a failed historical attempt; only the next exact passing/reviewed head may merge.
 
 C1 hosted ambiguity/lifecycle corrections: deterministic unresolved reuse, exact URL alias closure/reopen and registered native alias compatibility, with75focused/full1116passed40.54s. Repeated live/no-mutation proof passes. New exact-head CI/review required; no production shadow/cutover yet.
+
+C1 H4 historical-alias closure correction:77focused/full1118passed39.68s. Current-head CI/hosted review/merge remain pending. C2 draft branch is published separately for durable handoff, not a PR/release/deployment; storage compaction and workflow/final gates remain active work.

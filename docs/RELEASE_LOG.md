@@ -159,3 +159,5 @@ Evidence correction: a654434 prematurely recorded the H1 test run as passing. Ac
 C1 final H1 correction: weak URL claims excluded from native incompatibility;69focused/full1110passed37.69s. Earlier a654434 failure remains explicitly recorded. Live/no-mutation proof repeated; new exact-head release gates required.
 
 C1 hosted ambiguity/lifecycle correction: no retry identity inflation, matching URL alias closure/reopen, unrelated/moved URL safety and registered native alias compatibility.75focused/full1116passed40.54s; live/no-mutation check passes. Fresh exact-head gates pending.
+
+C1 H4 correction: historical alias ingestion respects later explicit closure without spurious old reopen; genuine newer reopen remains.77focused/full1118passed39.68s. Exact-head gates pending; no production cutover. C2 draft checkpoint published independently, not released.

@@ -485,3 +485,25 @@ def test_complete_presence_absence_current_status_is_permutation_invariant():
                 if any(present):assert rows[0]['status']==('open' if present[-1] else 'unknown')
                 else:assert not rows
     invariant()
+
+
+def test_historical_url_alias_cannot_undo_newer_explicit_closure(cat):
+    url='https://jobs.ashbyhq.com/labs/unique-posting'
+    native=job(id='Example Labs::ashby::labs:real',source_platform='ashby',source_board='labs',source_job_id='real',url=url)
+    fallback=replace(native,id='Example Labs::ashby::labs:url-aabbcc',source_job_id=None)
+    scan(cat,[native],run='native',when=NOW+timedelta(hours=1));identity=cat.query()[0]['job_id']
+    cat.record_closed(identity,'s1','real',NOW+timedelta(hours=2),evidence_url=url,evidence='Explicitly closed')
+    scan(cat,[fallback],run='old',when=NOW)
+    assert cat.query()[0]['status']=='closed'
+    assert not any(event['status']=='reopened' for event in cat.status_history())
+
+
+def test_historical_alias_keeps_a_genuine_later_reopen(cat):
+    url='https://jobs.ashbyhq.com/labs/unique-posting'
+    native=job(id='Example Labs::ashby::labs:real',source_platform='ashby',source_board='labs',source_job_id='real',url=url)
+    scan(cat,[native],run='native',when=NOW+timedelta(hours=1));identity=cat.query()[0]['job_id']
+    cat.record_closed(identity,'s1','real',NOW+timedelta(hours=2),evidence_url=url,evidence='Explicitly closed')
+    scan(cat,[native],run='reopen',when=NOW+timedelta(hours=3))
+    scan(cat,[replace(native,id='Example Labs::ashby::labs:url-old',source_job_id=None)],run='old',when=NOW)
+    assert cat.query()[0]['status']=='reopened'
+    assert all(event['observed_at']==(NOW+timedelta(hours=3)).isoformat() for event in cat.status_history() if event['status']=='reopened')
