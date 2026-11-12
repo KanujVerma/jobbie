@@ -40,3 +40,7 @@ Corrected local original13shadow read passed527.29s:11582stored rows,0rejects/id
 C2 final local checks: full1170passed38.85s, config/diff/docs/actionlint passed. Real original13no-mutation shadow read passed with0mismatches. Candidate is pinned for independent review, not merged/deployed; real72h and cutover approval remain blocked.
 
 C2 local Sol approved pinned55785e8 in one round, independently1170passed41.53s/config/diff/docs/clean-state checks; no findings. Own PR/current-head CI/hosted review/merge and actual ordinary shadow still required. See evidence/P2-C2-REVIEW.md; not72h/cutover approval.
+
+C2 hosted H1 reproduced/fixed: primary audit window is now recent96h independently of retained history, avoiding the1000-receipt permanent failure. Old records retained; fixture still cannot satisfy real72h. Fresh head full checks/CI/hosted review required.
+
+C2 audit correction full1171passed45.02s/config/diff, no ingestion/source/alert change. Fresh exact-head CI/review pending.

@@ -27,3 +27,5 @@ Full suite/current-head config/docs/diff/actionlint checks and independent/hoste
 Actual>=72h, primary-receipt identity/candidate/ACK reconciliation, exact cutover approval and an ordinary post-cutover run remain unsatisfied. Keep BLOCKED_72H_EVIDENCE/BLOCKED_APPROVAL, Phase2 PARTIAL. First ordinary shadow run must be independently inspected after authorized merge; no manual dispatch/test send to manufacture proof.
 
 Final local candidate checks after rejection isolation, original-v1 migration fixtures and transport retention: full1170passed38.85s; config validation, diff/docs continuity and actionlint1.7.12passed. The successful original13read above covers unchanged ingestion logic; later transport-only capacity/retention changes are unit/workflow-validated separately. No real72h/cutover/deployment claim. Independent/current-head hosted review/CI remain required.
+
+Hosted H1 corrected head: audit recent-window regression4passed; full1171passed45.02s, config/diff passed. Change is audit retrieval only, no ingestion/alert/source configuration change. Fresh exact-head CI/hosted review required; prior local approval remains pinned to its reviewed code.

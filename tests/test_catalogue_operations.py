@@ -67,3 +67,38 @@ def test_synthetic_transport_cycle_proves_stage_gates_and_keeps_legacy(tmp_path,
     restore.cache_hit='true';assert cmd_shadow(restore)==0
     with Catalogue(second/'jobs.sqlite',readonly=True) as store:
         assert store.stats()['runs']==1
+
+
+def test_audit_recent_window_is_independent_of_more_than_1000_retained_runs(tmp_path,monkeypatch):
+    import base64
+    from datetime import timedelta
+    import src.catalogue_operations as operations
+    from src.catalogue_checkpoint import seal
+    key=Fernet.generate_key();legacy=tmp_path/'seen.json';legacy.write_text(json.dumps(_empty_state()))
+    db=tmp_path/'db.sqlite';now=datetime.now(timezone.utc)
+    with Catalogue(db,create=True) as store:
+        with store.db:
+            for i in range(1001):
+                when=now-timedelta(days=30)+timedelta(minutes=i*15);rid=str(1000+i)
+                store.db.execute('INSERT INTO runs VALUES(?,?,?,?,?)',(rid,when.isoformat(),'schedule','a'*40,(when+timedelta(minutes=5)).isoformat()))
+                store.db.execute('INSERT INTO shadow_runs VALUES(?,?,?,?,?,?)',(rid,'b'*64,'c'*64,'d'*64,'{"parity_ok":false}','degraded'))
+        with Shadow(store,'9000001.1',now,_empty_state(),filters={},origin='fixture',head_sha='a'*40,config_sha='b'*64) as shadow:shadow.finish(_empty_state(),now)
+    cipher=tmp_path/'sealed.bin';cp=seal(db,cipher,key,legacy_path=legacy);cp.update(rollback_verified=True,cache_roundtrip_verified=True)
+    calls=[]
+    def primary(path,params=None):
+        calls.append((path,params))
+        if path.endswith('/runs'):
+            start=datetime.fromisoformat(params['created'][2:])
+            if start<now-timedelta(hours=98):
+                # The old implementation keeps asking for all old history and
+                # exhausts its10-page cap, despite the healthy recent interval.
+                return {'workflow_runs':[{'id':i} for i in range(100)]}
+            return {'workflow_runs':[]}
+        if path.endswith('/jobs'):return {'jobs':[]}
+        raise AssertionError(path)
+    monkeypatch.setattr(operations,'_primary',primary)
+    result=operations._audit(cp,cipher,key,None)
+    assert 'BLOCKED_72H_EVIDENCE' in result['gates']  # fixture data never qualifies
+    queries=[p for path,p in calls if path.endswith('/runs')]
+    assert len(queries)==1 and datetime.fromisoformat(queries[0]['created'][2:])>=now-timedelta(hours=98)
+    with Catalogue(db,readonly=True) as store:assert store.stats()['runs']==1002

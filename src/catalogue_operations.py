@@ -53,12 +53,15 @@ def _primary(path,params=None):
 
 
 def _audit(cp,cipher,key,approval_id):
+    # Evidence is a recent contiguous window, not a pagination of the entire
+    # retained catalogue. History remains intact in the authenticated database.
+    cutoff=datetime.now(timezone.utc)-timedelta(hours=96)
     with tempfile.TemporaryDirectory(prefix='jobbie-audit-') as directory:
         destination=Path(directory)/'retained.sqlite';unseal(cp,cipher,destination,key)
         with Catalogue(destination,readonly=True) as store:
-            rows=store._rows('SELECT r.*,s.result FROM runs r JOIN shadow_runs s ON s.run_id=r.run_id ORDER BY r.started_at')
+            rows=store._rows('SELECT r.*,s.result FROM runs r JOIN shadow_runs s ON s.run_id=r.run_id WHERE r.started_at>=? ORDER BY r.started_at',(cutoff.isoformat(),))
             custody=dict(store.db.execute("SELECT key,value FROM meta WHERE key LIKE 'custody:%'"))
-    first=min(datetime.fromisoformat(r['started_at']) for r in rows)
+    first=min((datetime.fromisoformat(r['started_at']) for r in rows),default=cutoff)
     receipts=[]
     for page in range(1,11):
         response=_primary('repos/KanujVerma/jobbie/actions/workflows/job-alerts.yml/runs',

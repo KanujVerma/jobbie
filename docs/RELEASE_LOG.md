@@ -180,3 +180,5 @@ C2 corrected permitted full13read:527.29s,11582normalized stored observations,0r
 C2 final local candidate1170tests38.85s/config/diff/docs/actionlint and corrected full13read pass. Pin for independent review; no release/deployment/72h/cutover assertion yet.
 
 C2 local independent review approved55785e8 in one round,1170independent tests41.53s/no findings. Source proof remains separate; final-head CI/hosted review and ordinary deployment evidence still required.
+
+C2 hosted audit correction: recent96hevidence window is independent of retained catalogue history; reproduced1000-receipt exhaustion, preserved all historical data. Fresh current-head tests/CI/hosted review required.
