@@ -33,3 +33,7 @@ P2-C2 remains required: automatic pre-filter capture, crash-safe persistent encr
 All3evaluated optional feeds remain OFF/BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL. No feed dataset fetched; actual feed coverage/confirmation/freshness NOT_MEASURED. [Guide](PUBLIC_FEEDS.md), [pinned rights](evidence/P2-B-SOURCE-RIGHTS.json). Owner intake [COMPANY_INTAKE.md](COMPANY_INTAKE.md) produces disabled discovered/networkfalse/referralunavailable proposals; no employer activated.
 
 Phase2 is PARTIAL, not complete. Exact next major goal: P3-A signed allowlisted private Discord interactions, private profile/resume upload with evidence and deterministic matching. Tailoring Phase4; exact one-job approved application execution Phase5. No dot API/trigger is verified.
+
+C1 local Sol found an out-of-order unseen-record status defect. Parent reproduced/fixed it with2focused cases, preserving historical listing and newer absence/presence evidence. See evidence/P2-C1-REVIEW.md. Fresh full tests/hosted review/CI required; no shadow/cutover claim.
+
+Corrected C1 candidate full1107passed41.82s/66focused; repeated permitted Plaid capture and no-mutation CLI/dry-run passed. Current-head own CI/hosted review/merge remain pending.

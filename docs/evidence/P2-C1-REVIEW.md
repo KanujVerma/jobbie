@@ -1,0 +1,5 @@
+# P2-C1 independent review ledger
+
+Round1 codex/gpt-6.1-sol, reasoningEffort high, serviceTier default. Pinned afc4a6b46f175469e06fd004773fe7a06ebd8e22 against f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb. Verdict CHANGES; full1105passed39.10s, config/diff/docs checks and10CLI boundary checks passed. Clean pinned checkout preserved. Usage unavailable; local source scan/scheduled shadow/cutover not independently repeated.
+
+S1 P2: a previously unseen old listing ingested after a newer complete empty scan appeared open instead of unknown. Parent reproduced the order-dependent failure, then applies subsequent complete absence evidence when importing a historical listing while retaining the listing observation. Newer positive presence is not overwritten by earlier absence. Two focused regressions compare reversed ingestion and a newer-presence retry. Parent repaired the small finding directly; no second delegate for it. Fresh full tests and exact-head hosted independent review/CI remain required; do not restate the old CHANGES verdict as approval.

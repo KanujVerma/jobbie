@@ -114,6 +114,7 @@ CREATE INDEX source_lookup ON observations(source_id,source_record_id);
 CREATE INDEX job_observations ON observations(job_id,observed_at);
 CREATE TABLE scans(run_id TEXT NOT NULL REFERENCES runs,source_id TEXT NOT NULL,employer TEXT NOT NULL,status TEXT NOT NULL,
  observed_at TEXT NOT NULL,returned_count INTEGER NOT NULL,rejected_count INTEGER NOT NULL,PRIMARY KEY(run_id,source_id));
+CREATE INDEX scan_chronology ON scans(source_id,employer,status,observed_at);
 CREATE TABLE source_state(job_id TEXT NOT NULL REFERENCES jobs,source_id TEXT NOT NULL,source_record_id TEXT NOT NULL,status TEXT NOT NULL,
  observed_at TEXT NOT NULL,PRIMARY KEY(job_id,source_id,source_record_id));
 CREATE TABLE status_events(id INTEGER PRIMARY KEY,job_id TEXT NOT NULL REFERENCES jobs,status TEXT NOT NULL,source_id TEXT NOT NULL,
@@ -266,6 +267,18 @@ class Catalogue:
                                 (run_id,source_id,record,identity,sha,when))
                 self.db.execute("INSERT INTO source_state VALUES(?,?,?,'open',?) ON CONFLICT(job_id,source_id,source_record_id) DO UPDATE SET status='open',observed_at=excluded.observed_at WHERE excluded.observed_at>=source_state.observed_at",(identity,source_id,record,when))
                 self._status(identity,source_id,'listed','Official adapter returned normalized listing',when)
+                # A newly imported historical record may not yet have a source
+                # head, even though newer complete absences are already stored.
+                absence=self.db.execute('''SELECT sc.observed_at,sc.run_id FROM scans sc
+                    WHERE sc.source_id=? AND sc.employer=? AND sc.status='complete' AND sc.observed_at>=?
+                    AND NOT EXISTS (SELECT 1 FROM observations o WHERE o.run_id=sc.run_id
+                        AND o.source_id=sc.source_id AND o.job_id=? AND o.source_record_id=?)
+                    ORDER BY sc.observed_at DESC LIMIT 1''',(source_id,employer,when,identity,record)).fetchone()
+                if absence:
+                    changed=self.db.execute("UPDATE source_state SET status='unknown',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=? AND status='open' AND observed_at<=?",(absence['observed_at'],identity,source_id,record,absence['observed_at'])).rowcount
+                    if changed:
+                        self._status(identity,source_id,'complete_scan_absence',
+                                     'Not observed in complete scan '+absence['run_id']+'; closure unknown',absence['observed_at'])
                 observed+=1
             conflicts=self.stats()['conflicts']-before
             effective='partial' if status=='complete' and (rejected or conflicts) else status

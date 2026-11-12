@@ -379,3 +379,22 @@ def test_bridge_between_existing_identities_is_reported_without_retry_inflation(
     before=cat.stats()['jobs']
     scan(cat,[bridge],source='b',run='r4')
     assert cat.stats()['jobs']==before==2 and cat.stats()['conflicts']>=2
+
+
+def test_new_historical_listing_respects_newer_complete_absence(tmp_path):
+    statuses=[]
+    for order in ['chronological','reverse']:
+        with Catalogue(tmp_path/(order+'.sqlite'),create=True) as db:
+            evidence=[([job()],'listed',NOW),([], 'absent',NOW+timedelta(hours=1))]
+            if order=='reverse':evidence.reverse()
+            for rows,run,when in evidence:scan(db,rows,run=run,when=when)
+            statuses.append(db.query()[0]['status'])
+            assert len(db.history())==1
+    assert statuses==['unknown','unknown']
+
+
+def test_later_presence_after_absence_stays_open_when_old_row_arrives(cat):
+    scan(cat,[],run='absence',when=NOW+timedelta(hours=1))
+    scan(cat,[job()],run='new-presence',when=NOW+timedelta(hours=2))
+    scan(cat,[job()],run='old-presence',when=NOW)
+    assert cat.query()[0]['status']=='open'
