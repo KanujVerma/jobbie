@@ -166,3 +166,5 @@ C1 H4 correction: historical alias ingestion respects later explicit closure wit
 Run43140198821, state d4724df: Plaid143/Oracle2113silent complete baselines with0new job ACKs, all257prior seen ACK flags/10URL entries retained.13successful responses/1empty SanDisk;600.08s/301.43minute gap. No manual seed/reset/dispatch. Source baselines VERIFIED_LIVE; catalogue shadow/cutover not deployed. C1 refreshes current-head gates after retaining this new production state.
 
 C1 rebased onto actual ordinary state d4724df, preserving baseline/ACK history exactly. Full1118tests pass; permitted local source/CLI/dry-run byte proof repeated on new state. New head CI/hosted review required.
+
+C2 WIP checkpoint only: pre-filter shadow comparison/ACK/memory dry-run and encrypted checkpoint helpers/CLI, optional crypto boundary and feed rights claims.30focused/1137fulltests passed42.13s on C1 ce304905 base. Not deployed or ready for PR: efficient logical scan membership, persistent workflow, primary receipt audit and final gates remain required. No activation/cutover/source-state reset.

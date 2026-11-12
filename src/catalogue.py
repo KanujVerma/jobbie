@@ -20,7 +20,7 @@ from pathlib import Path
 from src.job_identity import canonical_job_url
 from src.models import Job, CompensationRange
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 MAX_PAYLOAD = 512 * 1024
 MAX_SCAN_ROWS = 50000
 MAX_DB_BYTES = 256 * 1024 * 1024
@@ -135,9 +135,22 @@ CREATE TABLE lead_history(id INTEGER PRIMARY KEY,source_id TEXT NOT NULL,lead_id
  payload TEXT NOT NULL,observed_at TEXT NOT NULL);
 '''
 
+_SHADOW_SCHEMA='''
+CREATE TABLE shadow_runs(run_id TEXT PRIMARY KEY REFERENCES runs,config_sha TEXT NOT NULL,before_sha TEXT NOT NULL,
+ after_sha TEXT,result TEXT NOT NULL,status TEXT NOT NULL);
+CREATE TABLE shadow_sources(run_id TEXT NOT NULL REFERENCES runs,source_id TEXT NOT NULL,result TEXT NOT NULL,
+ PRIMARY KEY(run_id,source_id));
+CREATE TABLE shadow_delivery(id INTEGER PRIMARY KEY,run_id TEXT NOT NULL REFERENCES runs,source_id TEXT NOT NULL,
+ legacy_id TEXT NOT NULL,job_id TEXT REFERENCES jobs,outcome TEXT NOT NULL,observed_at TEXT NOT NULL);
+CREATE TABLE legacy_history(sha TEXT PRIMARY KEY,payload TEXT NOT NULL,observed_at TEXT NOT NULL,ledger_sha TEXT NOT NULL);
+CREATE INDEX observation_snapshot ON observations(snapshot_sha);
+CREATE INDEX snapshot_legacy_id ON snapshots(json_extract(payload,'$.company'),json_extract(payload,'$.id'));
+'''
+_SCHEMA+=_SHADOW_SCHEMA
+
 
 class Catalogue:
-    def __init__(self,path,*,create=False,readonly=False):
+    def __init__(self,path,*,create=False,readonly=False,migrate=False):
         self.path=Path(path).absolute();self.readonly=readonly;self.db=None
         if self.path.is_symlink() or not self.path.parent.is_dir():
             raise CatalogueError('unsafe or missing catalogue path')
@@ -163,12 +176,20 @@ class Catalogue:
                 self.db.execute(f'PRAGMA user_version={SCHEMA_VERSION}')
                 self.db.commit()
             version=self.db.execute('PRAGMA user_version').fetchone()[0]
+            if version==1 and migrate and not readonly:
+                # Explicit additive migration, retaining a private SQLite backup.
+                backup=self.path.with_name(self.path.name+'.v1-backup')
+                fd=os.open(backup,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600);os.close(fd)
+                with sqlite3.connect(backup) as target:self.db.backup(target)
+                self.db.executescript('BEGIN IMMEDIATE;\n'+_SHADOW_SCHEMA+f'\nPRAGMA user_version={SCHEMA_VERSION};\nCOMMIT;')
+                version=SCHEMA_VERSION
             if version!=SCHEMA_VERSION or self.db.execute('PRAGMA quick_check').fetchone()[0]!='ok':
                 raise CatalogueError('unsupported or corrupt catalogue; no reset performed')
             if self.db.execute('PRAGMA foreign_key_check').fetchone() is not None:
                 raise CatalogueError('catalogue referential integrity failure')
             expected={'meta','runs','jobs','claims','snapshots','observations','scans','source_state',
-                      'status_events','conflicts','classifications','leads','lead_history'}
+                      'status_events','conflicts','classifications','leads','lead_history',
+                      'shadow_runs','shadow_sources','shadow_delivery','legacy_history'}
             actual={r[0] for r in self.db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             if actual!=expected:
                 raise CatalogueError('unsupported catalogue schema')
@@ -183,6 +204,19 @@ class Catalogue:
     def __exit__(self,*_):self.close()
     def close(self):
         if self.db is not None:self.db.close()
+    @classmethod
+    def memory(cls,source=None):
+        """A dry-run copy owns no persistent file and cannot mutate its source."""
+        result=object.__new__(cls);result.path=None;result.readonly=False
+        result.db=sqlite3.connect(':memory:');result.db.row_factory=sqlite3.Row
+        result.db.execute('PRAGMA foreign_keys=ON')
+        if source is not None:source.db.backup(result.db)
+        else:
+            result.db.executescript(_SCHEMA)
+            result.db.execute('INSERT INTO meta VALUES(?,?)',('catalogue_uuid',str(uuid.uuid4())))
+            result.db.execute('INSERT INTO meta VALUES(?,?)',('identity_version','1'))
+            result.db.execute(f'PRAGMA user_version={SCHEMA_VERSION}');result.db.commit()
+        return result
     def _write(self):
         if self.readonly:raise CatalogueError('read-only catalogue')
     def _rows(self,sql,args=()):return [dict(r) for r in self.db.execute(sql,args)]

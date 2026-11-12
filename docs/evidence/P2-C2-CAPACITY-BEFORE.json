@@ -1,0 +1,24 @@
+{
+  "tier": "synthetic_capacity_only_not_live_coverage",
+  "rows_per_scan": 1000,
+  "samples": [
+    {
+      "scans": 1,
+      "db_bytes": 3899392,
+      "seconds": 0.174,
+      "logical_observations": 1000
+    },
+    {
+      "scans": 2,
+      "db_bytes": 4251648,
+      "seconds": 0.285,
+      "logical_observations": 2000
+    },
+    {
+      "scans": 3,
+      "db_bytes": 4620288,
+      "seconds": 0.284,
+      "logical_observations": 3000
+    }
+  ]
+}

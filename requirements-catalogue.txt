@@ -1,0 +1,2 @@
+# Optional encrypted catalogue transport. Legacy alert polling does not require it.
+cryptography>=50.0.2,<51
