@@ -224,3 +224,24 @@ def test_overlapping_pages_cannot_complete_source_baseline():
     from src.storage import classify_jobs
     assert classify_jobs(current, 'Oracle', state, 48, datetime.now(timezone.utc)) == []
     assert state['companies']['Oracle']['source_baselines']['finder-v1']['observed_count'] == 4
+
+
+@pytest.mark.parametrize('clause',[
+    'Required: United States citizenship or permanent residency.',
+    'Required: US citizenship or lawful permanent residency.',
+    'Must be a US citizen or a permanent resident.',
+    'US citizenship required, or green card holder accepted.',
+])
+def test_acceptable_residency_alternatives_do_not_require_citizenship(clause):
+    from src.eligibility import classify_eligibility
+    j=next(adapter(payload([row(ExternalQualificationsStr='<p>'+clause+'</p>')],1)).fetch())
+    verdict=classify_eligibility(j)
+    assert 'US_CITIZEN_REQUIRED' not in verdict.reasons
+    assert verdict.status=='eligible'
+
+
+def test_separate_mandatory_citizenship_clause_is_not_overridden_by_alternative():
+    from src.eligibility import classify_eligibility
+    j=next(adapter(payload([row(ExternalQualificationsStr='<p>Required: US citizenship or permanent residency.</p><p>US citizenship required for this contract.</p>')],1)).fetch())
+    verdict=classify_eligibility(j)
+    assert verdict.status=='excluded' and 'US_CITIZEN_REQUIRED' in verdict.reasons

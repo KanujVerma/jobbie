@@ -131,3 +131,7 @@ P2-R3 Sol round2 approved b7112bcf4b30d277050a1556858f4e049093a62c with S1 resol
 PR31 merged9317c73b1971d6c7bb19dcb22a6be76876ad7369 after exact-head81524a6 CI/hosted review; post-merge Tests43116984772 passed, merge tree equals reviewed tree. Ordinary Plaid production baseline PENDING_LIVE: no qualifying post-merge schedule exists at check. Oracle rebased onto this parent, functional patch unchanged from its local approval; own PR/CI/review/live gates pending.
 
 Oracle integration verification: rebase onto merged9317c73 retains functional patch76c6409fe877a5fac07570fb78aa05916a71fc1e. Combined full990tests passed36.78s; config/compileall/diff pass, current main seen-state retained unchanged. Local Oracle behavior was independently approved atb7112bc with938tests before base integration; own current-head hosted review/CI/merge remain required.
+
+Hosted H1 correction: the explicit citizenship matcher rejected a clause that also accepts permanent residency. Parent reproduced4failing alternative clauses, then checks the immediate continuation for an accepted residency/green-card alternative while retaining any separate mandatory citizenship clause. Five focused cases now pass. No personal status is inferred. Fresh exact-head hosted review/CI required; prior local review remains scoped to its earlier head.
+
+Oracle H1 verification: full995tests passed38.93s;5focused clauses, config/compileall/diff passed. A separate mandatory clause still excludes correctly. This does not repeat live source/client rendering or approve production cutover.

@@ -36,3 +36,7 @@ PR31 modernization proof: combined full952tests passed36.35s (source repair plus
 P2-R3 is rebased onto merged parent9317c73 without changing its approved functional patch (76c6409fe877a5fac07570fb78aa05916a71fc1e). Current own PR/CI/hosted review remain required. The first corrected Oracle production baseline will also require an ordinary post-merge run. SanDisk replacement access remains blocked406, no bypass.
 
 Oracle integration verification: rebase onto merged9317c73 retains functional patch76c6409fe877a5fac07570fb78aa05916a71fc1e. Combined full990tests passed36.78s; config/compileall/diff pass, current main seen-state retained unchanged. Local Oracle behavior was independently approved atb7112bc with938tests before base integration; own current-head hosted review/CI/merge remain required.
+
+Hosted H1 correction: the explicit citizenship matcher rejected a clause that also accepts permanent residency. Parent reproduced4failing alternative clauses, then checks the immediate continuation for an accepted residency/green-card alternative while retaining any separate mandatory citizenship clause. Five focused cases now pass. No personal status is inferred. Fresh exact-head hosted review/CI required; prior local review remains scoped to its earlier head.
+
+Oracle H1 verification: full995tests passed38.93s;5focused clauses, config/compileall/diff passed. A separate mandatory clause still excludes correctly. This does not repeat live source/client rendering or approve production cutover.
