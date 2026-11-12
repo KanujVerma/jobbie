@@ -141,3 +141,5 @@ P2-B local candidate: bounded OFF JSON leads, provenance/health/source dedup and
 Oracle PR33 merged4eb83f454e2671e8e06d7cb10f4b079ab98fcf90 after current-head e976032 checks/clean hosted review. Oracle/Plaid first ordinary production baselines remain PENDING_LIVE until a qualifying schedule. P2-B is integrated onto this merged parent; all3feeds remain OFF/rightsblocked, with no data-source activation. See PUBLIC_FEEDS.md and evidence/P2-B-VERIFICATION.md.
 
 P2-B review corrections: supported source posting-ID confirmation and order-independent duplicate posting-date conflicts, reproduced before fixed. Fresh head checks/hosted review required; no feed/company enabled.
+
+P2-B hosted correction: index official posting URLs once per employer when leads exist, preserving ID ambiguity/permission gates and protecting original delivery timing. Reproduced4000before/120after normalizations in normal-poller fixture. Fresh CI/review required.

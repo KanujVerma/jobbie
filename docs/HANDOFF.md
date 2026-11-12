@@ -31,3 +31,5 @@ After Phase2, exact next major goal is P3-A signed private Discord interactions,
 P2-B local Sol round1 returned2findings, reproduced then fixed directly: consult supported source posting IDs for confirmation, and fail conflicting normalized duplicate dates in both orders. Six focused cases prove fixes; ledger evidence/P2-B-REVIEW.md. Current-head full CI/hosted review is still required, not inferred from earlier local review.
 
 Corrected P2-B candidate full1039passed37.12s/focused44; repeated config/OFF feed-check/Plaid dry-run preserved state/config. Proceed own PR/hosted review/CI, then catalogue plan docs/superpowers/plans/2026-11-12-p2-c-catalogue.md in the independent checkout.
+
+PR34 hosted H1 repaired directly: bounded per-employer index replaces repeated posting scans for each lead. Poller regression measured4000before/120after URL normalizations, no state mutation. Fresh exact-head gates required; keep watching existing PR34 without duplicate watcher.

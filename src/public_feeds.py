@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -222,18 +223,37 @@ def collect_feeds(manifest_path, state, *, http=None, now=None, allow_network=Tr
     return leads,reports
 
 
-def confirm_lead(lead, official_jobs, company_config, *, now=None):
-    if company_config.get('enabled') is not True or not lead.employer:
-        return None
-    import unicodedata
-    def key(value):return ''.join(c for c in unicodedata.normalize('NFKC',value).casefold() if c.isalnum())
+def _company_key(value):
+    return ''.join(c for c in unicodedata.normalize('NFKC',value).casefold() if c.isalnum())
+
+
+@dataclass(frozen=True)
+class OfficialPostingIndex:
+    names: frozenset
+    by_url: dict
+
+
+def build_official_index(official_jobs, company_config):
+    """One bounded pass per employer fetch, reused by every optional lead."""
     names=[company_config['name'],*company_config.get('aliases',[])]
     if company_config['name']=='Microsoft Research':names.append('Microsoft')
-    if key(lead.employer) not in {key(n) for n in names}:return None
-    matches=[j for j in official_jobs if key(j.company) in {key(n) for n in names} and canonical_job_url(j.url)==canonical_job_url(lead.url)]
-    if len({j.id for j in matches})!=1:return None
+    names=frozenset(_company_key(n) for n in names);by_url={}
+    for job in official_jobs:
+        if _company_key(job.company) not in names:continue
+        url=canonical_job_url(job.url)
+        if url:by_url.setdefault(url,[]).append(job)
+    return OfficialPostingIndex(names,by_url)
+
+
+def confirm_lead(lead, official_jobs, company_config, *, now=None):
+    if company_config.get('enabled') is not True or not lead.employer:return None
+    index=official_jobs if isinstance(official_jobs,OfficialPostingIndex) else build_official_index(official_jobs,company_config)
+    if _company_key(lead.employer) not in index.names:return None
+    url=canonical_job_url(lead.url);matches=index.by_url.get(url,[])
+    identities={(j.id,j.source_platform,j.source_job_id,getattr(j,'official_req_id',None)) for j in matches}
+    if len(identities)!=1:return None
     job=matches[0]
     req=getattr(job,'official_req_id',None)
     if job.source_platform in {'greenhouse','ashby','oracle_careers'}:req=job.source_job_id
     if lead.official_req_id and req!=lead.official_req_id:return None
-    return LeadConfirmation(lead.source_id,lead.lead_id,job.id,canonical_job_url(job.url),company_config['name'],now or datetime.now(timezone.utc))
+    return LeadConfirmation(lead.source_id,lead.lead_id,job.id,url,company_config['name'],now or datetime.now(timezone.utc))

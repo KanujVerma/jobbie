@@ -50,7 +50,7 @@ from src.backfill import deliver_backfill_batch
 from src.filtering import apply_filter_pipeline
 from src.scheduler import run_loop
 from src.source_migration import apply_source_baseline, validate_source_revision
-from src.public_feeds import collect_feeds, confirm_lead
+from src.public_feeds import collect_feeds, confirm_lead, build_official_index
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -241,10 +241,12 @@ def do_run(args) -> int:
                 fetch_error = ", ".join(query_errors)
             any_company_succeeded = any_company_succeeded or adapter_succeeded
             fetch_duration = round(time.monotonic() - fetch_start, 2)
-            for lead in feed_leads:
-                confirmation = confirm_lead(lead, fetched, company_cfg)
-                if confirmation is not None:
-                    feed_confirmations.add((confirmation.source_id, confirmation.lead_id))
+            if feed_leads:
+                official_index = build_official_index(fetched, company_cfg)
+                for lead in feed_leads:
+                    confirmation = confirm_lead(lead, official_index, company_cfg)
+                    if confirmation is not None:
+                        feed_confirmations.add((confirmation.source_id, confirmation.lead_id))
 
             # Adapter health. Keyed on pre-filter count.
             company_state = state["companies"].setdefault(

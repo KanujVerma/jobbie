@@ -32,3 +32,5 @@ Phase2 is PARTIAL, not complete. Next major goal is P3-A signed allowlisted priv
 P2-B local Sol review found2reproduced defects (supported posting-ID confirmation and conflicting duplicate posting dates); parent fixed both with6focused cases. See evidence/P2-B-REVIEW.md; fresh full checks and hosted exact-head independent review remain release gates.
 
 P2-B corrected candidate: full1039passed37.12s, focused44passed; repeated config/OFF CLI/Plaid no-webhook check preserved bytes. No feed activated.
+
+P2-B hosted H1 reproduced quadratic confirmation work; fixed by one employer URL/company index. The actual poller regression drops4000normalizations to120for100postings/20leads, preserving ambiguity/source-ID checks. Fresh current-head CI/hosted review required; no source activated.

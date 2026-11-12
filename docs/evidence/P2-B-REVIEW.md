@@ -6,3 +6,5 @@ Round1: codex/gpt-6.1-sol, reasoningEffort high, serviceTier default, pinned d03
 - S2 P2: same feed source ID with contradictory posting dates retained the first row. Parent reproduced2failures for reversed orders, added normalized date/instant facts to collision comparison; both fail closed now. Equivalent timezone instants still deduplicate.
 
 Parent repaired the small findings directly and verified6focused cases. No second delegate was started for these small fixes. Fresh full tests and exact-head hosted independent review/CI remain required; the earlier local reviewer verdict is not restated as approval of a different head.
+
+Hosted H1 on8a797f0: repeated normalization cost O(leads*postings) could delay original employer alerts. Parent reproduced4000URL normalizations for20nonmatching leads/100postings. A reusable official URL/company index is now built once per employer only when leads exist; the same poller regression requires <=130calls and observed120. Exact source-ID ambiguity/conflict checks remain. Two focused regressions include conflicting official posting IDs at the same URL. No feed activation or timeout increase.

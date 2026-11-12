@@ -322,3 +322,41 @@ def test_equivalent_posting_instants_are_identical_duplicates():
     leads,r=fetch_feed(source(),{},http=http_for({'jobs':[
         row(posted_at='2026-11-10T12:00:00Z'),row(posted_at='2026-11-10T07:00:00-05:00')]}),now=NOW)
     assert len(leads)==1 and r['duplicate_count']==1
+
+
+def test_normal_poller_indexes_official_jobs_once_for_feed_confirmation(tmp_path,monkeypatch):
+    import main
+    import src.public_feeds as feeds
+    from src.config import Config
+    from src.storage import _empty_state
+    from types import SimpleNamespace
+    from dataclasses import replace
+    state=tmp_path/'state.json';state.write_text(json.dumps(_empty_state()));before=state.read_bytes()
+    official=[replace(official_job(url=f'https://example.com/jobs/{i}'),id=f'official-{i}') for i in range(100)]
+    leads,_=fetch_feed(source(),{},http=http_for({'jobs':[row(str(i),url=f'https://example.com/unmatched/{i}') for i in range(20)]}),now=NOW)
+    class Adapter:
+        def __init__(self,*a,**kw):pass
+        def fetch(self):return official
+    cfg=Config(defaults={'state_path':str(state),'request_delay_seconds':[0,0],'public_feeds_manifest':'fixture.yaml'},
+        filters={},companies=[{'name':'Example Labs','adapter':'official','enabled':True,'config':{}}])
+    monkeypatch.setattr(main,'load_config',lambda _:cfg)
+    monkeypatch.setattr(main,'ADAPTER_REGISTRY',{'official':Adapter})
+    monkeypatch.setattr(main,'HTTPClient',MagicMock())
+    monkeypatch.setattr(main,'Notifier',MagicMock())
+    monkeypatch.setattr(main,'apply_filter_pipeline',lambda *a:(None,['excluded']))
+    monkeypatch.setattr(main,'collect_feeds',lambda *a,**kw:(leads,[]))
+    actual=feeds.canonical_job_url;calls=[]
+    def count(value):calls.append(value);return actual(value)
+    monkeypatch.setattr(feeds,'canonical_job_url',count)
+    assert main.do_run(SimpleNamespace(config='unused',dry_run=True))==0
+    print(f'confirmation_url_normalizations={len(calls)}')
+    assert len(calls)<=len(official)+len(leads)+10
+    assert state.read_bytes()==before
+
+
+def test_conflicting_official_ids_at_same_url_cannot_confirm():
+    from dataclasses import replace
+    leads,_=fetch_feed(source(),{},http=http_for({'jobs':[row(official_req_id='123')]}),now=NOW)
+    a=replace(official_job(),source_platform='greenhouse',source_job_id='123')
+    b=replace(a,source_job_id='456')
+    assert confirm_lead(leads[0],[a,b],{'name':'Example Labs','enabled':True},now=NOW) is None
