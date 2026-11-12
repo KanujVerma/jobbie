@@ -146,3 +146,5 @@ P2-B hosted correction: index official posting URLs once per employer when leads
 
 ## P2-C1 local catalogue candidate
 SQLite source snapshots/identity and lifecycle evidence, versioned reclassification, query/history/JSONL/CSV CLI. No normal-run hook, source activation, state reset or delivery/cutover change. C2 pre-filter persistent shadow/parity/rollback and actual72h evidence still required. See CATALOGUE.md; release gates pending.
+
+B actual release: PR34 merged f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb; exact-head CI/hosted review and postmerge43128988343 passed. C1 candidate rebased onto this merge, full1105passed44.19s/64focused, permitted Plaid source capture143normalized rows/0identity conflicts and no-mutation CLI/dry-run proof. C1 review/CI/merge and C2 shadow gates remain pending.

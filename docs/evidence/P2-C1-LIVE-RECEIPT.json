@@ -1,0 +1,84 @@
+{
+  "observed_at": "2026-11-12T00:44:50.895974+00:00",
+  "origin": "local_read_only_source_check",
+  "before": {
+    "companies.yaml": "8afbe552edb59566e6bedf604510337bf5d1e3a6cc02c02f1b8161dd0ece12f0",
+    "state/seen_jobs.json": "12bed813017dbd685b085e9b4fceceb79dadd158ef77df7be6071028343cbbbe"
+  },
+  "checks": [
+    {
+      "command": [
+        "main.py",
+        "validate-config"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "main.py",
+        "catalogue",
+        "query",
+        "--db",
+        "<private-local-db>",
+        "--limit",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "main.py",
+        "catalogue",
+        "export",
+        "--db",
+        "<private-local-db>",
+        "--format",
+        "csv",
+        "--limit",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "main.py",
+        "run",
+        "--company",
+        "Plaid",
+        "--dry-run",
+        "--verbose"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source": "Plaid approved public Ashby",
+  "source_endpoint": "https://api.ashbyhq.com/posting-api/job-board/plaid",
+  "source_status": {
+    "status": "complete",
+    "observed": 143,
+    "rejected": 0,
+    "conflicts": 0
+  },
+  "catalogue": {
+    "jobs": 143,
+    "snapshots": 143,
+    "observations": 143,
+    "conflicts": 0,
+    "leads": 0,
+    "runs": 1
+  },
+  "classifications": {
+    "excluded": 131,
+    "eligible": 4,
+    "needs_review": 8
+  },
+  "source_errors": [],
+  "readonly_db_unchanged": true,
+  "after": {
+    "companies.yaml": "8afbe552edb59566e6bedf604510337bf5d1e3a6cc02c02f1b8161dd0ece12f0",
+    "state/seen_jobs.json": "12bed813017dbd685b085e9b4fceceb79dadd158ef77df7be6071028343cbbbe"
+  },
+  "legacy_config_unchanged": true,
+  "third_party_feed_reads": 0,
+  "sends": 0
+}

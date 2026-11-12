@@ -12,6 +12,7 @@ Verified2026-11-12UTC. Snapshot only; inspect current GitHub HEAD and Actions be
 | Owner intake | #32 /f46625845577f158da31974d927aa5748d0c3642 | Exact-head CI/review clean; postmerge43114825827 passed. Disabled proposals only; no employer activated. |
 | Plaid/Amazon | #31 /9317c73b1971d6c7bb19dcb22a6be76876ad7369 | Exact-head81524a6 CI/review clean; postmerge43116984772 passed. Plaid first complete silent baseline PENDING_LIVE. |
 | Oracle | #33 /4eb83f454e2671e8e06d7cb10f4b079ab98fcf90 | Exact-head e976032 CI/review clean; postmerge43125554558 passed. Full995tests before merge. First ordinary corrected baseline PENDING_LIVE. |
+| Optional feeds | #34 /f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb | Full1041tests; exact-head2ef45e1 CI/review and postmerge43128988343 passed. All3feeds remain OFF/rightsblocked. |
 
 Production retains exactly13 enabled original Network Priority sources with unconfirmed referrals, plus Snowflake/Applied Digital disabled. No employer/feed/profile/application is activated. Legacy seen/URL state, eligibility, dedup, backfill, rate limits and ACKs remain authoritative. Never reset/seed state or force a send to manufacture proof.
 
@@ -21,18 +22,14 @@ Latest ordinary [Job Alerts43100310762](https://github.com/KanujVerma/jobbie/act
 
 No ordinary schedule after #31/#33 qualifies at this checkpoint. Plaid/Oracle source revisions stay pending until a complete ordinary scan silently baselines old roles without fake ACKs. Partial/failing scans must remain pending. SanDisk replacement ATS returned406: access BLOCKED, no bypass or no-openings claim.
 
-## Current candidate and remaining Phase2
+## Catalogue candidate and remaining Phase2
 
-P2-B implements bounded OFF JSON leads, source provenance/health/dedup and exact official-employer URL/ID confirmation. Three evaluated feeds remain OFF with BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL. No feed dataset was fetched; actual feed coverage/confirmation/freshness NOT_MEASURED. See [guide](PUBLIC_FEEDS.md), [rights](evidence/P2-B-SOURCE-RIGHTS.json) and [verification](evidence/P2-B-VERIFICATION.md). Candidate current-head independent review, CI, hosted review and merge remain gates.
+P2-C1 is implemented locally on feat/p2-c-catalogue, rebased onto B merge f3a61f4. SQLite retains normalized source snapshots, stable provider/requisition/URL identities, source/observation history, explicit unknown/closed/reopen evidence, immutable policy reclassification and bounded query/history/JSONL/CSV export. No normal-poller hook or SQLite delivery authority yet. Full1105tests passed44.19s,64catalogue cases; config/diff/docs checks pass. Independent review, own PR/current-head CI/hosted review/merge remain gates. [Guide](CATALOGUE.md), [proof](evidence/P2-C1-VERIFICATION.md).
 
-P2-C remains to implement: SQLite pre-filter normalized catalogue, identities/provenance/dates/unknowns, history/dedup/reclassification/query/export, crash-safe shadow and reconciliation/rollback. Actual >=72h shadow has not started. Keep legacy delivery authority until parity/rollback proof and exact owner cutover approval. Missing evidence/approval stays BLOCKED_72H_EVIDENCE/BLOCKED_APPROVAL, while independent code proceeds.
+Approved Plaid local capture stored143pre-filter rows/143jobs/143snapshots,0rejected/identityconflicts. Deterministic eligibility alone:4eligible/8review/131excluded; those4are not alert candidates or proof of freshness. Normal no-webhook dry-run had0candidates/alerts and preserved config/seen bytes. Read-only catalogue query/export preserved DB bytes. Local source proof is not a scheduled production shadow run.
 
-Phase2 is PARTIAL, not complete. Next major goal is P3-A signed allowlisted private Discord interactions, profile/resume upload with evidence, and deterministic matching. Tailoring is Phase4; exact one-job approved application execution is Phase5. No dot API/trigger is verified.
+P2-C2 remains required: automatic pre-filter capture, crash-safe persistent encrypted shadow, independent identity/candidate/ACK reconciliation, rollback proof and actual>=72h ordinary scheduled comparison. Window not started. Legacy JSON/URL state stays authoritative until parity/rollback proof and exact owner cutover approval, followed by an ordinary scheduled run. BLOCKED_72H_EVIDENCE/BLOCKED_APPROVAL remain explicit while implementation continues.
 
-P2-B local Sol review found2reproduced defects (supported posting-ID confirmation and conflicting duplicate posting dates); parent fixed both with6focused cases. See evidence/P2-B-REVIEW.md; fresh full checks and hosted exact-head independent review remain release gates.
+All3evaluated optional feeds remain OFF/BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL. No feed dataset fetched; actual feed coverage/confirmation/freshness NOT_MEASURED. [Guide](PUBLIC_FEEDS.md), [pinned rights](evidence/P2-B-SOURCE-RIGHTS.json). Owner intake [COMPANY_INTAKE.md](COMPANY_INTAKE.md) produces disabled discovered/networkfalse/referralunavailable proposals; no employer activated.
 
-P2-B corrected candidate: full1039passed37.12s, focused44passed; repeated config/OFF CLI/Plaid no-webhook check preserved bytes. No feed activated.
-
-P2-B hosted H1 reproduced quadratic confirmation work; fixed by one employer URL/company index. The actual poller regression drops4000normalizations to120for100postings/20leads, preserving ambiguity/source-ID checks. Fresh current-head CI/hosted review required; no source activated.
-
-P2-C1 local implementation in progress: SQLite normalized source snapshots/identities/history/status evidence, immutable reclassification and bounded query/export CLI. Production polling still uses legacy JSON only. C2 shadow capture/persistence/parity/rollback and >=72h actual evidence remain required. See CATALOGUE.md and the2026-11-12catalogue plan. No canonical cutover or new employer/feed is approved.
+Phase2 is PARTIAL, not complete. Exact next major goal: P3-A signed allowlisted private Discord interactions, private profile/resume upload with evidence and deterministic matching. Tailoring Phase4; exact one-job approved application execution Phase5. No dot API/trigger is verified.
