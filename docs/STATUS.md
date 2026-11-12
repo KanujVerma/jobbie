@@ -23,11 +23,11 @@ All13original enabled Network Priority source entries/unconfirmed referrals and2
 
 Source baseline gates VERIFIED_LIVE. No manual dispatch, seed/reset, forced backfill or test send. Complete responses are within configured scope and do not prove no openings. SanDisk replacement406 remains BLOCKED_SOURCE_ACCESS; current empty response is not a no-openings result. Cron remains best effort. Earlier43100310762 remains the separate2individual HTTP204job proof; human client receipt/rendering unverified.
 
-## C2 release candidate
+## Persistent shadow code release
 
 C2 implements pre-filter shadow capture, compact exact logical observation history/context, independent filter/canonical-candidate/ACK comparisons, immutable reclassification/query/export, explicit v1 backup migration, bounded encrypted checkpoint/rollback tools and optional transport workflow. Original ACK state commits before optional cache transport; publication requires a fresh exact-key restore/digest. Missing crypto/custody/storage leaves original alerts independent. No automatic cutover.
 
-Local full1164passed43.12s after integrating onto actual C1 merge. Current permitted original13memory-only no-webhook dry-run/capacity verification is in progress; do not call it production shadow. Synthetic1000rows×3scans retained3000logical/1000physical with8KiB repeat growth, not actual72h proof. C2 review/CI/merge/key preparation are complete; actual ordinary shadow observation/72h/approved cutover remain gates. [Guide](CATALOGUE.md), [plan](superpowers/plans/2026-11-12-p2-c-catalogue.md).
+Final C2 full1171passed45.02s after hosted audit-window correction; exact-head CI/hosted review and postmerge checks passed. Permitted original13memory-only no-webhook verification passed11582rows/0mismatches; it is not production shadow. Synthetic1000rows×3scans retained3000logical/1000physical with8KiB repeat growth, not actual72h proof. C2 review/CI/merge/key preparation are complete; actual ordinary shadow observation/72h/approved cutover remain gates. [Guide](CATALOGUE.md), [plan](superpowers/plans/2026-11-12-p2-c-catalogue.md).
 
 All3evaluated feeds remain OFF/BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL;0datasets fetched and real coverage/freshness NOT_MEASURED. [Rights](evidence/P2-B-SOURCE-RIGHTS.json), [feed guide](PUBLIC_FEEDS.md). Owner onboarding is [COMPANY_INTAKE.md](COMPANY_INTAKE.md); requested monitors default discovered/networkfalse/referralunavailable and stay disabled until separate exact approval.
 
