@@ -151,4 +151,9 @@ B actual release: PR34 merged f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb; exact-he
 
 C1 review correction: historical unseen listings respect already retained newer complete absence evidence, preserving source history and current status regardless of ingestion order. Reproduced before fixed; fresh checks/review/CI required.
 
-C1 hosted correction: exclude synthetic Ashby URL fallback/unknown composite IDs from native recovery; later real posting ID links via URL without conflicts. Full1109tests; no legacy state change or activation. New head review/CI required.
+C1 hosted correction: exclude synthetic Ashby URL fallback/unknown composite IDs from native recovery; later real posting ID links via URL without conflicts. Initial H1 run1failed/1108passed; no legacy state change or activation. New head review/CI required.
+
+
+Evidence correction: a654434 prematurely recorded the H1 test run as passing. Actual full result was1failed/1108passed: the weak URL source-record claim still blocked reconciliation. The source/provider compatibility correction and fresh result supersede that failed attempt; no merge/approval is claimed for a654434.
+
+C1 final H1 correction: weak URL claims excluded from native incompatibility;69focused/full1110passed37.69s. Earlier a654434 failure remains explicitly recorded. Live/no-mutation proof repeated; new exact-head release gates required.

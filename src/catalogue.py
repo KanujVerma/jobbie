@@ -201,7 +201,7 @@ class Catalogue:
         return result
 
     def _compatible(self,job_id,claims):
-        old=self._rows("SELECT kind,value FROM claims WHERE job_id=? AND kind!='url'",(job_id,))
+        old=self._rows("SELECT kind,value FROM claims WHERE job_id=? AND kind!='url' AND kind NOT LIKE 'source:%'",(job_id,))
         incoming=dict(claims)
         old_req={row['value'] for row in old if row['kind']=='requisition'}
         if old_req and incoming.get('requisition'):

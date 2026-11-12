@@ -32,4 +32,9 @@ C1 Sol round1 returned1P2finding: an unseen old record imported after a newer co
 
 Corrected C1 full1107passed41.82s/66focused; repeated Plaid local capture/CLI/dry-run preserved hashes. Finish own current-head PR/CI/hosted review/merge, then C2 full shadow integration, persistence, reconciliation and rollback. Actual72h has not started.
 
-C1 PR35 hosted H1 repaired directly: whitelist legacy composite-native formats, keep Ashby URL fallback/unknown composites opaque. Two new regressions, full1109tests passed; permitted Plaid check preserves hashes. Fresh head CI/review required. C2 now has local shadow core/schema2/memory dry-run and78focused core tests passed before this upstream fix; rebase own changes onto actual C1 merge before C2 filing. No persistent shadow/cutover is deployed yet.
+C1 PR35 hosted H1 repaired directly: whitelist legacy composite-native formats, keep Ashby URL fallback/unknown composites opaque. Two new regressions, initial H1 full run1failed/1108passed; permitted Plaid check preserves hashes. Fresh head CI/review required. C2 now has local shadow core/schema2/memory dry-run and78focused core tests passed before this upstream fix; rebase own changes onto actual C1 merge before C2 filing. No persistent shadow/cutover is deployed yet.
+
+
+Evidence correction: a654434 prematurely recorded the H1 test run as passing. Actual full result was1failed/1108passed: the weak URL source-record claim still blocked reconciliation. The source/provider compatibility correction and fresh result supersede that failed attempt; no merge/approval is claimed for a654434.
+
+Final C1 H1 correction now genuinely passes69focused/full1110(37.69s): weak URL record claims no longer block reconciliation with later native IDs. Earlier a654434 actually failed1test and its premature success notes were corrected. Repeated live/no-mutation proof passes. Continue fresh exact-head CI/hosted review before merge; preserve failure history.

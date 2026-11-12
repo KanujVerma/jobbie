@@ -12,4 +12,9 @@ C1 has no automatic poller capture/cutover. Revert its helper/CLI/model field to
 
 After the reproduced local Sol ordering finding was fixed: full1107passed41.82s,66focused cases. Repeated approved Plaid capture/query/export and normal no-webhook dry-run passed with unchanged config/seen/readonly-DB hashes. Parent fixed the small issue directly; the prior local CHANGES verdict is not an approval of this corrected head. Fresh hosted exact-head independent review and CI required.
 
-Hosted H1 corrected candidate: full1109passed,68focused catalogue cases. Ashby missing-ID URL fallback stays non-native and reconciles to later real ID at the same posting URL without duplicate canonical jobs/partial scans. Unknown provider composites also stay opaque. Repeated permitted Plaid capture/no-mutation CLI/dry-run passed. Fresh current-head CI/hosted review still required.
+Hosted H1 corrected candidate: initial H1 run1failed/1108passed, not a passing candidate. Ashby missing-ID URL fallback stays non-native and reconciles to later real ID at the same posting URL without duplicate canonical jobs/partial scans. Unknown provider composites also stay opaque. Repeated permitted Plaid capture/no-mutation CLI/dry-run passed. Fresh current-head CI/hosted review still required.
+
+
+Evidence correction: a654434 prematurely recorded the H1 test run as passing. Actual full result was1failed/1108passed: the weak URL source-record claim still blocked reconciliation. The source/provider compatibility correction and fresh result supersede that failed attempt; no merge/approval is claimed for a654434.
+
+Final H1 correction verified: focused69passed3.83s, full1110passed37.69s. Weak URL-derived source-record keys do not create native-ID incompatibility; actual different native IDs/requisitions remain distinct. Both Ashby transition directions and retry roundtrip pass. Repeated permitted live143-row capture/readonly CLI/no-webhook dry-run retained hashes. This supersedes the explicitly recorded a654434 failure. Fresh exact-head CI/hosted review required.

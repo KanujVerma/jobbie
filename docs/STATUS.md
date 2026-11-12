@@ -38,4 +38,9 @@ C1 local Sol found an out-of-order unseen-record status defect. Parent reproduce
 
 Corrected C1 candidate full1107passed41.82s/66focused; repeated permitted Plaid capture and no-mutation CLI/dry-run passed. Current-head own CI/hosted review/merge remain pending.
 
-C1 hosted H1 reproduced/fixed: Ashby URL fallback and unknown composite IDs stay opaque; only explicit legacy native-ID formats are decoded. Later native Ashby identity reconciles without duplicate jobs/conflicts. Full1109tests passed; fresh exact-head CI/review required.
+C1 hosted H1 reproduced/fixed: Ashby URL fallback and unknown composite IDs stay opaque; only explicit legacy native-ID formats are decoded. Later native Ashby identity reconciles without duplicate jobs/conflicts. Initial H1 full run1failed/1108passed; fresh exact-head CI/review required.
+
+
+Evidence correction: a654434 prematurely recorded the H1 test run as passing. Actual full result was1failed/1108passed: the weak URL source-record claim still blocked reconciliation. The source/provider compatibility correction and fresh result supersede that failed attempt; no merge/approval is claimed for a654434.
+
+Final C1 H1 candidate:69focusedpassed3.83s/full1110passed37.69s after correcting weak URL claim compatibility. Repeated permitted live/no-mutation proof passes. Earlier a654434 is a failed historical attempt; only the next exact passing/reviewed head may merge.

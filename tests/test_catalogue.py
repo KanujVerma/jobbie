@@ -413,3 +413,13 @@ def test_ashby_url_fallback_is_not_promoted_to_native_id(cat):
 def test_unknown_adapter_composite_is_opaque_not_implicitly_native():
     value=job(id='Example Labs::future_adapter::synthetic-value',source_platform='future_adapter',source_job_id=None)
     assert normalized_snapshot(value,CFG)['source_job_id'] is None
+
+
+def test_ashby_native_missing_native_roundtrip_preserves_identity(cat):
+    url='https://jobs.ashbyhq.com/labs/unique-posting'
+    native=job(id='Example Labs::ashby::labs:real',source_platform='ashby',source_board='labs',source_job_id='real',url=url)
+    fallback=replace(native,id='Example Labs::ashby::labs:url-aabbcc',source_job_id=None)
+    for i,record in enumerate([native,fallback,native]):
+        result=scan(cat,[record],run=str(i))
+        assert result['conflicts']==0
+    assert cat.stats()['jobs']==1
