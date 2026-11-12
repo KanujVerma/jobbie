@@ -1,4 +1,4 @@
-> HISTORICAL RUNBOOK: P2-A PR #23 is ALREADY MERGED (2026-11-09), read `docs/STATUS.md` and `docs/agent-prompts/PHASE-2-UX-GOAL.md` for current next work. Do not rerun P2-A verification or enable boards from this old checklist unless separately authorized.
+> HISTORICAL RUNBOOK: P2-A PR #23 is ALREADY MERGED (2026-11-09), read `docs/HANDOFF.md`, `docs/STATUS.md` and `docs/agent-prompts/PHASE-2-CODE.md` for current work. Do not rerun P2-A verification or enable boards from this old checklist unless separately authorized.
 
 # Gemini: verify and finish existing Phase 2A PR #23
 

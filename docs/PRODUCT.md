@@ -53,4 +53,4 @@ New discovered companies get `network_priority=false` / `referral_status=unavail
 
 See [PHASES.md](PHASES.md) for scoped PRs, [AUTO_APPLY.md](AUTO_APPLY.md) for executor protocol, [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md) for card spec, and [RESUME_TAILORING.md](RESUME_TAILORING.md) for grounded revisions.
 
-P2-ACT implementation candidate: portable CLI/GitHub-form requests and explicit supplied-source verification, with OFF proposals only. See COMPANY_INTAKE.md. This is source-review intake, not new production coverage, actual referral, private fit matching or dot integration.
+P2-ACT implementation merged in #32: portable CLI/GitHub-form requests and explicit supplied-source verification, with OFF proposals only. See COMPANY_INTAKE.md. This is source-review intake, not new production coverage, actual referral, private fit matching or dot integration.

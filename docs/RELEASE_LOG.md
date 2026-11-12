@@ -182,3 +182,10 @@ C2 final local candidate1170tests38.85s/config/diff/docs/actionlint and correcte
 C2 local independent review approved55785e8 in one round,1170independent tests41.53s/no findings. Source proof remains separate; final-head CI/hosted review and ordinary deployment evidence still required.
 
 C2 hosted audit correction: recent96hevidence window is independent of retained catalogue history; reproduced1000-receipt exhaustion, preserved all historical data. Fresh current-head tests/CI/hosted review required.
+
+Documentation reconciliation candidate: completed UX/intake/source baselines/C1 releases replace stale "next UX"/"intake unmerged"/"not implemented" entrypoints. Historical scoped prompts are explicitly completed and point to the active remaining Phase2 goal. As-built map separates merged main from C2 #36 hosted release gates; no deployment/72h/cutover assertion.
+
+## C2 actual merge830dcd13
+PR36 merged2026-11-12T04:41:10Z at830dcd13d05433b286e7b810385807481e9cc744 after exactfe8f7f7 CI/test43155934557/public-read43155934550 and completed hosted clean review. Merged tree equals reviewed; postmerge43156415856passed. Workflow active/secret provisioned; ordinary bootstrap/parity/custody PENDING_LIVE, real72h not started, cutover not approved. No source/feed/legacy authority change.
+
+Documentation reconciliation final checks:1171tests45.23s, config/read-only health/Plaid dry-run pass with unchanged config/state hashes. No executable/config/workflow change; fresh exact-head doc PR gates required.

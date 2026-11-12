@@ -23,11 +23,11 @@ All13original enabled Network Priority source entries/unconfirmed referrals and2
 
 Source baseline gates VERIFIED_LIVE. No manual dispatch, seed/reset, forced backfill or test send. Complete responses are within configured scope and do not prove no openings. SanDisk replacement406 remains BLOCKED_SOURCE_ACCESS; current empty response is not a no-openings result. Cron remains best effort. Earlier43100310762 remains the separate2individual HTTP204job proof; human client receipt/rendering unverified.
 
-## C2 release candidate
+## Persistent shadow code release
 
 C2 implements pre-filter shadow capture, compact exact logical observation history/context, independent filter/canonical-candidate/ACK comparisons, immutable reclassification/query/export, explicit v1 backup migration, bounded encrypted checkpoint/rollback tools and optional transport workflow. Original ACK state commits before optional cache transport; publication requires a fresh exact-key restore/digest. Missing crypto/custody/storage leaves original alerts independent. No automatic cutover.
 
-Local full1164passed43.12s after integrating onto actual C1 merge. Current permitted original13memory-only no-webhook dry-run/capacity verification is in progress; do not call it production shadow. Synthetic1000rows×3scans retained3000logical/1000physical with8KiB repeat growth, not actual72h proof. Own independent review/current-head CI/hosted review/merge/key provisioning/ordinary shadow observation remain release gates. [Guide](CATALOGUE.md), [plan](superpowers/plans/2026-11-12-p2-c-catalogue.md).
+Final C2 full1171passed45.02s after hosted audit-window correction; exact-head CI/hosted review and postmerge checks passed. Permitted original13memory-only no-webhook verification passed11582rows/0mismatches; it is not production shadow. Synthetic1000rows×3scans retained3000logical/1000physical with8KiB repeat growth, not actual72h proof. C2 review/CI/merge/key preparation are complete; actual ordinary shadow observation/72h/approved cutover remain gates. [Guide](CATALOGUE.md), [plan](superpowers/plans/2026-11-12-p2-c-catalogue.md).
 
 All3evaluated feeds remain OFF/BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL;0datasets fetched and real coverage/freshness NOT_MEASURED. [Rights](evidence/P2-B-SOURCE-RIGHTS.json), [feed guide](PUBLIC_FEEDS.md). Owner onboarding is [COMPANY_INTAKE.md](COMPANY_INTAKE.md); requested monitors default discovered/networkfalse/referralunavailable and stay disabled until separate exact approval.
 
@@ -44,3 +44,7 @@ C2 local Sol approved pinned55785e8 in one round, independently1170passed41.53s/
 C2 hosted H1 reproduced/fixed: primary audit window is now recent96h independently of retained history, avoiding the1000-receipt permanent failure. Old records retained; fixture still cannot satisfy real72h. Fresh head full checks/CI/hosted review required.
 
 C2 audit correction full1171passed45.02s/config/diff, no ingestion/source/alert change. Fresh exact-head CI/review pending.
+
+## C2 release2026-11-12
+
+PR36 merged830dcd13d05433b286e7b810385807481e9cc744 after exactfe8f7f73e42c928e99d96025ff906d43169a1a6d test43155934557/public-read43155934550 and completed hosted review with both finding flags false. The merged/reviewed trees match. Postmerge Tests43156415856 passed.1171local tests include the hosted audit-window regression; local Sol independently approved earlier source with1170tests. Key provisioned and Job Alerts workflow337994764active. No ordinary post-C2run qualifies yet: first bootstrap/custody/restore/parity are PENDING_LIVE, actual72hclock has not started. Code release is not operational evidence. Legacy JSON remains authority; no employer/feed/canonical activation beyond authorized shadow code deployment.

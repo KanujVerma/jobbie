@@ -1,6 +1,6 @@
 # Phase2 acceptance ledger
 
-This is a requirement audit, not a completion claim. Verify current GitHub/Actions before acting. Canonical live source receipt: evidence/P2-R2-R3-LIVE-2026-11-12.*. C2 is not merged/deployed at this checkpoint.
+This is a requirement audit, not a completion claim. Verify current GitHub/Actions before acting. Canonical live source receipt: evidence/P2-R2-R3-LIVE-2026-11-12.*. C2 #36 merged830dcd13; workflow active/key provisioned. First ordinary run/72h remain unverified.
 
 | Requirement | Current proof | Status / remaining gate |
 | --- | --- | --- |
@@ -15,15 +15,15 @@ This is a requirement audit, not a completion claim. Verify current GitHub/Actio
 | Roster/referrals/opt-in expansion | companies.yaml unchanged13enabled original Network Priority +2historicaldisabled | Preserved; exact new employer approval absent |
 | Generic optional feed infrastructure | #34 + candidate C2 provenance persistence; source/rights gates/bounds/errors/ID/date collisions/official confirmation tests | Merged OFF capability; no actual feed coverage |
 | Real feed rights/activation | Pinned P2-B-SOURCE-RIGHTS.json; New-Grad-Jobs excludes job data, others lack confirmed data rights | BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL; all3OFF,0datasets fetched |
-| Normalized catalogue before filtering | C1 #35 + C2 normal-run hook/compact logical memberships/context | C2 local candidate; permitted full13no-mutation proof in progress |
+| Normalized catalogue before filtering | C1 #35 + C2 normal-run hook/compact logical memberships/context | C2 merged; permitted full13no-mutation11582-row proof passed, actual scheduled shadow pending |
 | Stable IDs/URLs/original sources/date precision/unknown lifecycle/reopens | C1 identity/history tests + C2 compact history/context/migration regressions | Implemented/tested locally; no title-only merging |
 | Cross-source dedup/reclassification/query/export | C1 CLI/API and C2 canonical projection; exact source/employer facts, policy versioning | Implemented; preserve conflicts/unknowns, never infer referral |
-| Crash-safe shadow/custody/parity/rollback | C2 transactions, v1 backup, off/on/missing/corrupt/failed/summary ACK tests, bounded Fernet roundtrip, ACK-before-transport workflow | Local tests; own independent review/CI/merge/real scheduled run pending |
+| Crash-safe shadow/custody/parity/rollback | C2 transactions, v1 backup, off/on/missing/corrupt/failed/summary ACK tests, bounded Fernet roundtrip, ACK-before-transport workflow | Merged with1171tests/current-head CI/hosted clean; real scheduled run pending |
 | Verified $0 storage/private source data | Standard-library SQLite/public domain, optional Apache/BSD crypto, included cache usage guard; ciphertext only | Policy/read-only usage checked; custom paid-limit read402unverified, no change/bypass |
 | >=72h actual shadow comparison | Audit rejects fixture/local/short/incomplete/manual/time/head/config/custody gaps and verifies primary receipts | BLOCKED_72H_EVIDENCE; real window not started |
 | Exact production cutover approval | Read-only owner-bound audit; no actuation/sender/authority switch | BLOCKED_APPROVAL; legacy JSON remains authority |
 | Ordinary run after approved cutover | No cutover performed | BLOCKED_APPROVAL/PENDING_LIVE after any later authorization |
-| Per-PR tests/docs/CI/independent review/rollback | STATUS/HANDOFF/RELEASE_LOG + exact-head proof/review ledgers | C2 current-head gates still required; no failed/stale head counts |
+| Per-PR tests/docs/CI/independent review/rollback | STATUS/HANDOFF/RELEASE_LOG + exact-head proof/review ledgers | C2 exactfe8f7f7 CI/hosted clean; no failed/stale head counts |
 | Privacy/no extra sends/paid services/applications | Whitelisted public-source data/private encrypted storage; no private profile/resume/application code; dry-run/missing-dependency regressions | Preserved within implemented scope; no test dispatch/send |
 | Roadmap/handoff | PHASES/specs/prompts/current docs/issue7; source commits/evidence linked | Keep current through C2 release and final audit |
 

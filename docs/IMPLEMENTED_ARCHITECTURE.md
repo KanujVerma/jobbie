@@ -1,53 +1,35 @@
-# As-built architecture vs intended future system
+# Implemented architecture and operational proof
 
-**As-built code release audited 2026-11-10:** P2-A `ecb553fa98cf5a7ccd0cd4d2212b72ea457a3aeb` (merge #23), followed by docs #24. Later `main` commits may be state-only. P2-A adds Greenhouse/Ashby public read-only adapters but no employer board is production enabled. Future architecture in `docs/ARCHITECTURE.md` describes targets, not implemented capabilities.
+Snapshot2026-11-12UTC. Verify current main/PRs/Actions before acting. #23ATS, #29Discord layout, #30reliability, #32owner intake, #31Plaid/Amazon, #33Oracle, #34OFFfeeds and #35catalogue core are merged. STATUS/RELEASE_LOG have exact SHAs/CI. C2 #36 merged830dcd13d05433b286e7b810385807481e9cc744 after exact-head CI/hosted review; its workflow is active and secret provisioned. First ordinary shadow verification and72h are separate pending facts.
 
-## As-built synchronous cycle
-`GitHub Actions job-alerts.yml` (best-effort cron / manual dispatch)
-→ `main.py run`
-→ `companies.yaml` 13 enabled monitored source entries
-→ `src/adapters/__init__.py` and per-platform `BaseAdapter.fetch`
-→ immutable `src.models.Job`
-→ `src.filtering.apply_filter_pipeline` (normal 48-hour freshness; special migration 7 days)
-→ `src.eligibility.classify_eligibility` + `src.experience.assess_experience_requirements` (tri-state)
-→ `src.storage.classify_jobs` (per-source seen IDs and cross-source URL history)
-→ `src.notifier.Notifier` (Discord webhook, only confirmed-delivery ACK)
-→ bounded versioned `state/seen_jobs.json` commit to `main`.
+## Legacy delivery authority
 
-Ambiguous early-career jobs go into a review queue/daily digest, not an "eligible" alert. `src.backfill.deliver_backfill_batch` sends only up to 10 represented direct links per scan and acknowledges exactly those after confirmed delivery; further unalerted candidates remain pending. `src.health.compute_run_diagnostics` records failed vs empty sources and scheduling gaps.
+GitHub Actions best-effort schedule -> main.py run ->13enabled source entries -> BaseAdapter.fetch -> immutable Job -> deterministic freshness/location/tri-state eligibility -> legacy seen/URL classification -> bounded Notifier -> atomic seen JSON save/state commit. Unknown early-career records go to review/digest; represented-link backfill ACKs only after successful delivery. No internship/private profile/application feature is added here.
 
-No long-running server, webhook receiver, Cloudflare database/Worker, AI SDK, private document upload, recruiter mail OAuth or application tracker exists in the running architecture at this audited release.
+Original Network Priority is source configuration, not a referral. Role/location preference is separate. Workday details can be incomplete; Oracle finder supplies date-only/unknown employment/description facts. Do not turn missing source facts into qualifications or timestamps. Exactly13original enabled sources plus2historicaldisabled remain; no new employer/feed is enabled. Source failures/partial/empty distinguish responding within configured scope from verified employer coverage.
 
-## Important actual semantics and constraints
-- `network_priority` is a config-driven *original source* badge, not a confirmed referral. Original 13 source names are locked in `docs/PRODUCT.md`.
-- `Job.priority` means location preference and must not be reused as network importance.
-- Workday may retrieve details for promising postings; Microsoft PCSX uses summary fields (full detail can require additional requests). Never treat missing descriptions as confirmed experience requirements.
-- Employment/seniority parsing is heuristic and conservative. Even when classifier says eligible, real ATS full requirements and employer cohorts need verification before applications.
-- `state/seen_jobs.json` public state must never contain personal resumes, family contacts or private API tokens.
-- `.github/workflows/job-alerts.yml` can be 4–8 hours late despite */15 schedule; health logs do not fix the scheduler.
+## Implemented modules
 
-## Phase 2A implemented vs later Phase 2 delta (planned)
-P2-A Greenhouse/Ashby public read-only adapters, safe provider normalizers, optional immutable Job source fields, integration tests and read-only verification workflow are merged and CI-tested. No new employer boards have been activated; production remains the original 13 enabled source entries. P2-UX1 notification layout, P2-ACT controlled owner-approved boards, P2-B permitted feeds and P2-C catalogue are NOT implemented yet.
-P2-A: read-only official Greenhouse and Ashby job-board adapters with pagination, description/role/compensation sources and backoff. Existing employers unaffected.
-P2-B: vetted and authorized public feeds, permission and original-employer source verification.
-P2-C: canonical catalogue storing validated jobs *before* personal filtering, provenance, global dedup and status history, 72-hour shadow migration. Proposed Cloudflare D1 may be replaced with a fully free local/Actions-compatible catalogue; validate actual quota and no paid fallback.
+| Boundary | Implemented code | Authority / limits |
+| --- | --- | --- |
+| Public employer ingestion | src/adapters/*, public_board.py, HTTPClient | Official/fixed approved sources, bounded retries/errors; no protected scraping/login |
+| Eligibility | filtering.py, eligibility.py, experience.py | Deterministic tri-state, source unknowns preserved; no hiring outcome/application authority |
+| Legacy ledger/delivery | storage.py, source_migration.py, backfill.py, notifier.py, health.py | JSON/URL ACK authority, quiet revisions, limits/dedup, no reset |
+| Owner intake | company_intake.py, CLI/form, COMPANY_INTAKE.md | Portable monitor/startup-research requests, manual evidence/fixed probes, OFF proposals; no dot API/activation |
+| Optional leads | public_feeds.py, job_identity.py, PUBLIC_FEEDS.md | OFF rights/owner gates, bounded JSON/provenance/health, exact current official link;0production feeds |
+| Catalogue C1 | catalogue.py, catalogue_cli.py, CATALOGUE.md | SQLite normalized identities/history/reclassification/search/export; no send authority |
+| C2 #36 merged shadow | catalogue_history.py, catalogue_shadow.py, catalogue_checkpoint.py, catalogue_operations.py, workflow | Pre-filter compact logical observations/context, independent parity, encrypted custody/rollback; actual ordinary evidence/72h/approved cutover still required |
 
-## Target Phases 3–6 (NOT implemented)
-3. Authenticated Discord interactions/private candidate and resume store, verified GitHub evidence, explainable matching, plus early private Application/Attempt ledger.
-4. Structured, source-backed natural resume tailoring, exact before/after review and full PDF/DOCX, owner Approve resume separate from Approve & Apply packet.
-5. Dot-first MANUAL owner delegation feasibility, then exact one-job consent-bound application execution/receipts and optional policy-compliant local browser fallback. **No verified direct dot API**, no mass applications.
-6. Startup sourcing/verified contacts and exact approval outbound email, plus recruiter/application reminders and feedback. No automatic LinkedIn DMs.
+No Cloudflare service/database, AI provider, long-running private interaction server, resume upload, recruiter OAuth or application executor is deployed. Future provider boundaries in ARCHITECTURE are design, not capabilities.
 
-## Failure isolation and rollback
-Legacy company polling must remain runnable even if later data feed, AI, private storage or outreach services fail. Feature flags and migrations must preserve original job history. On a state commit conflict, preserve both branches' relevant data and do NOT force push or delete state. Source-rights restrictions apply to all sources and feeds.
+## Actual production and rollback
 
-## Provider boundary (future only)
-Source adapters -> normalized record -> hard eligibility -> ranking -> evidence-backed LLM interpretation -> human approval for documents/outbound actions -> tracking. No single model may declare that an email was sent, job is open, candidate has a credential, or applicant is hired without independently verified evidence.
+Ordinary43140198821 on f3a61f4 retained real state d4724df: Plaid143/Oracle2113complete silent baselines,0new job ACKs, all257legacy seen ACK flags/10URL entries retained.13successful responses/1empty SanDisk,11569fetched/2matched/356review/11211excluded,600.08s/301.43minute gap. See evidence/P2-R2-R3-LIVE-2026-11-12.*. No manual seed/dispatch/backfill. SanDisk replacement406 remains access blocked; empty is not no openings. Earlier43100310762 separately accepted2individual HTTP204job sends; human receipt/rendering unverified.
 
-## P2-A branch addition (not yet production-enabled)
-`GreenhouseAdapter` and `AshbyAdapter` -> shared `public_board` validation/GET
-normalization -> optional immutable Job source facts -> existing tri-state
-eligibility, storage, notifier. No new database/service. Explicit source employment
-and incomplete-description flags prevent false full-time alerts; review queue
-retains these facts. `scripts/verify_public_boards.py` runs the same adapters
-read-only with metadata-only receipts, not `main.do_run` or any webhook.
+C2 preserves original JSON authority and isolates optional crypto/custody failures. Its workflow commits ACKs before optional transport and publishes a new checkpoint only after a fresh exact-key ciphertext restore/digest check. Latest DB snapshots retain all append-only canonical history; only redundant task-owned encrypted transport copies may expire. Roll back by disabling optional shadow stages/mode, retaining both ledgers/keys; never reset history or bypass lost custody. These mechanics have local/fixture proof; deployed scheduled comparison and>=72h are not established by those tests.
+
+## Next boundaries
+
+Complete C2 release and ordinary verification, then record real72h/approval gates truthfully. Exact owner approval/parity/rollback is required before any canonical delivery cutover, followed by an ordinary scheduled run. Phase2 remains PARTIAL meanwhile.
+
+Next major goal: P3-A signed allowlisted private Discord interactions, profile/resume upload/evidence and deterministic matching. P4grounded tailoring/owner resume approval is separate from P5one-exact-job approved application execution. Dot-first execution remains a manual feasibility path, no verified direct dot API. P6startup sourcing/outreach requires source permission and exact-message approval; no automatic LinkedIn sending. No model-only claim establishes a credential, open role, send or application outcome.
