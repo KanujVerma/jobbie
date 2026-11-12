@@ -44,3 +44,5 @@ C1 hosted H1 reproduced/fixed: Ashby URL fallback and unknown composite IDs stay
 Evidence correction: a654434 prematurely recorded the H1 test run as passing. Actual full result was1failed/1108passed: the weak URL source-record claim still blocked reconciliation. The source/provider compatibility correction and fresh result supersede that failed attempt; no merge/approval is claimed for a654434.
 
 Final C1 H1 candidate:69focusedpassed3.83s/full1110passed37.69s after correcting weak URL claim compatibility. Repeated permitted live/no-mutation proof passes. Earlier a654434 is a failed historical attempt; only the next exact passing/reviewed head may merge.
+
+C1 hosted ambiguity/lifecycle corrections: deterministic unresolved reuse, exact URL alias closure/reopen and registered native alias compatibility, with75focused/full1116passed40.54s. Repeated live/no-mutation proof passes. New exact-head CI/review required; no production shadow/cutover yet.

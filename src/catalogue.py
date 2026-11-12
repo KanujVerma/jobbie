@@ -206,7 +206,9 @@ class Catalogue:
         old_req={row['value'] for row in old if row['kind']=='requisition'}
         if old_req and incoming.get('requisition'):
             return old_req=={incoming['requisition']}
-        return all(row['kind'] not in incoming or incoming[row['kind']]==row['value'] for row in old)
+        values={}
+        for row in old:values.setdefault(row['kind'],set()).add(row['value'])
+        return all(kind not in values or value in values[kind] for kind,value in incoming.items())
 
     def _conflict(self,run,source,record,code,detail,when):
         self.db.execute('INSERT INTO conflicts(run_id,source_id,source_record_id,code,detail,observed_at) VALUES(?,?,?,?,?,?)',
@@ -227,10 +229,18 @@ class Catalogue:
             found=by_claim[kind]&compatible
             if len(found)==1:identity=next(iter(found));break
         if identity is None and len(compatible)==1:identity=next(iter(compatible))
+        unresolved=None
+        if identity is None and len(compatible)>1:
+            unresolved=hashlib.sha256(compact(sorted(claims)).encode()).hexdigest()
+            previous=self.db.execute("SELECT job_id FROM claims WHERE employer=? AND kind='unresolved' AND value=?",(employer,unresolved)).fetchall()
+            known={row[0] for row in previous}&compatible
+            if len(known)==1:identity=next(iter(known))
         if identity is None:
             # Never silently merge two existing identities. Reconciliation is evidence-gated.
             identity=str(uuid.uuid4())
             self.db.execute('INSERT INTO jobs VALUES(?,?,?,?,?)',(identity,employer,when,when,'unknown'))
+        if unresolved:
+            self.db.execute("INSERT OR IGNORE INTO claims VALUES(?,'unresolved',?,?)",(employer,unresolved,identity))
         if candidates-compatible or len(compatible)>1:
             self._conflict(run,source,data['source_record_id'],'IDENTITY_CONFLICT',
                            {'existing_job_ids':sorted(candidates),'retained_job_id':identity},when)
@@ -299,8 +309,16 @@ class Catalogue:
         self._write();when=stamp(when)
         if not canonical_job_url(evidence_url) or not text(evidence,2048,nullable=False):raise CatalogueError('explicit public closure evidence required')
         with self.db:
+            latest=self.db.execute('SELECT s.payload FROM observations o JOIN snapshots s ON s.sha=o.snapshot_sha WHERE o.job_id=? AND o.source_id=? AND o.source_record_id=? ORDER BY o.observed_at DESC,o.id DESC LIMIT 1',(identity,source_id,record_id)).fetchone()
+            if latest is None or json.loads(latest[0])['canonical_url']!=canonical_job_url(evidence_url):raise CatalogueError('closure URL does not match observed posting')
             changed=self.db.execute("UPDATE source_state SET status='closed',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=? AND observed_at<=?",(when,identity,source_id,record_id,when)).rowcount
             if changed!=1:raise CatalogueError('closure must reference an observed source record')
+            # URL-derived and later native IDs can be aliases of this same
+            # official posting. Preserve observations; close only matching URL
+            # aliases that have no newer positive evidence.
+            aliases=self._rows('SELECT ss.source_record_id FROM source_state ss WHERE ss.job_id=? AND ss.source_id=? AND ss.observed_at<=? AND ?=(SELECT json_extract(s.payload,\'$.canonical_url\') FROM observations o JOIN snapshots s ON o.snapshot_sha=s.sha WHERE o.job_id=ss.job_id AND o.source_id=ss.source_id AND o.source_record_id=ss.source_record_id ORDER BY o.observed_at DESC,o.id DESC LIMIT 1)',(identity,source_id,when,canonical_job_url(evidence_url)))
+            for alias in aliases:
+                self.db.execute("UPDATE source_state SET status='closed',observed_at=? WHERE job_id=? AND source_id=? AND source_record_id=?",(when,identity,source_id,alias['source_record_id']))
             self._status(identity,source_id,'explicit_closed',compact({'url':evidence_url,'evidence':evidence}),when)
 
     def stats(self):

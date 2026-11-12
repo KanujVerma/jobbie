@@ -157,3 +157,5 @@ C1 hosted correction: exclude synthetic Ashby URL fallback/unknown composite IDs
 Evidence correction: a654434 prematurely recorded the H1 test run as passing. Actual full result was1failed/1108passed: the weak URL source-record claim still blocked reconciliation. The source/provider compatibility correction and fresh result supersede that failed attempt; no merge/approval is claimed for a654434.
 
 C1 final H1 correction: weak URL claims excluded from native incompatibility;69focused/full1110passed37.69s. Earlier a654434 failure remains explicitly recorded. Live/no-mutation proof repeated; new exact-head release gates required.
+
+C1 hosted ambiguity/lifecycle correction: no retry identity inflation, matching URL alias closure/reopen, unrelated/moved URL safety and registered native alias compatibility.75focused/full1116passed40.54s; live/no-mutation check passes. Fresh exact-head gates pending.

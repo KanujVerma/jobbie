@@ -423,3 +423,65 @@ def test_ashby_native_missing_native_roundtrip_preserves_identity(cat):
         result=scan(cat,[record],run=str(i))
         assert result['conflicts']==0
     assert cat.stats()['jobs']==1
+
+
+def test_reused_req_then_missing_req_reuses_one_unresolved_identity(cat):
+    a=job(official_req_id='R1');b=replace(a,official_req_id='R2')
+    scan(cat,[a],run='r1');scan(cat,[b],run='r2')
+    unknown=replace(a,official_req_id=None)
+    scan(cat,[unknown],run='r3');before=cat.stats()['jobs']
+    for run in ['r4','r5']:scan(cat,[unknown],run=run)
+    assert before==cat.stats()['jobs']==3
+    assert cat.stats()['conflicts']>=3
+
+
+def test_url_native_aliases_cannot_mask_explicit_closure_or_reopen(cat):
+    url='https://jobs.ashbyhq.com/labs/unique-posting'
+    fallback=job(id='Example Labs::ashby::labs:url-aabbcc',source_platform='ashby',source_board='labs',source_job_id=None,url=url)
+    native=replace(fallback,id='Example Labs::ashby::labs:real',source_job_id='real')
+    scan(cat,[fallback]);scan(cat,[native],run='native',when=NOW+timedelta(hours=1))
+    identity=cat.query()[0]['job_id']
+    cat.record_closed(identity,'s1','real',NOW+timedelta(hours=2),evidence_url=url,evidence='Official posting no longer accepting')
+    assert cat.query()[0]['status']=='closed'
+    scan(cat,[native],run='reopen',when=NOW+timedelta(hours=3))
+    assert cat.query()[0]['status']=='reopened'
+
+
+def test_closure_url_must_match_the_actual_observed_posting(cat):
+    scan(cat,[job()]);identity=cat.query()[0]['job_id']
+    with pytest.raises(CatalogueError):cat.record_closed(identity,'s1','1',NOW,evidence_url='https://other.example/unrelated',evidence='Unrelated page')
+    assert cat.query()[0]['status']=='open'
+
+
+def test_closing_one_url_does_not_close_alias_that_moved_to_another_url(cat):
+    a=job('1',official_req_id='REQ',url='https://example.com/posting/a')
+    b=job('2',official_req_id='REQ',url=a.url)
+    scan(cat,[a,b])
+    moved=replace(a,url='https://example.com/posting/b')
+    scan(cat,[moved,b],run='moved',when=NOW+timedelta(hours=1))
+    identity=cat.query()[0]['job_id']
+    cat.record_closed(identity,'s1','2',NOW+timedelta(hours=2),evidence_url=b.url,evidence='Posting a explicitly closed')
+    assert cat.query()[0]['status']=='open'
+
+
+def test_registered_native_alias_stays_same_job_when_req_later_missing(cat):
+    scan(cat,[job('post1',official_req_id='REQ')],run='r1')
+    scan(cat,[job('post2',official_req_id='REQ')],run='r2')
+    result=scan(cat,[job('post2')],run='r3')
+    assert cat.stats()['jobs']==1 and result['conflicts']==0
+
+
+def test_complete_presence_absence_current_status_is_permutation_invariant():
+    from hypothesis import given,settings,strategies as st
+    import tempfile
+    @settings(max_examples=30,deadline=None)
+    @given(st.lists(st.booleans(),min_size=1,max_size=5),st.data())
+    def invariant(present,data):
+        order=data.draw(st.permutations(tuple(range(len(present)))))
+        with tempfile.TemporaryDirectory() as directory:
+            with Catalogue(Path(directory)/'db.sqlite',create=True) as store:
+                for i in order:scan(store,[job()] if present[i] else [],run=str(i),when=NOW+timedelta(hours=i))
+                rows=store.query()
+                if any(present):assert rows[0]['status']==('open' if present[-1] else 'unknown')
+                else:assert not rows
+    invariant()
