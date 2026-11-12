@@ -1,4 +1,4 @@
-Status update 2026-11-11: P2-UX1 merged in #29 at e0346f49bd572179250fe08bed73131db0ba311a. Live webhook delivery remains unverified. This is its historical scoped contract; current work is the remaining Phase 2 goal.
+> HISTORICAL COMPLETED CONTRACT: code merged in #29; ordinary43100310762 established2individual HTTP204job ACKs. Human receipt/client rendering remain unverified. Current work is PHASE-2-CODE.md via STATUS/HANDOFF.
 
 # P2-UX1 executable PR — make existing Discord alerts informative
 

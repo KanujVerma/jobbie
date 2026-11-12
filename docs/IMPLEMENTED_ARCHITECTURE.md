@@ -1,6 +1,6 @@
 # Implemented architecture and operational proof
 
-Snapshot2026-11-12UTC. Verify current main/PRs/Actions before acting. #23ATS, #29Discord layout, #30reliability, #32owner intake, #31Plaid/Amazon, #33Oracle, #34OFFfeeds and #35catalogue core are merged. STATUS/RELEASE_LOG have exact SHAs/CI. C2 #36 persistent shadow is implemented/reviewed locally but still under hosted release gates at this snapshot; deployment and72h are separate facts.
+Snapshot2026-11-12UTC. Verify current main/PRs/Actions before acting. #23ATS, #29Discord layout, #30reliability, #32owner intake, #31Plaid/Amazon, #33Oracle, #34OFFfeeds and #35catalogue core are merged. STATUS/RELEASE_LOG have exact SHAs/CI. C2 #36 merged830dcd13d05433b286e7b810385807481e9cc744 after exact-head CI/hosted review; its workflow is active and secret provisioned. First ordinary shadow verification and72h are separate pending facts.
 
 ## Legacy delivery authority
 
@@ -18,7 +18,7 @@ Original Network Priority is source configuration, not a referral. Role/location
 | Owner intake | company_intake.py, CLI/form, COMPANY_INTAKE.md | Portable monitor/startup-research requests, manual evidence/fixed probes, OFF proposals; no dot API/activation |
 | Optional leads | public_feeds.py, job_identity.py, PUBLIC_FEEDS.md | OFF rights/owner gates, bounded JSON/provenance/health, exact current official link;0production feeds |
 | Catalogue C1 | catalogue.py, catalogue_cli.py, CATALOGUE.md | SQLite normalized identities/history/reclassification/search/export; no send authority |
-| C2 #36 candidate | catalogue_history.py, catalogue_shadow.py, catalogue_checkpoint.py, catalogue_operations.py, workflow | Pre-filter compact logical observations/context, independent parity, encrypted custody/rollback; hosted merge/actual ordinary evidence still required |
+| C2 #36 merged shadow | catalogue_history.py, catalogue_shadow.py, catalogue_checkpoint.py, catalogue_operations.py, workflow | Pre-filter compact logical observations/context, independent parity, encrypted custody/rollback; actual ordinary evidence/72h/approved cutover still required |
 
 No Cloudflare service/database, AI provider, long-running private interaction server, resume upload, recruiter OAuth or application executor is deployed. Future provider boundaries in ARCHITECTURE are design, not capabilities.
 

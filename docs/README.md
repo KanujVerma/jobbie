@@ -29,7 +29,7 @@
 | P2-UX1 (#29 merged) | Source-grounded cards; ordinary HTTP204 ACKs verified | [P2-UX1](phases/PHASE-2-UX.md) | Historical UX goal |
 | P2-R1/R2/R3 merged | Source-failure health, read-only state safety and original-source repairs | [Phase 2](phases/PHASE-2.md) | [Remaining Phase 2 goal](agent-prompts/PHASE-2-CODE.md) |
 | P2-ACT #32 merged | Tested form/CLI for monitor/startup-research and OFF proposals; [onboarding](COMPANY_INTAKE.md) | [P2-ACT](phases/PHASE-2-ACT.md) | [Intake goal](agent-prompts/PHASE-2-ACT-GOAL.md) |
-| P2-B #34/C1 #35 merged; C2 #36 under gates | OFF feeds, canonical store and persistent shadow | [Phase 2](phases/PHASE-2.md) | [P2 overview](agent-prompts/PHASE-2-CODE.md) |
+| P2-B #34/C1 #35 merged; C2 #36 merged/live gates pending | OFF feeds, canonical store and persistent shadow | [Phase 2](phases/PHASE-2.md) | [P2 overview](agent-prompts/PHASE-2-CODE.md) |
 | P3 | Real private commands/profile/evidence/basic app ledger | [Phase 3](phases/PHASE-3.md) | [P3](agent-prompts/PHASE-3-CODE.md) |
 | P4 | Grounded tailored resume, diff/preview, private approval packet | [Phase 4](phases/PHASE-4.md) | [P4](agent-prompts/PHASE-4-CODE.md) |
 | P5 | Owner-approved dot/browser application execution | [Phase 5](phases/PHASE-5.md) | [P5](agent-prompts/PHASE-5-CODE.md) |
@@ -43,4 +43,4 @@ Every functional PR changes [STATUS](STATUS.md), [HANDOFF](HANDOFF.md) and [RELE
 
 [PUBLIC_FEEDS.md](PUBLIC_FEEDS.md) documents the optional OFF lead path and actual source-rights blockers. No current third-party feed dataset is ingested.
 
-[CATALOGUE.md](CATALOGUE.md) describes the merged C1 source store/query and C2 persistent shadow/parity candidate, including actual operational gates. A local SQLite helper is not production cutover or real72h evidence.
+[CATALOGUE.md](CATALOGUE.md) describes the merged C1 source store/query and C2 persistent shadow/parity implementation, including actual operational gates. A local SQLite helper is not production cutover or real72h evidence.
