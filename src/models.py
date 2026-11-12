@@ -52,6 +52,8 @@ class Job:
     compensation: tuple[CompensationRange, ...] = ()
     # A source calendar date is not an exact posting timestamp or timezone.
     source_posted_date: str | None = None
+    # An explicit employer requisition, distinct from ATS posting/internal IDs.
+    official_req_id: str | None = None
 
     def __post_init__(self):
         if self.role_type not in ROLE_TYPES:

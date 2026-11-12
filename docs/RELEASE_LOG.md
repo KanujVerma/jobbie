@@ -143,3 +143,26 @@ Oracle PR33 merged4eb83f454e2671e8e06d7cb10f4b079ab98fcf90 after current-head e9
 P2-B review corrections: supported source posting-ID confirmation and order-independent duplicate posting-date conflicts, reproduced before fixed. Fresh head checks/hosted review required; no feed/company enabled.
 
 P2-B hosted correction: index official posting URLs once per employer when leads exist, preserving ID ambiguity/permission gates and protecting original delivery timing. Reproduced4000before/120after normalizations in normal-poller fixture. Fresh CI/review required.
+
+## P2-C1 local catalogue candidate
+SQLite source snapshots/identity and lifecycle evidence, versioned reclassification, query/history/JSONL/CSV CLI. No normal-run hook, source activation, state reset or delivery/cutover change. C2 pre-filter persistent shadow/parity/rollback and actual72h evidence still required. See CATALOGUE.md; release gates pending.
+
+B actual release: PR34 merged f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb; exact-head CI/hosted review and postmerge43128988343 passed. C1 candidate rebased onto this merge, full1105passed44.19s/64focused, permitted Plaid source capture143normalized rows/0identity conflicts and no-mutation CLI/dry-run proof. C1 review/CI/merge and C2 shadow gates remain pending.
+
+C1 review correction: historical unseen listings respect already retained newer complete absence evidence, preserving source history and current status regardless of ingestion order. Reproduced before fixed; fresh checks/review/CI required.
+
+C1 hosted correction: exclude synthetic Ashby URL fallback/unknown composite IDs from native recovery; later real posting ID links via URL without conflicts. Initial H1 run1failed/1108passed; no legacy state change or activation. New head review/CI required.
+
+
+Evidence correction: a654434 prematurely recorded the H1 test run as passing. Actual full result was1failed/1108passed: the weak URL source-record claim still blocked reconciliation. The source/provider compatibility correction and fresh result supersede that failed attempt; no merge/approval is claimed for a654434.
+
+C1 final H1 correction: weak URL claims excluded from native incompatibility;69focused/full1110passed37.69s. Earlier a654434 failure remains explicitly recorded. Live/no-mutation proof repeated; new exact-head release gates required.
+
+C1 hosted ambiguity/lifecycle correction: no retry identity inflation, matching URL alias closure/reopen, unrelated/moved URL safety and registered native alias compatibility.75focused/full1116passed40.54s; live/no-mutation check passes. Fresh exact-head gates pending.
+
+C1 H4 correction: historical alias ingestion respects later explicit closure without spurious old reopen; genuine newer reopen remains.77focused/full1118passed39.68s. Exact-head gates pending; no production cutover. C2 draft checkpoint published independently, not released.
+
+## Ordinary repaired-source verification2026-11-12
+Run43140198821, state d4724df: Plaid143/Oracle2113silent complete baselines with0new job ACKs, all257prior seen ACK flags/10URL entries retained.13successful responses/1empty SanDisk;600.08s/301.43minute gap. No manual seed/reset/dispatch. Source baselines VERIFIED_LIVE; catalogue shadow/cutover not deployed. C1 refreshes current-head gates after retaining this new production state.
+
+C1 rebased onto actual ordinary state d4724df, preserving baseline/ACK history exactly. Full1118tests pass; permitted local source/CLI/dry-run byte proof repeated on new state. New head CI/hosted review required.

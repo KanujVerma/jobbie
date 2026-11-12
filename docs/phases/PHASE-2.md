@@ -1,6 +1,6 @@
 # Phase 2 executable contract — broaden job discovery without losing original cohort
 
-STATUS: PARTIAL. P2-A #23 and P2-UX1 #29 are merged. Live P2-UX1 delivery is unverified. Owner instruction 2026-11-11 authorizes completing all feasible remaining Phase 2 across scoped PRs, without automatic roster/feed expansion. See STATUS and the delivery plan for actual evidence.
+STATUS: PARTIAL. P2-A #23 and P2-UX1 #29 are merged. Ordinary run43100310762 established2individual HTTP204 job ACKs; human receipt/client rendering remain unverified. Owner instruction 2026-11-11 authorizes completing all feasible remaining Phase 2 across scoped PRs, without automatic roster/feed expansion. See STATUS and the delivery plan for actual evidence.
 
 ## P2-A: direct company ATS adapters
 - Add reusable Greenhouse and Ashby read-only adapters under `src/adapters/` with fixture contracts for pagination/HTTP failures/rate limits/descriptions, salary structured fields and locations. Maintain existing BaseAdapter/Job compatibility or migrate through a tested normalization layer.
@@ -11,7 +11,7 @@ STATUS: PARTIAL. P2-A #23 and P2-UX1 #29 are merged. Live P2-UX1 delivery is unv
 ## P2-R1/R2 and owner-directed P2-ACT
 - P2-R1: audit original 13 fetch, eligibility reasons, errors, scheduler gaps and delivery; fix reproduced false-health and dry-run defects with regression proof. Preserve partial results while surfacing failures.
 - P2-R2: repair independently verified original-source migrations with identity reconciliation and suppression of historical alerts. No replacement/new employer is implicitly approved. Missing ownership/permission or a risky cutover is an explicit blocker.
-- P2-UX1 is merged (#29). Synthetic payloads and workflow success do not prove live delivery.
+- P2-UX1 is merged (#29). Synthetic payloads/workflow success alone do not prove live delivery; see the actual ACK receipt in STATUS.
 - [P2-ACT](PHASE-2-ACT.md) is now an owner-directed issue/CLI proposal workflow. Accept company name, optional careers URL, role/location, priority, and monitor versus startup-research. Verify aliases, official ATS ownership/ID, access permission, health and actual listings. Generate disabled reviewable config proposals; preserve original 13 plus 2 historical disabled. Discovered never means confirmed referral. Dot compatibility is a portable request, not a fabricated trigger.
 
 ## P2-B: licensed/allowed curated feeds
@@ -47,5 +47,7 @@ disabled in production (examples in `examples/p2a-public-boards.yaml`). Original
 configured / 13 enabled Network Priority production sources remain unchanged.
 
 
-## P2-B candidate interface
+## P2-B merged disabled interface (#34)
 See PUBLIC_FEEDS.md: feed-check plus an optional default-OFF manifest hook, bounded public JSON leads, provenance/health/dedup and exact confirmation using approved employer records. Current candidates are all OFF/BLOCKED_SOURCE_RIGHTS with no owner feed approval. Metadata/policy and synthetic tests are not dataset coverage. Missing rights does not block the independent catalogue; legacy JSON remains delivery authority.
+
+P2-C is split for review: C1 normalized SQLite identities/snapshots/history/reclassification/query/export; C2 automatic pre-filter shadow, encrypted persistent custody, legacy candidate/ACK parity, rollback and actual>=72h evidence gates. Both remain in scope. C1 alone is not a deployed catalogue/shadow/cutover. See CATALOGUE.md and2026-11-12plan.

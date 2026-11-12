@@ -42,3 +42,5 @@ Every functional PR changes [STATUS](STATUS.md), [HANDOFF](HANDOFF.md) and [RELE
 [COMPANY_INTAKE.md](COMPANY_INTAKE.md) is the current owner request, source-evidence and disabled-proposal workflow. It preserves the original roster and has no automatic activation/dot trigger.
 
 [PUBLIC_FEEDS.md](PUBLIC_FEEDS.md) documents the optional OFF lead path and actual source-rights blockers. No current third-party feed dataset is ingested.
+
+[CATALOGUE.md](CATALOGUE.md) describes the local P2-C1 source store/query contract and remaining C2 persistent shadow/parity gates. A local SQLite helper is not production cutover or real72h evidence.
