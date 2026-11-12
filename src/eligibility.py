@@ -180,6 +180,7 @@ _US_CITIZENSHIP_PATTERN = re.compile(
     r"(?:(?:\bus\b|u\.s\.|united states)\s+citizen(?:ship)?\s+(?:only|required|mandatory|must be)|"
     r"must be an?\s+(?:\bus\b|u\.s\.|united states)\s+citizen|"
     r"requires?(?:\s+active)?\s+(?:\bus\b|u\.s\.|united states)\s+citizen(?:ship)?|"
+    r"(?:^|[;\n])\s*required\s*:\s*(?:\bus\b|u\.s\.|united states)\s+citizen(?:ship)?|"
     r"only\s+(?:\bus\b|u\.s\.|united states)\s+citizens?\s+(?:may|can)\s+apply|"
     r"due to government contracts?,?\s+(?:candidates must be|must be an?)\s+(?:\bus\b|u\.s\.|united states)\s+citizen)",
     re.IGNORECASE,
@@ -463,9 +464,21 @@ def classify_eligibility(job: Job, filters: dict | None = None) -> EligibilityVe
         unknowns.append("location")
 
     # 4. Citizenship / Security Clearance Check
-    cit_match = _US_CITIZENSHIP_PATTERN.search(raw_lower)
+    cit_match = None
+    for candidate in _US_CITIZENSHIP_PATTERN.finditer(raw_lower):
+        # An explicitly accepted alternative does not make citizenship
+        # mandatory. Only inspect the immediate continuation of this clause;
+        # another mandatory clause still applies independently.
+        alternative = re.match(
+            r"\s*,?\s*or\s+(?:(?:a|an|lawful|legal|us|u\.s\.|united states)\s+)*"
+            r"(?:permanent\s+residen(?:cy|ts?)|green[ -]card(?:\s+holders?)?)\b",
+            raw_lower[candidate.end():], re.IGNORECASE,
+        )
+        if alternative is None:
+            cit_match = candidate
+            break
     if cit_match:
-        ev = _find_evidence(sentences, _US_CITIZENSHIP_PATTERN) or cit_match.group(0)
+        ev = cit_match.group(0)
         reasons.append(REASON_US_CITIZEN_REQUIRED)
         evidence_spans.append(f"US citizenship required: {ev}")
 

@@ -190,7 +190,16 @@ def build_job_embed(job: Job) -> dict:
         screen += " | Unknown: " + ", ".join(str(u).replace("_", " ").lower() for u in unknowns)
     screen += " | Deterministic screen, not hiring confirmation"
 
-    if job.posted_at is not None and job.posted_at_kind in ("first_published", "last_published"):
+    source_date = None
+    if job.source_posted_date:
+        try:
+            from datetime import date
+            source_date = date.fromisoformat(job.source_posted_date).isoformat()
+        except (TypeError, ValueError):
+            pass
+    if job.posted_at is None and source_date:
+        date_name, date_value = "Source date (time unknown)", source_date
+    elif job.posted_at is not None and job.posted_at_kind in ("first_published", "last_published"):
         date_name = "First published" if job.posted_at_kind == "first_published" else "Last published"
         date_value = _date_text(job.posted_at)
     elif job.posted_at is not None and job.posted_at_kind == "posted" and job.source_platform not in ("workday",):

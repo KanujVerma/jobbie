@@ -8,7 +8,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 | Order | PR slot / phase | User-visible completion | Dependencies |
 |---|---|---|---|
 | Shipped | Phase 1 + hardening (#12–18) | New-grad filtering and original 13 Network Priority stars | Existing bot |
-| Shipped code | P2-A (#23, docs #24) | Official Greenhouse and Ashby read-only adapters available, **not activated** | Phase 1 |
+| Shipped code | P2-A (#23, docs #24) | Public adapters available; original Plaid uses Ashby after #31; additional boards stay OFF | Phase 1 |
 | Shipped code | P2-UX1 (#29) | Source-grounded cards; ordinary HTTP204 ACKs observed | P2-A merged |
 | Source follow-up | P2-R1 merged / P2-R2/P2-R3 candidates | Failure/empty distinction, dry-run safety, actionable health, state-safe original-source repairs | P2-UX1 merged |
 | Shipped code (#32) | P2-ACT owner-directed intake | Issue form, tested portable CLI requests and disabled reviewed proposals for monitor/startup-research | P2-R1; activation separately approved |

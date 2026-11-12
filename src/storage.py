@@ -219,6 +219,7 @@ def record_review_job(
             "source_job_id": job.source_job_id,
             "employment_type": job.employment_type,
             "description_complete": job.description_complete,
+            "source_posted_date": job.source_posted_date,
             "reasons": reasons,
             "first_seen": now.isoformat(),
             "last_seen": now.isoformat(),
@@ -228,7 +229,7 @@ def record_review_job(
         entry["reasons"] = reasons
         # Preserve structured source evidence for later review reclassification.
         for key in ("source_platform", "source_url", "source_board", "source_job_id",
-                    "employment_type", "description_complete"):
+                    "employment_type", "description_complete", "source_posted_date"):
             value = getattr(job, key)
             if value is not None:
                 entry[key] = value
@@ -286,6 +287,7 @@ def clean_review_queue(state: dict) -> int:
             source_job_id=entry.get("source_job_id"),
             employment_type=entry.get("employment_type"),
             description_complete=entry.get("description_complete"),
+            source_posted_date=entry.get("source_posted_date"),
             posted_at=None,
             detected_at=now,
             raw_text=raw_text,
