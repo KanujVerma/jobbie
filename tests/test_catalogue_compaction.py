@@ -63,3 +63,35 @@ def test_repeated_scan_storage_growth_is_bounded_by_membership_not_full_rows(tmp
         for number in range(1,8):scan(store,rows,number)
         assert path.stat().st_size-initial<=128*1024
         assert store.stats()['observations']==800
+
+
+def test_content_revert_keeps_all_versions_and_latest_pointer(tmp_path):
+    with Catalogue(tmp_path/'db.sqlite',create=True) as store:
+        for number,body in enumerate(['version a','version b','version a']):scan(store,[job(raw_text=body)],number)
+        assert store.stats()['snapshots']==2
+        assert [r['snapshot']['raw_text'] for r in store.history()]==['version a','version b','version a']
+        assert store.query()[0]['snapshot']['raw_text']=='version a'
+
+
+def test_membership_cannot_relabel_another_sources_observation(tmp_path):
+    from src.catalogue_history import pack_members
+    from src.catalogue import CatalogueError
+    with Catalogue(tmp_path/'db.sqlite',create=True) as store:
+        scan(store,[job()],0)
+        when=NOW+timedelta(hours=1);store.start_run('other',when,origin='fixture')
+        store.observe_scan('other','other-source',CFG,[job('2')],status='complete',observed_at=when)
+        foreign=store.db.execute("SELECT id FROM observations WHERE source_id='other-source'").fetchone()[0]
+        with store.db:store.db.execute('UPDATE scan_memberships SET members=? WHERE run_id=?',(pack_members([foreign],[None]),'0'))
+        with pytest.raises(CatalogueError):store.scan_rows('0','source')
+
+
+def test_corrupt_membership_is_reported_without_reset(tmp_path):
+    from src.catalogue import CatalogueError
+    path=tmp_path/'db.sqlite'
+    with Catalogue(path,create=True) as store:
+        scan(store,[job()],0)
+        with store.db:store.db.execute("UPDATE scan_memberships SET members=x'000000'")
+    before=path.read_bytes()
+    with Catalogue(path,readonly=True) as store:
+        with pytest.raises(CatalogueError):store.history()
+    assert path.read_bytes()==before

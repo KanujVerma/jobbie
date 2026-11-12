@@ -19,7 +19,7 @@ MAX_COMPRESSED_BYTES=16*1024*1024
 MAX_CIPHER_BYTES=24*1024*1024
 MAX_METADATA_BYTES=16384
 CACHE_BUDGET_BYTES=8*1024**3  # Below the documented included10GiB; never opt into paid settings.
-_FIELDS={'schema_version','epoch','catalogue_uuid','run_id','config_sha256','code_sha256',
+_FIELDS={'schema_version','epoch','catalogue_uuid','run_id','config_sha256','code_sha256','complete_run',
          'db_sha256','legacy_file_sha256','parent_cipher_sha256','sealed_at'}
 
 
@@ -71,6 +71,7 @@ def validate_checkpoint(cp):
         if not isinstance(cp[field],str) or not re.fullmatch(r'[0-9a-f]{64}',cp[field]):raise CatalogueError('invalid checkpoint digest')
     if cp['parent_cipher_sha256'] is not None and not re.fullmatch(r'[0-9a-f]{64}',cp['parent_cipher_sha256']):raise CatalogueError('invalid parent checkpoint')
     if cp['cache_key']!=_cache_key(cp):raise CatalogueError('checkpoint cache key mismatch')
+    if type(cp['complete_run']) is not bool:raise CatalogueError('invalid run completion evidence')
     return cp
 
 
@@ -79,7 +80,7 @@ def read_checkpoint(path):
     except (OSError,ValueError,TypeError) as error:raise CatalogueError('cannot read retained checkpoint') from error
 
 
-def seal(db_path,cipher_path,key,*,legacy_path,parent=None):
+def seal(db_path,cipher_path,key,*,legacy_path,parent=None,allow_incomplete=False,expected_run_id=None):
     from cryptography.fernet import Fernet
     cipher_path=Path(cipher_path)
     if cipher_path.exists():raise CatalogueError('refusing to replace a retained sealed snapshot')
@@ -87,7 +88,8 @@ def seal(db_path,cipher_path,key,*,legacy_path,parent=None):
     with Catalogue(db_path,readonly=True) as store:
         uid=store.db.execute("SELECT value FROM meta WHERE key='catalogue_uuid'").fetchone()[0]
         last=store.db.execute("SELECT * FROM shadow_runs ORDER BY rowid DESC LIMIT 1").fetchone()
-        if last is None or last['status']=='running':raise CatalogueError('unfinished shadow run cannot publish')
+        if last is None or (last['status']=='running' and not allow_incomplete):raise CatalogueError('unfinished shadow run cannot publish')
+        if expected_run_id is not None and last['run_id']!=expected_run_id:raise CatalogueError('this ordinary run did not capture a shadow ledger')
         if parent and parent['catalogue_uuid']!=uid:raise CatalogueError('checkpoint lineage mismatch')
         if parent:
             restored=store.db.execute("SELECT value FROM meta WHERE key='restored_cipher_sha256'").fetchone()
@@ -97,8 +99,10 @@ def seal(db_path,cipher_path,key,*,legacy_path,parent=None):
             with sqlite3.connect(scratch) as target:store.db.backup(target)
             raw=_read(scratch,MAX_DB_BYTES);compressed=zlib.compress(raw,6)
             if len(compressed)>MAX_COMPRESSED_BYTES:raise CatalogueError('compressed catalogue exceeds transport bound')
+            report=json.loads(last['result'])
             cp={'schema_version':SCHEMA_VERSION,'epoch':EPOCH,'catalogue_uuid':uid,'run_id':last['run_id'],
-                'config_sha256':last['config_sha'],'code_sha256':code_sha(),'db_sha256':hashlib.sha256(raw).hexdigest(),
+                'config_sha256':last['config_sha'],'code_sha256':report.get('code_sha256'),
+                'complete_run':last['status']!='running','db_sha256':hashlib.sha256(raw).hexdigest(),
                 'legacy_file_sha256':file_sha(legacy_path),'parent_cipher_sha256':parent['cipher_sha256'] if parent else None,
                 'sealed_at':datetime.now(timezone.utc).isoformat()}
             token=Fernet(key).encrypt(compact(cp).encode()+b'\n'+compressed)

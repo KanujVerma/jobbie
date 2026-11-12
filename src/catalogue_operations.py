@@ -28,6 +28,7 @@ def _arguments(parser):
     parser.add_argument('--cache-hit',choices=['true','false'],default='false')
     parser.add_argument('--cache-usage')
     parser.add_argument('--allow-bootstrap',action='store_true')
+    parser.add_argument('--allow-incomplete',action='store_true')
     parser.add_argument('--approval-comment-id',type=int)
 
 
@@ -131,7 +132,11 @@ def cmd_shadow(args):
             _output(mode='shadow');result={'mode':'shadow','delivery_authority':'legacy_json','status':'ready'}
         elif operation=='seal':
             parent=read_checkpoint(checkpoint) if checkpoint.exists() else None
-            cp=seal(database,cipher,key,legacy_path=args.legacy,parent=parent)
+            actual=(os.getenv('GITHUB_ACTIONS')=='true' and os.getenv('GITHUB_WORKFLOW')=='Job Alerts'
+                and os.getenv('GITHUB_REPOSITORY','').casefold()=='kanujverma/jobbie' and os.getenv('GITHUB_REF')=='refs/heads/main')
+            expected=os.getenv('GITHUB_RUN_ID','')+'.'+os.getenv('GITHUB_RUN_ATTEMPT','1') if actual else None
+            cp=seal(database,cipher,key,legacy_path=args.legacy,parent=parent,
+                allow_incomplete=getattr(args,'allow_incomplete',False),expected_run_id=expected)
             if not args.cache_usage:raise CatalogueError('primary cache usage receipt required')
             usage=json.loads(_read(args.cache_usage,MAX_METADATA_BYTES))
             if not cache_budget(usage.get('active_caches_size_in_bytes'),cipher.stat().st_size):raise CatalogueError('BLOCKED_STORAGE_BUDGET')

@@ -296,3 +296,15 @@ runpy.run_path('main.py',run_name='__main__')
         env={**os.environ,'JOBBIE_CATALOGUE_MODE':'off','DISCORD_WEBHOOK_URL':''})
     assert result.returncode==0,result.stderr
     assert 'Config is valid' in result.stdout
+
+
+def test_prior_failed_window_does_not_fabricate_or_permanently_block_new_real_window():
+    records=[];receipts=[]
+    for i in range(6):
+        when=NOW+timedelta(hours=i*24);good=i>=2
+        receipts.append({'id':i+1,'event':'schedule','head_branch':'main','head_sha':'a'*40,'status':'completed','conclusion':'success' if good else 'failure','run_started_at':when.isoformat(),'updated_at':(when+timedelta(minutes=5)).isoformat()})
+        records.append({'run_id':str(i+1),'origin':'schedule','head_sha':'a'*40,'started_at':when.isoformat(),'finished_at':(when+timedelta(minutes=5)).isoformat(),'parity_ok':good,'custody_verified':True})
+    result=evidence_gate(records,github_runs=receipts,owner_approval=None,rollback_proof=True)
+    assert result['shadow_hours']>=72 and result['window_first_run_id']=='3'
+    assert result['gates']==['BLOCKED_APPROVAL']
+    assert result['invalid_run_ids']==['1','2']

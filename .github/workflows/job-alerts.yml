@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: job-alerts
@@ -20,7 +21,7 @@ jobs:
     # Actions minutes are free and unlimited and none of that was billed. The real
     # cost was a dead run holding the concurrency group, which is reason enough to
     # keep the cap — but do not cite money as the reason, because there is none.
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,6 +31,37 @@ jobs:
       - name: Install dependencies
         timeout-minutes: 5
         run: pip install -r requirements.txt
+      - name: Install optional catalogue transport
+        id: catalogue_deps
+        continue-on-error: true
+        timeout-minutes: 2
+        run: pip install -r requirements-catalogue.txt
+      - name: Plan catalogue shadow restore
+        id: catalogue_plan
+        continue-on-error: true
+        timeout-minutes: 1
+        run: python main.py catalogue-shadow plan
+      - name: Restore exact encrypted catalogue
+        id: catalogue_cache
+        if: steps.catalogue_deps.outcome == 'success' && steps.catalogue_plan.outputs.restore == 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/restore@v4
+        with:
+          path: state/catalogue-shadow/sealed.bin
+          key: ${{ steps.catalogue_plan.outputs.cache_key }}
+      - name: Open catalogue shadow safely
+        id: catalogue_open
+        continue-on-error: true
+        timeout-minutes: 1
+        run: |
+          args=()
+          if [ "$BOOTSTRAP" = true ]; then args+=(--allow-bootstrap); fi
+          python main.py catalogue-shadow restore --cache-hit "$CACHE_HIT" "${args[@]}"
+        env:
+          JOBBIE_CATALOGUE_KEY: ${{ secrets.CATALOGUE_SHADOW_KEY }}
+          BOOTSTRAP: ${{ steps.catalogue_plan.outputs.bootstrap || 'false' }}
+          CACHE_HIT: ${{ steps.catalogue_cache.outputs.cache-hit || 'false' }}
       - name: Check whether any enabled company needs a browser
         # Only phenom_people and eightfold_playwright touch the browser, and both
         # belong to companies that are currently disabled — so the three Chromium
@@ -106,6 +138,8 @@ jobs:
         run: python main.py run
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          JOBBIE_CATALOGUE_MODE: ${{ steps.catalogue_open.outputs.mode || 'off' }}
+          JOBBIE_CATALOGUE_DB: state/catalogue-shadow/jobs.sqlite
       - name: Publish source and delivery health snapshot
         if: always()
         run: python main.py health --format markdown >> "$GITHUB_STEP_SUMMARY"
@@ -118,4 +152,68 @@ jobs:
           git config user.name  "job-alerts-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/seen_jobs.json
+          # Restore may update this tracked health file. Include it so rebase
+          # cannot reject the ACK push because of an unstaged metadata change.
+          if [ -f state/catalogue_shadow_health.json ]; then git add state/catalogue_shadow_health.json; fi
           git diff --cached --quiet || (git commit -m "state: $(date -u +%FT%TZ)" && git pull --rebase origin main && git push)
+
+      # ACK state is committed above before optional cache transport. A cache
+      # failure/timeout must never discard successful legacy delivery receipts.
+      - name: Seal bounded catalogue checkpoint
+        id: catalogue_seal
+        if: ${{ !cancelled() && steps.catalogue_open.outputs.mode == 'shadow' && (steps.scan.outcome == 'success' || steps.scan.outcome == 'failure') }}
+        continue-on-error: true
+        timeout-minutes: 2
+        run: |
+          gh api repos/KanujVerma/jobbie/actions/cache/usage > state/catalogue-shadow/cache-usage.json
+          python main.py catalogue-shadow seal --allow-incomplete --cache-usage state/catalogue-shadow/cache-usage.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOBBIE_CATALOGUE_KEY: ${{ secrets.CATALOGUE_SHADOW_KEY }}
+      - name: Save encrypted catalogue checkpoint
+        if: ${{ !cancelled() && steps.catalogue_seal.outputs.ready == 'true' }}
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/save@v4
+        with:
+          path: state/catalogue-shadow/sealed.bin
+          key: ${{ steps.catalogue_seal.outputs.cache_key }}
+      - name: Prepare fresh catalogue cache probe
+        id: catalogue_probe_prepare
+        if: ${{ !cancelled() && steps.catalogue_seal.outputs.ready == 'true' }}
+        continue-on-error: true
+        run: python main.py catalogue-shadow probe-prepare
+      - name: Restore newly saved catalogue for verification
+        id: catalogue_probe
+        if: ${{ !cancelled() && steps.catalogue_probe_prepare.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/restore@v4
+        with:
+          path: state/catalogue-shadow/sealed.bin
+          key: ${{ steps.catalogue_seal.outputs.cache_key }}
+      - name: Publish verified catalogue checkpoint
+        id: catalogue_publish
+        if: ${{ !cancelled() && steps.catalogue_probe_prepare.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 1
+        run: python main.py catalogue-shadow publish --cache-hit "$CACHE_HIT"
+        env:
+          JOBBIE_CATALOGUE_KEY: ${{ secrets.CATALOGUE_SHADOW_KEY }}
+          CACHE_HIT: ${{ steps.catalogue_probe.outputs.cache-hit || 'false' }}
+      - name: Publish catalogue shadow health
+        if: always()
+        run: |
+          if [ -f state/catalogue_shadow_health.json ]; then
+            echo 'Catalogue shadow health (legacy delivery authority):' >> "$GITHUB_STEP_SUMMARY"
+            cat state/catalogue_shadow_health.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Commit catalogue custody metadata
+        if: ${{ !cancelled() && (steps.scan.outcome == 'success' || steps.scan.outcome == 'failure') }}
+        continue-on-error: true
+        timeout-minutes: 3
+        run: |
+          for file in state/catalogue_shadow_checkpoint.json state/catalogue_shadow_health.json; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
+          git diff --cached --quiet || (git commit -m "state: catalogue custody $(date -u +%FT%TZ)" && git pull --rebase origin main && git push)

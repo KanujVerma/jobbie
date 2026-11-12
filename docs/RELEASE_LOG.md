@@ -168,3 +168,5 @@ Run43140198821, state d4724df: Plaid143/Oracle2113silent complete baselines with
 C1 rebased onto actual ordinary state d4724df, preserving baseline/ACK history exactly. Full1118tests pass; permitted local source/CLI/dry-run byte proof repeated on new state. New head CI/hosted review required.
 
 C2 WIP checkpoint only: pre-filter shadow comparison/ACK/memory dry-run and encrypted checkpoint helpers/CLI, optional crypto boundary and feed rights claims.30focused/1137fulltests passed42.13s on C1 ce304905 base. Not deployed or ready for PR: efficient logical scan membership, persistent workflow, primary receipt audit and final gates remain required. No activation/cutover/source-state reset.
+
+C1 PR35 merged1614d804 after exact0be562f CI/clean hosted review; postmerge43148218676 passed. C2 local candidate now has efficient exact logical history, shadow comparisons/ACK receipts, encrypted bounded roundtrip custody workflow and optional-dependency isolation. Full1163passed40.76s before own rebase. No key/deployment/72h/cutover success claim. Capacity before/after fixtures committed separately from live source evidence.

@@ -57,7 +57,7 @@ class Shadow:
         self.row_indexes={};self.current_urls={};self.leads_by_key={};self.confirmed_employers={}
         store.start_run(run_id,when,origin=origin,head_sha=head_sha)
         with store.db:
-            store.db.execute('INSERT INTO shadow_runs VALUES(?,?,?,?,?,?)',(run_id,config_sha,digest(self.initial),None,'{}','running'))
+            store.db.execute('INSERT INTO shadow_runs VALUES(?,?,?,?,?,?)',(run_id,config_sha,digest(self.initial),None,compact(self.report()),'running'))
         self._retain_legacy(self.initial,when)
     def configure_sources(self,keys,when):
         self.expected_sources=set(keys);at=stamp(when)
@@ -78,14 +78,13 @@ class Shadow:
         key=source_key(config)
         result=self.store.observe_scan(self.run_id,key,config,jobs,status=status,observed_at=observed_at)
         index={}
-        for raw in self.store.db.execute('SELECT o.job_id,o.snapshot_sha,o.source_record_id,s.payload,o.observed_at FROM observations o JOIN snapshots s ON s.sha=o.snapshot_sha WHERE o.run_id=? AND o.source_id=?',(self.run_id,key)):
+        for raw in self.store.scan_rows(self.run_id,key):
             row=dict(raw);row['data']=json.loads(row['payload'])
             index.setdefault((row['data']['id'],row['data']['canonical_url']),[]).append(row)
         self.row_indexes[key]=index
         urls={}
         for row in self.store.db.execute('''SELECT ss.job_id,json_extract(s.payload,'$.canonical_url') AS url FROM source_state ss JOIN jobs j ON j.job_id=ss.job_id
-            JOIN observations o ON o.id=(SELECT id FROM observations WHERE job_id=ss.job_id AND source_id=ss.source_id
-                AND source_record_id=ss.source_record_id ORDER BY observed_at DESC,id DESC LIMIT 1)
+            JOIN observations o ON o.id=ss.latest_observation_id
             JOIN snapshots s ON s.sha=o.snapshot_sha WHERE j.employer=? AND ss.status='open' ''',(employer_key(config),)):
             urls.setdefault(row['url'],set()).add(row['job_id'])
         self.current_urls[employer_key(config)]=urls
@@ -219,35 +218,48 @@ def _date(value):
 
 
 def evidence_gate(stored,*,github_runs,owner_approval,rollback_proof,target=None):
-    """Only caller-fetched primary GitHub receipts can attest an actual window."""
-    receipts={str(row['id']):row for row in github_runs if row.get('event')=='schedule' and row.get('head_branch')=='main'
-              and row.get('status')=='completed' and row.get('run_attempt',1)==1}
+    """Measure a contiguous healthy suffix of actual ordinary GitHub receipts."""
+    candidates=[r for r in stored if _date(r.get('started_at'))]
+    earliest=min((_date(r['started_at']) for r in candidates),default=None)
+    receipts={str(r['id']):r for r in github_runs if r.get('event')=='schedule' and r.get('head_branch')=='main'
+              and r.get('status')=='completed' and _date(r.get('updated_at'))
+              and (earliest is None or _date(r['updated_at'])>=earliest)}
     records={};invalid=[]
-    for row in stored:
-        key=str(row.get('run_id','')).split('.')[0];receipt=receipts.get(key)
+    for row in candidates:
+        raw=str(row.get('run_id',''));parts=raw.split('.');key=parts[0];receipt=receipts.get(key)
         if not receipt:continue
         start,finish=_date(row.get('started_at')),_date(row.get('finished_at'))
         official_start,official_finish=_date(receipt.get('run_started_at')),_date(receipt.get('updated_at'))
         valid=(row.get('origin')=='schedule' and row.get('head_sha')==receipt.get('head_sha') and row.get('parity_ok') is True
                and row.get('custody_verified') is True and receipt.get('conclusion')=='success'
+               and receipt.get('run_attempt',1)==1 and (len(parts)==1 or parts[1]=='1')
                and all([start,finish,official_start,official_finish]))
         if valid:valid=0<=(start-official_start).total_seconds()<=1800 and 0<=(finish-start).total_seconds()<=1800 and finish<=official_finish
+        if valid and target is not None:
+            valid=all(row.get(k)==target.get(k) for k in ['config_sha256','code_sha256'])
         if valid:records[key]=row
         else:invalid.append(key)
-    hours=0.;missing=[]
-    if records:
-        first=min(_date(r['started_at']) for r in records.values());last=max(_date(r['finished_at']) for r in records.values())
-        hours=(last-first).total_seconds()/3600
-        missing=[key for key,r in receipts.items() if _date(r.get('run_started_at')) and _date(r['run_started_at'])>=first and key not in records]
+    ordered=sorted(receipts,key=lambda k:_date(receipts[k].get('run_started_at')) or datetime.min.replace(tzinfo=timezone.utc))
+    suffix=[]
+    for key in reversed(ordered):
+        if key not in records:break
+        suffix.append(key)
+    suffix.reverse()
+    hours=0.
+    if suffix:
+        hours=(_date(records[suffix[-1]]['finished_at'])-_date(records[suffix[0]]['started_at'])).total_seconds()/3600
+    missing=[key for key in ordered if key not in records]
     gates=[]
-    if hours<72 or missing or invalid:gates.append('BLOCKED_72H_EVIDENCE')
+    if hours<72:gates.append('BLOCKED_72H_EVIDENCE')
     if not rollback_proof:gates.append('BLOCKED_ROLLBACK')
     required={'catalogue_uuid','checkpoint_sha256','config_sha256','last_run_id'}
     approved=(isinstance(target,dict) and required<=target.keys() and isinstance(owner_approval,dict)
         and owner_approval.get('verified_owner')=='KanujVerma' and owner_approval.get('mode')=='canonical'
         and all(owner_approval.get(k)==target[k] for k in required) and _date(owner_approval.get('approved_at')) is not None)
+    if approved and suffix:approved=_date(owner_approval['approved_at'])>=_date(records[suffix[-1]]['finished_at'])
     if not approved:gates.append('BLOCKED_APPROVAL')
-    return {'shadow_hours':hours,'verified_run_count':len(records),'missing_run_ids':missing,'invalid_run_ids':invalid,
+    return {'shadow_hours':hours,'verified_run_count':len(suffix),'missing_run_ids':missing,'invalid_run_ids':invalid,
+            'window_first_run_id':suffix[0] if suffix else None,'window_last_run_id':suffix[-1] if suffix else None,
             'gates':gates,'cutover_ready':not gates}
 
 
@@ -261,7 +273,8 @@ class ShadowBridge:
         except Exception:self.config_sha='unknown'
         if not self.requested:return
         action=(os.getenv('GITHUB_ACTIONS')=='true' and os.getenv('GITHUB_REPOSITORY','').casefold()=='kanujverma/jobbie'
-                and os.getenv('GITHUB_REF')=='refs/heads/main')
+                and os.getenv('GITHUB_REF')=='refs/heads/main' and os.getenv('GITHUB_WORKFLOW')=='Job Alerts'
+                and os.getenv('GITHUB_EVENT_NAME') in {'schedule','workflow_dispatch'})
         origin=os.getenv('GITHUB_EVENT_NAME','local') if action else 'local'
         run_id=(os.getenv('GITHUB_RUN_ID','')+'.'+os.getenv('GITHUB_RUN_ATTEMPT','1')) if action else 'local-'+uuid.uuid4().hex
         try:
@@ -283,11 +296,18 @@ class ShadowBridge:
             self.monitor.gates.add('BLOCKED_STORAGE')
             return None
     def observe(self,config,jobs,succeeded):
-        metadata=copy.deepcopy(config)
-        if metadata['name']=='Microsoft Research':metadata['aliases']=[*metadata.get('aliases',[]),'Microsoft']
+        metadata=self._metadata(config)
         return self._call('observe',metadata,jobs,status='complete' if succeeded else 'partial' if jobs else 'failed',observed_at=datetime.now(timezone.utc))
+    @staticmethod
+    def _metadata(config):
+        metadata=copy.deepcopy(config)
+        if metadata['name']=='Microsoft Research':
+            metadata['aliases']=[*metadata.get('aliases',[]),'Microsoft']
+            if metadata.get('cohort')=='original_2026_11_04' and metadata.get('network_priority') is True:
+                metadata.setdefault('catalogue_employer_key','microsoft')
+        return metadata
     def leads(self,leads):return self._call('leads',leads)
-    def confirm(self,lead,config,confirmation):return self._call('confirm',lead,config,confirmation)
+    def confirm(self,lead,config,confirmation):return self._call('confirm',lead,self._metadata(config),confirmation)
     def project(self,config,fetched,matched,state,freshness_hours,now):
         self._call('replay_filter',config,fetched,matched)
         return self._call('project',config,matched,legacy_snapshot(state),freshness_hours=freshness_hours,now=now)

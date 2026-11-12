@@ -84,7 +84,7 @@ def test_explicit_v1_migration_keeps_backup_and_source_history(tmp_path):
                    'fixture',None,NOW,'software','unknown','normal',(),source_job_id='1')
         store.observe_scan('original','source',{'name':'Example'},[record],status='complete',observed_at=NOW)
         identity=store.query()[0]['job_id']
-        store.db.executescript('DROP TABLE shadow_runs; DROP TABLE shadow_sources; DROP TABLE shadow_delivery; DROP TABLE legacy_history; DROP INDEX observation_snapshot; DROP INDEX snapshot_legacy_id; PRAGMA user_version=1;')
+        store.db.executescript('DROP TABLE scan_memberships; DROP TABLE observation_spans; DROP INDEX observation_content; ALTER TABLE source_state DROP COLUMN latest_observation_id; ALTER TABLE source_state DROP COLUMN last_listing_at; ALTER TABLE source_state DROP COLUMN adapter_posted_at; DROP TABLE shadow_runs; DROP TABLE shadow_sources; DROP TABLE shadow_delivery; DROP TABLE legacy_history; DROP INDEX observation_snapshot; DROP INDEX snapshot_legacy_id; PRAGMA user_version=1;')
     before=db.read_bytes()
     with pytest.raises(CatalogueError):Catalogue(db)
     assert db.read_bytes()==before
@@ -94,3 +94,15 @@ def test_explicit_v1_migration_keeps_backup_and_source_history(tmp_path):
         assert backup.execute('PRAGMA user_version').fetchone()[0]==1
         assert backup.execute('SELECT job_id FROM jobs').fetchone()[0]==identity
         assert backup.execute('SELECT count(*) FROM observations').fetchone()[0]==1
+
+
+def test_interrupted_shadow_can_be_retained_only_as_incomplete_evidence(tmp_path):
+    legacy=tmp_path/'seen.json';legacy.write_text(json.dumps(_empty_state()));key=Fernet.generate_key()
+    db=tmp_path/'db.sqlite'
+    with Catalogue(db,create=True) as store:
+        with Shadow(store,'123.1',NOW,_empty_state(),filters={},origin='fixture',config_sha='b'*64):pass
+    cipher=tmp_path/'sealed.bin'
+    with pytest.raises(CatalogueError):seal(db,cipher,key,legacy_path=legacy)
+    cp=seal(db,cipher,key,legacy_path=legacy,allow_incomplete=True,expected_run_id='123.1')
+    assert cp['complete_run'] is False
+    with pytest.raises(CatalogueError):seal(db,tmp_path/'other.bin',key,legacy_path=legacy,allow_incomplete=True,expected_run_id='124.1')
