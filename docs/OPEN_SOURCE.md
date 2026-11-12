@@ -43,3 +43,5 @@ These all exceed 1,000 GitHub stars at observation; counts/commit and license MU
 | [Skyvern-AI/skyvern](https://github.com/Skyvern-AI/skyvern) | 23,376 | AGPL-3.0 | More integrated visual workflow reference; evaluate license and hosting obligations |
 
 **Tooling order:** test owner's dot cloud-browser/manual delegation first, because no direct public dot invocation is verified; then evaluate supported trigger; only then implement self-hosted/local browser fallback if needed. Never equate OSS code cost to zero model/cloud-browser runtime cost. Follow official ATS/website terms, no captcha/account protections bypass, no unauthorized LinkedIn automation or protected data scraping.
+
+P2-B test-only dependency: Hypothesis6.x (installed6.170.15), MPL-2.0 per primary PyPI metadata, used without source vendoring/modification for normalization invariants. It grants no job-data rights and is not a runtime service.

@@ -50,6 +50,7 @@ from src.backfill import deliver_backfill_batch
 from src.filtering import apply_filter_pipeline
 from src.scheduler import run_loop
 from src.source_migration import apply_source_baseline, validate_source_revision
+from src.public_feeds import collect_feeds, confirm_lead
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -184,6 +185,14 @@ def do_run(args) -> int:
     any_company_succeeded = False
     companies_attempted = 0
     company_stats: dict[str, dict] = {}
+    feed_leads, feed_reports = [], []
+    feed_confirmations = set()
+    feed_manifest = config.defaults.get("public_feeds_manifest")
+    if feed_manifest:
+        feed_state = state.get("feed_health", {})
+        feed_leads, feed_reports = collect_feeds(feed_manifest, feed_state, http=http)
+        if isinstance(feed_state, dict) and feed_state:
+            state["feed_health"] = feed_state
 
     alerted_urls: set[str] = set()
 
@@ -232,6 +241,10 @@ def do_run(args) -> int:
                 fetch_error = ", ".join(query_errors)
             any_company_succeeded = any_company_succeeded or adapter_succeeded
             fetch_duration = round(time.monotonic() - fetch_start, 2)
+            for lead in feed_leads:
+                confirmation = confirm_lead(lead, fetched, company_cfg)
+                if confirmation is not None:
+                    feed_confirmations.add((confirmation.source_id, confirmation.lead_id))
 
             # Adapter health. Keyed on pre-filter count.
             company_state = state["companies"].setdefault(
@@ -538,6 +551,10 @@ def do_run(args) -> int:
         state, run_start, run_finish, cadence_min, company_stats, alert_count, alert_failure_count=alert_failures
     )
     record_run_heartbeat(state, diag)
+    if feed_manifest:
+        diag["optional_feeds"] = feed_reports
+        diag["feed_lead_count"] = len(feed_leads)
+        diag["feed_confirmed_count"] = len(feed_confirmations)
     gap_display = f"{diag['gap_since_last_run_seconds']}s" if diag['gap_since_last_run_seconds'] is not None else "initial"
     logger.info(
         "Run heartbeat: duration=%.2fs, gap=%s, scheduler_gap=%s, adapters=%d/%d (zero=%d), matched=%d, review=%d, excluded=%d, alerted=%d",
@@ -649,6 +666,15 @@ def cmd_company_proposal(args) -> int:
     return 0
 
 
+def cmd_feed_check(args) -> int:
+    """Explicit read-only feed inspection; configured OFF/rights gates still apply."""
+    from dataclasses import asdict
+    leads, reports = collect_feeds(args.manifest, {}, allow_network=args.allow_network)
+    print(json.dumps({"sources": reports, "leads": [asdict(lead) for lead in leads]},
+                     indent=2, default=lambda value: value.isoformat()))
+    return 0
+
+
 def cmd_daemon(args) -> int:
     load_dotenv()
     try:
@@ -697,6 +723,9 @@ def main():
     proposal_parser.add_argument("--request", required=True, help="Portable request JSON file, or - for stdin")
     proposal_parser.add_argument("--evidence", help="Manually source-verified evidence JSON file")
     proposal_parser.add_argument("--live-check", action="store_true", help="Read the fixed public ATS endpoint after supplied permission/ownership checks")
+    feed_parser = subparsers.add_parser("feed-check", help="Inspect optional unverified feeds; OFF/rights/owner gates always apply")
+    feed_parser.add_argument("--manifest", default="public-feeds.yaml")
+    feed_parser.add_argument("--allow-network", action="store_true")
 
     # needs-browser
     subparsers.add_parser(
@@ -765,6 +794,8 @@ def main():
         sys.exit(cmd_company_request(args))
     elif args.command == "company-proposal":
         sys.exit(cmd_company_proposal(args))
+    elif args.command == "feed-check":
+        sys.exit(cmd_feed_check(args))
     elif args.command == "run":
         sys.exit(cmd_run(args))
     elif args.command == "daemon":

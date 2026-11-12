@@ -1,0 +1,29 @@
+schema_version: 1
+feeds:
+  - id: new-grad-jobs
+    enabled: false
+    repository: https://github.com/ambicuity/New-Grad-Jobs
+    endpoint: null
+    format: unverified
+    rights:
+      status: unknown
+      basis: Project MIT license explicitly excludes employer job data. No dataset permission established.
+    owner_approval: null
+  - id: simplify
+    enabled: false
+    repository: https://github.com/SimplifyJobs/New-Grad-Positions
+    endpoint: null
+    format: unverified
+    rights:
+      status: unknown
+      basis: No reusable job dataset license confirmed at evaluated head.
+    owner_approval: null
+  - id: jobright
+    enabled: false
+    repository: https://github.com/jobright-ai/2026-Software-Engineer-New-Grad
+    endpoint: null
+    format: unverified
+    rights:
+      status: unknown
+      basis: No reusable dataset license confirmed. Aggregator links are unverified leads.
+    owner_approval: null

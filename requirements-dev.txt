@@ -4,3 +4,6 @@
 pytest>=8.0
 pytest-mock>=3.12
 responses>=0.25
+
+# Identity normalization invariants (test-only).
+hypothesis>=6.0,<7
