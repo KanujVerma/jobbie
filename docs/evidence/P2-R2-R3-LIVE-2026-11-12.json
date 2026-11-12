@@ -1,0 +1,227 @@
+{
+  "run_id": 43140198821,
+  "event": "ordinary_schedule",
+  "source_head": "f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb",
+  "state_commit": "d4724df3e3f70b17762f123c32216a1a671e8bfb",
+  "before_sha256": "12bed813017dbd685b085e9b4fceceb79dadd158ef77df7be6071028343cbbbe",
+  "after_sha256": "e1967067a69c86c5e39b8ac49e3c206aeb2193b17387aea4bf1dfa6885c7cdd6",
+  "old_ack_count": 257,
+  "new_ack_count": 257,
+  "lost_old_ack_count": 0,
+  "old_url_ack_count": 10,
+  "url_ack_count": 10,
+  "lost_old_url_ack_count": 0,
+  "selected_log_lines": [
+    "check\tRun job alerts\t2026-11-12T02:22:36.7502942Z 2026-11-12 02:22:36,749 INFO __main__: Plaid: status=ok fetched=143 matched=0 review=8 excluded=135 candidates=0 alerted=0 duration=0.27s",
+    "check\tRun job alerts\t2026-11-12T02:23:56.4940745Z 2026-11-12 02:23:56,493 INFO __main__: Oracle: status=ok fetched=2113 matched=0 review=19 excluded=2094 candidates=0 alerted=0 duration=75.41s",
+    "check\tRun job alerts\t2026-11-12T02:26:21.8876779Z 2026-11-12 02:26:21,887 INFO __main__: Run heartbeat: duration=600.08s, gap=18086.02s, scheduler_gap=True, adapters=13/13 (zero=1), matched=2, review=356, excluded=11211, alerted=0"
+  ],
+  "metrics": {
+    "started_at": "2026-11-12T02:16:21.809423+00:00",
+    "finished_at": "2026-11-12T02:26:21.887067+00:00",
+    "duration_seconds": 600.08,
+    "gap_since_last_run_seconds": 18086.02,
+    "adapters_attempted": 13,
+    "adapters_succeeded": 13,
+    "adapters_failed": 0,
+    "adapters_zero_results": 1,
+    "accepted_count": 2,
+    "review_count": 356,
+    "excluded_count": 11211,
+    "alert_success_count": 0,
+    "alert_failure_count": 0
+  },
+  "sources": {
+    "Micron": {
+      "status": "ok",
+      "fetched": 2894,
+      "matched": 0,
+      "review": 13,
+      "excluded": 2881,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Salesforce": {
+      "status": "ok",
+      "fetched": 1574,
+      "matched": 0,
+      "review": 15,
+      "excluded": 1559,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "CrowdStrike": {
+      "status": "ok",
+      "fetched": 378,
+      "matched": 0,
+      "review": 5,
+      "excluded": 373,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Intel": {
+      "status": "ok",
+      "fetched": 878,
+      "matched": 0,
+      "review": 8,
+      "excluded": 870,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Applied Materials": {
+      "status": "ok",
+      "fetched": 2000,
+      "matched": 1,
+      "review": 12,
+      "excluded": 1987,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Western Digital": {
+      "status": "ok",
+      "fetched": 339,
+      "matched": 0,
+      "review": 1,
+      "excluded": 338,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "SanDisk": {
+      "status": "zero",
+      "fetched": 0,
+      "matched": 0,
+      "review": 0,
+      "excluded": 0,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Plaid": {
+      "status": "ok",
+      "fetched": 143,
+      "matched": 0,
+      "review": 8,
+      "excluded": 135,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": true,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 143
+    },
+    "Oracle": {
+      "status": "ok",
+      "fetched": 2113,
+      "matched": 0,
+      "review": 19,
+      "excluded": 2094,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": true,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 2113
+    },
+    "Microsoft Research": {
+      "status": "ok",
+      "fetched": 149,
+      "matched": 0,
+      "review": 3,
+      "excluded": 146,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Microsoft": {
+      "status": "ok",
+      "fetched": 190,
+      "matched": 0,
+      "review": 15,
+      "excluded": 175,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Amazon": {
+      "status": "ok",
+      "fetched": 511,
+      "matched": 1,
+      "review": 181,
+      "excluded": 329,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    },
+    "Apple": {
+      "status": "ok",
+      "fetched": 400,
+      "matched": 0,
+      "review": 76,
+      "excluded": 324,
+      "candidates": 0,
+      "alerted": 0,
+      "acknowledged": 0,
+      "source_baseline_scan": false,
+      "source_baseline_pending": false,
+      "baseline_suppressed": 0
+    }
+  },
+  "baselines": {
+    "Plaid": {
+      "plaid-ashby-2026-11-11": {
+        "completed_at": "2026-11-12T02:22:35.987229+00:00",
+        "observed_count": 143,
+        "delivery_acknowledged": false
+      }
+    },
+    "Oracle": {
+      "oracle-cx45001-finder-2026-11-11": {
+        "completed_at": "2026-11-12T02:23:55.625927+00:00",
+        "observed_count": 2113,
+        "delivery_acknowledged": false
+      }
+    }
+  },
+  "limits": [
+    "13 successful adapter responses do not prove13employers have eligible openings",
+    "SanDisk replacement access406 remains blocked; current response empty",
+    "Job ACKs distinguished from any health/digest summaries",
+    "No manual dispatch, state seed/reset, forced backfill or agent test send"
+  ]
+}

@@ -161,3 +161,8 @@ C1 final H1 correction: weak URL claims excluded from native incompatibility;69f
 C1 hosted ambiguity/lifecycle correction: no retry identity inflation, matching URL alias closure/reopen, unrelated/moved URL safety and registered native alias compatibility.75focused/full1116passed40.54s; live/no-mutation check passes. Fresh exact-head gates pending.
 
 C1 H4 correction: historical alias ingestion respects later explicit closure without spurious old reopen; genuine newer reopen remains.77focused/full1118passed39.68s. Exact-head gates pending; no production cutover. C2 draft checkpoint published independently, not released.
+
+## Ordinary repaired-source verification2026-11-12
+Run43140198821, state d4724df: Plaid143/Oracle2113silent complete baselines with0new job ACKs, all257prior seen ACK flags/10URL entries retained.13successful responses/1empty SanDisk;600.08s/301.43minute gap. No manual seed/reset/dispatch. Source baselines VERIFIED_LIVE; catalogue shadow/cutover not deployed. C1 refreshes current-head gates after retaining this new production state.
+
+C1 rebased onto actual ordinary state d4724df, preserving baseline/ACK history exactly. Full1118tests pass; permitted local source/CLI/dry-run byte proof repeated on new state. New head CI/hosted review required.
