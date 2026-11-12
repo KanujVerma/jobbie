@@ -24,6 +24,11 @@ SCHEMA_VERSION = 1
 MAX_PAYLOAD = 512 * 1024
 MAX_SCAN_ROWS = 50000
 MAX_DB_BYTES = 256 * 1024 * 1024
+_LEGACY_NATIVE_COMPOSITES = {
+    'amazon_jobs','apple_jobs','workday','lever','smartrecruiters',
+    'microsoft_research','eightfold','eightfold_pcsx','eightfold_playwright',
+    'phenom_people','oracle_careers',
+}
 
 
 class CatalogueError(Exception):
@@ -61,7 +66,7 @@ def normalized_snapshot(job, config):
         raise CatalogueError('unsafe or missing official posting URL')
     native=job.source_job_id
     prefix=f'{job.company}::{job.source_platform}::'
-    if native is None and job.id.startswith(prefix):
+    if native is None and job.source_platform in _LEGACY_NATIVE_COMPOSITES and job.id.startswith(prefix):
         native=job.id[len(prefix):] or None
     req=job.official_req_id
     if req is None and job.source_platform=='oracle_careers':

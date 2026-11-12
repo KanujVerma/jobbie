@@ -150,3 +150,5 @@ SQLite source snapshots/identity and lifecycle evidence, versioned reclassificat
 B actual release: PR34 merged f3a61f4ab2d5165474ffddf63ac0e052b4a75fdb; exact-head CI/hosted review and postmerge43128988343 passed. C1 candidate rebased onto this merge, full1105passed44.19s/64focused, permitted Plaid source capture143normalized rows/0identity conflicts and no-mutation CLI/dry-run proof. C1 review/CI/merge and C2 shadow gates remain pending.
 
 C1 review correction: historical unseen listings respect already retained newer complete absence evidence, preserving source history and current status regardless of ingestion order. Reproduced before fixed; fresh checks/review/CI required.
+
+C1 hosted correction: exclude synthetic Ashby URL fallback/unknown composite IDs from native recovery; later real posting ID links via URL without conflicts. Full1109tests; no legacy state change or activation. New head review/CI required.

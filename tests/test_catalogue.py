@@ -398,3 +398,18 @@ def test_later_presence_after_absence_stays_open_when_old_row_arrives(cat):
     scan(cat,[job()],run='new-presence',when=NOW+timedelta(hours=2))
     scan(cat,[job()],run='old-presence',when=NOW)
     assert cat.query()[0]['status']=='open'
+
+
+def test_ashby_url_fallback_is_not_promoted_to_native_id(cat):
+    url='https://jobs.ashbyhq.com/labs/unique-posting'
+    old=job(id='Example Labs::ashby::labs:url-aabbcc',source_platform='ashby',source_board='labs',source_job_id=None,url=url)
+    scan(cat,[old])
+    assert cat.history()[0]['snapshot']['source_job_id'] is None
+    new=replace(old,id='Example Labs::ashby::labs:real-id',source_job_id='real-id')
+    result=scan(cat,[new],run='r2')
+    assert cat.stats()['jobs']==1 and result['conflicts']==0 and result['status']=='complete'
+
+
+def test_unknown_adapter_composite_is_opaque_not_implicitly_native():
+    value=job(id='Example Labs::future_adapter::synthetic-value',source_platform='future_adapter',source_job_id=None)
+    assert normalized_snapshot(value,CFG)['source_job_id'] is None

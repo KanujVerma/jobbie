@@ -37,3 +37,5 @@ Phase2 is PARTIAL, not complete. Exact next major goal: P3-A signed allowlisted 
 C1 local Sol found an out-of-order unseen-record status defect. Parent reproduced/fixed it with2focused cases, preserving historical listing and newer absence/presence evidence. See evidence/P2-C1-REVIEW.md. Fresh full tests/hosted review/CI required; no shadow/cutover claim.
 
 Corrected C1 candidate full1107passed41.82s/66focused; repeated permitted Plaid capture and no-mutation CLI/dry-run passed. Current-head own CI/hosted review/merge remain pending.
+
+C1 hosted H1 reproduced/fixed: Ashby URL fallback and unknown composite IDs stay opaque; only explicit legacy native-ID formats are decoded. Later native Ashby identity reconciles without duplicate jobs/conflicts. Full1109tests passed; fresh exact-head CI/review required.
