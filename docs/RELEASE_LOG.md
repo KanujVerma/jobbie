@@ -178,3 +178,5 @@ C2 first live shadow rejection stopped later source capture; legacy dry-run/no-m
 C2 corrected permitted full13read:527.29s,11582normalized stored observations,0rejects/conflicts/filter/candidate/ACK differences,0sends; config/state/input DB retained. Actual initial memory52.7MBraw/10.2MBcompressed. Preserve first failed shadow receipt. Projected ledger volume requires64/96MiB transport caps + retained current/parent/four newest redundant copies, no canonical history pruning. Not deployment/72hevidence.
 
 C2 final local candidate1170tests38.85s/config/diff/docs/actionlint and corrected full13read pass. Pin for independent review; no release/deployment/72h/cutover assertion yet.
+
+C2 local independent review approved55785e8 in one round,1170independent tests41.53s/no findings. Source proof remains separate; final-head CI/hosted review and ordinary deployment evidence still required.
