@@ -1,0 +1,63 @@
+[
+  {
+    "repository": "ambicuity/New-Grad-Jobs",
+    "evaluated_head": "99b37e17173def1657d4d044b0e0d53f48db3d76",
+    "retrieved_at": "2026-11-12T00:04:06.847389+00:00",
+    "head_commit_date": "2026-11-11T21:59:46Z",
+    "code_license": "MIT",
+    "legal_paths": [
+      "LICENSE",
+      "site/content/legal/copyright.md",
+      "site/content/legal/data-sources.md",
+      "site/content/legal/terms.md",
+      "site/scripts/seo/licenses.mjs"
+    ],
+    "policy_documents": [
+      {
+        "path": "site/content/legal/copyright.md",
+        "url": "https://github.com/ambicuity/New-Grad-Jobs/blob/99b37e17173def1657d4d044b0e0d53f48db3d76/site/content/legal/copyright.md",
+        "sha256": "3e8f5c70f41e04ad25d40f058aa702dd92bceb42e730581485197bb7466c82ae"
+      },
+      {
+        "path": "site/content/legal/terms.md",
+        "url": "https://github.com/ambicuity/New-Grad-Jobs/blob/99b37e17173def1657d4d044b0e0d53f48db3d76/site/content/legal/terms.md",
+        "sha256": "bf9fb7d8e4182216f7958cbb4716c4c5e8d14ca194b565099c9edb9e85dfb635"
+      },
+      {
+        "path": "site/content/legal/data-sources.md",
+        "url": "https://github.com/ambicuity/New-Grad-Jobs/blob/99b37e17173def1657d4d044b0e0d53f48db3d76/site/content/legal/data-sources.md",
+        "sha256": "26c58dc7026d0099dadfdee06a05382d1fcdd399859734006176a3eb46617874"
+      }
+    ],
+    "tree_truncated": false,
+    "status": "BLOCKED_SOURCE_RIGHTS",
+    "owner_approved": false,
+    "enabled": false
+  },
+  {
+    "repository": "SimplifyJobs/New-Grad-Positions",
+    "evaluated_head": "cf6aa295b37ea1364946f6e332e661d31841709c",
+    "retrieved_at": "2026-11-12T00:04:08.134952+00:00",
+    "head_commit_date": "2026-11-12T00:02:00Z",
+    "code_license": null,
+    "legal_paths": [],
+    "policy_documents": [],
+    "tree_truncated": false,
+    "status": "BLOCKED_SOURCE_RIGHTS",
+    "owner_approved": false,
+    "enabled": false
+  },
+  {
+    "repository": "jobright-ai/2026-Software-Engineer-New-Grad",
+    "evaluated_head": "a842cb5cf7913d09ecf03b5469ab6e72ed1fd0aa",
+    "retrieved_at": "2026-11-12T00:04:09.358514+00:00",
+    "head_commit_date": "2026-11-11T23:38:24Z",
+    "code_license": null,
+    "legal_paths": [],
+    "policy_documents": [],
+    "tree_truncated": false,
+    "status": "BLOCKED_SOURCE_RIGHTS",
+    "owner_approved": false,
+    "enabled": false
+  }
+]

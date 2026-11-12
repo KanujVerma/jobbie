@@ -40,3 +40,5 @@
 Every functional PR changes [STATUS](STATUS.md), [HANDOFF](HANDOFF.md) and [RELEASE_LOG](RELEASE_LOG.md); a pull-request CI check enforces that these files were touched. Scheduled production state-only commits are exempt. The guard does NOT prove truth: reviewer must still compare documentation to code, CI and live logs.
 
 [COMPANY_INTAKE.md](COMPANY_INTAKE.md) is the current owner request, source-evidence and disabled-proposal workflow. It preserves the original roster and has no automatic activation/dot trigger.
+
+[PUBLIC_FEEDS.md](PUBLIC_FEEDS.md) documents the optional OFF lead path and actual source-rights blockers. No current third-party feed dataset is ingested.

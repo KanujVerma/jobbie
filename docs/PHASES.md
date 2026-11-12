@@ -12,7 +12,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 | Shipped code | P2-UX1 (#29) | Source-grounded cards; ordinary HTTP204 ACKs observed | P2-A merged |
 | Source follow-up | P2-R1 merged / P2-R2/P2-R3 candidates | Failure/empty distinction, dry-run safety, actionable health, state-safe original-source repairs | P2-UX1 merged |
 | Shipped code (#32) | P2-ACT owner-directed intake | Issue form, tested portable CLI requests and disabled reviewed proposals for monitor/startup-research | P2-R1; activation separately approved |
-| Then | P2-B optional public feeds | Reusable OFF capability, rights/provenance/official-link checks; activate only if permitted and owner-approved | P2-A; expansion optional |
+| Local candidate | P2-B optional public feeds | Reusable OFF capability, rights/provenance/official-link checks; activate only if permitted and owner-approved | P2-A; expansion optional |
 | Then | P2-C canonical catalogue | SQLite pre-filter identity/history/search/export; legacy delivery authority through >=72h shadow and approved cutover | Existing normalized adapters; feed activation optional |
 | 3A | P3-A — Signed Discord interactions | Real private buttons/commands, allowlist, durable task status | P2-C |
 | 3B | P3-B — Private store + basic app ledger | Saved jobs, owner-only docs/versioned uploads, append-only application event/attempt records | P3-A |
@@ -61,3 +61,5 @@ Follow the [remaining Phase 2 goal](agent-prompts/PHASE-2-CODE.md) and [delivery
 - [NOTIFICATIONS_V2.md](NOTIFICATIONS_V2.md) and [RESUME_TAILORING.md](RESUME_TAILORING.md)
 
 Merged P2-ACT CLI/form/helper and onboarding are in COMPANY_INTAKE.md; it does not wait for an employer shortlist or activate one. Source repair/CI, OFF feeds, catalogue and real shadow/cutover gates remain separate work.
+
+P2-B disabled JSON lead/confirmation capability is a local candidate; PUBLIC_FEEDS.md records blocked real-source rights. No actual feed ingestion/coverage is claimed. Oracle #33 is merged; ordinary baselines remain live gates. Catalogue implementation/real shadow/cutover remains next.

@@ -135,3 +135,11 @@ Oracle integration verification: rebase onto merged9317c73 retains functional pa
 Hosted H1 correction: the explicit citizenship matcher rejected a clause that also accepts permanent residency. Parent reproduced4failing alternative clauses, then checks the immediate continuation for an accepted residency/green-card alternative while retaining any separate mandatory citizenship clause. Five focused cases now pass. No personal status is inferred. Fresh exact-head hosted review/CI required; prior local review remains scoped to its earlier head.
 
 Oracle H1 verification: full995tests passed38.93s;5focused clauses, config/compileall/diff passed. A separate mandatory clause still excludes correctly. This does not repeat live source/client rendering or approve production cutover.
+
+P2-B local candidate: bounded OFF JSON leads, provenance/health/source dedup and exact approved-employer URL/ID confirmation. All3candidate feeds remain disabled with BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL; no feed dataset fetched. At base9317c73, full990tests passed37.30s, focused38 including generated URL invariants. Config/compileall/diff and no-mutation OFF feed-check/Plaid dry-run passed. Rebase onto newly merged Oracle #33, then repeat combined checks/current-head review/CI. No catalogue/72h/cutover claim.
+
+Oracle PR33 merged4eb83f454e2671e8e06d7cb10f4b079ab98fcf90 after current-head e976032 checks/clean hosted review. Oracle/Plaid first ordinary production baselines remain PENDING_LIVE until a qualifying schedule. P2-B is integrated onto this merged parent; all3feeds remain OFF/rightsblocked, with no data-source activation. See PUBLIC_FEEDS.md and evidence/P2-B-VERIFICATION.md.
+
+P2-B review corrections: supported source posting-ID confirmation and order-independent duplicate posting-date conflicts, reproduced before fixed. Fresh head checks/hosted review required; no feed/company enabled.
+
+P2-B hosted correction: index official posting URLs once per employer when leads exist, preserving ID ambiguity/permission gates and protecting original delivery timing. Reproduced4000before/120after normalizations in normal-poller fixture. Fresh CI/review required.
