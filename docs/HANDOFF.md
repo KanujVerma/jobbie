@@ -33,3 +33,5 @@ P2-B local Sol round1 returned2findings, reproduced then fixed directly: consult
 Corrected P2-B candidate full1039passed37.12s/focused44; repeated config/OFF feed-check/Plaid dry-run preserved state/config. Proceed own PR/hosted review/CI, then catalogue plan docs/superpowers/plans/2026-11-12-p2-c-catalogue.md in the independent checkout.
 
 PR34 hosted H1 repaired directly: bounded per-employer index replaces repeated posting scans for each lead. Poller regression measured4000before/120after URL normalizations, no state mutation. Fresh exact-head gates required; keep watching existing PR34 without duplicate watcher.
+
+Independent P2-C1 branch feat/p2-c-catalogue uses original checkout after its Oracle PR merged. Local SQLite helper/CLI/tests are under implementation; B remains reviewed separately in the native worktree. Rebase own commits onto B's actual merge before filing. CATALOGUE.md and docs/superpowers/plans/2026-11-12-p2-c-catalogue.md specify the full next shadow persistence/parity rollout; C1 alone does not satisfy it. Legacy seen/URL authority stays intact.

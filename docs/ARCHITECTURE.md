@@ -73,3 +73,5 @@ Outreach: approved exact draft + recipient + provider receipt.
 Release status: CI, test evidence, actual operational verification; never README assertion alone.
 
 P2-ACT local boundary: issue form/manual CLI -> normalized public request -> supplied manual source evidence -> optional fixed public ATS read -> disabled config proposal and separate owner activation gate. The helper does not enter the production polling/state/sender path. Startup research remains a portable request without a monitor or asserted opening; no dot API/event trigger.
+
+P2-C1 local implementation boundary: source batch -> transactional SQLite snapshots/observations/identities/status evidence -> independent policy classifications -> bounded query/history/export. No sender/network or normal-poller hook in this release. P2-C2 adds pre-filter shadow capture and encrypted scheduled custody/parity; legacy JSON remains authority until approved cutover. See CATALOGUE.md for exact fields/date/identity/closure unknowns.

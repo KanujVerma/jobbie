@@ -63,3 +63,5 @@ Follow the [remaining Phase 2 goal](agent-prompts/PHASE-2-CODE.md) and [delivery
 Merged P2-ACT CLI/form/helper and onboarding are in COMPANY_INTAKE.md; it does not wait for an employer shortlist or activate one. Source repair/CI, OFF feeds, catalogue and real shadow/cutover gates remain separate work.
 
 P2-B disabled JSON lead/confirmation capability is a local candidate; PUBLIC_FEEDS.md records blocked real-source rights. No actual feed ingestion/coverage is claimed. Oracle #33 is merged; ordinary baselines remain live gates. Catalogue implementation/real shadow/cutover remains next.
+
+P2-C review scopes: C1 SQLite normalized identity/source history/query/reclassification; C2 pre-filter persistent encrypted shadow, parity/rollback and operational gates. Both required; owner requests safe shadow deployment while real72h evidence accrues, but canonical cutover still needs exact approval.

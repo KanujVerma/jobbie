@@ -9,3 +9,6 @@ dist/
 debug_artifacts/
 .claude-flow/
 tests/fixtures/dom_discovery/
+# Local public-source catalogue contains source text; never commit snapshots.
+state/*.sqlite*
+state/catalogue-shadow/

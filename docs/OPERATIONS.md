@@ -116,3 +116,5 @@ Only listing data is fetched; missing full qualifications remain review. No prot
 
 ## P2-B OFF operational boundary
 `python main.py feed-check --manifest public-feeds.yaml` reports current blocked sources without reads; --allow-network does not override OFF/rights/approval gates. Only an explicitly configured defaults.public_feeds_manifest enables optional polling after exact source approvals. It retains feed_health cadence metadata without resetting corrupt optional data; original source fetch/delivery continues on optional errors. Leads are not notifications and no new employer is fetched for them. Rollback removes the optional manifest/hook, preserving legacy state/ACKs. See PUBLIC_FEEDS.md.
+
+P2-C1 local catalogue commands and rollback are documented in CATALOGUE.md. No automatic polling capture yet; local/fixture snapshots are not production shadow evidence. Do not initialize/reset a production catalogue to bypass missing custody. Preserve legacy seen/URL state. Full persistent shadow/parity/rollback is the next scoped release; actual>=72h and exact cutover approval remain external gates.

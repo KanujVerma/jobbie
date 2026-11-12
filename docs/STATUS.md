@@ -34,3 +34,5 @@ P2-B local Sol review found2reproduced defects (supported posting-ID confirmatio
 P2-B corrected candidate: full1039passed37.12s, focused44passed; repeated config/OFF CLI/Plaid no-webhook check preserved bytes. No feed activated.
 
 P2-B hosted H1 reproduced quadratic confirmation work; fixed by one employer URL/company index. The actual poller regression drops4000normalizations to120for100postings/20leads, preserving ambiguity/source-ID checks. Fresh current-head CI/hosted review required; no source activated.
+
+P2-C1 local implementation in progress: SQLite normalized source snapshots/identities/history/status evidence, immutable reclassification and bounded query/export CLI. Production polling still uses legacy JSON only. C2 shadow capture/persistence/parity/rollback and >=72h actual evidence remain required. See CATALOGUE.md and the2026-11-12catalogue plan. No canonical cutover or new employer/feed is approved.

@@ -49,3 +49,5 @@ configured / 13 enabled Network Priority production sources remain unchanged.
 
 ## P2-B candidate interface
 See PUBLIC_FEEDS.md: feed-check plus an optional default-OFF manifest hook, bounded public JSON leads, provenance/health/dedup and exact confirmation using approved employer records. Current candidates are all OFF/BLOCKED_SOURCE_RIGHTS with no owner feed approval. Metadata/policy and synthetic tests are not dataset coverage. Missing rights does not block the independent catalogue; legacy JSON remains delivery authority.
+
+P2-C is split for review: C1 normalized SQLite identities/snapshots/history/reclassification/query/export; C2 automatic pre-filter shadow, encrypted persistent custody, legacy candidate/ACK parity, rollback and actual>=72h evidence gates. Both remain in scope. C1 alone is not a deployed catalogue/shadow/cutover. See CATALOGUE.md and2026-11-12plan.

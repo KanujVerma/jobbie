@@ -51,6 +51,7 @@ from src.filtering import apply_filter_pipeline
 from src.scheduler import run_loop
 from src.source_migration import apply_source_baseline, validate_source_revision
 from src.public_feeds import collect_feeds, confirm_lead, build_official_index
+from src.catalogue_cli import add_catalogue_parser, cmd_catalogue
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -728,6 +729,7 @@ def main():
     feed_parser = subparsers.add_parser("feed-check", help="Inspect optional unverified feeds; OFF/rights/owner gates always apply")
     feed_parser.add_argument("--manifest", default="public-feeds.yaml")
     feed_parser.add_argument("--allow-network", action="store_true")
+    add_catalogue_parser(subparsers)
 
     # needs-browser
     subparsers.add_parser(
@@ -798,6 +800,8 @@ def main():
         sys.exit(cmd_company_proposal(args))
     elif args.command == "feed-check":
         sys.exit(cmd_feed_check(args))
+    elif args.command == "catalogue":
+        sys.exit(cmd_catalogue(args))
     elif args.command == "run":
         sys.exit(cmd_run(args))
     elif args.command == "daemon":

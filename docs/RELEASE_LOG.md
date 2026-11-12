@@ -143,3 +143,6 @@ Oracle PR33 merged4eb83f454e2671e8e06d7cb10f4b079ab98fcf90 after current-head e9
 P2-B review corrections: supported source posting-ID confirmation and order-independent duplicate posting-date conflicts, reproduced before fixed. Fresh head checks/hosted review required; no feed/company enabled.
 
 P2-B hosted correction: index official posting URLs once per employer when leads exist, preserving ID ambiguity/permission gates and protecting original delivery timing. Reproduced4000before/120after normalizations in normal-poller fixture. Fresh CI/review required.
+
+## P2-C1 local catalogue candidate
+SQLite source snapshots/identity and lifecycle evidence, versioned reclassification, query/history/JSONL/CSV CLI. No normal-run hook, source activation, state reset or delivery/cutover change. C2 pre-filter persistent shadow/parity/rollback and actual72h evidence still required. See CATALOGUE.md; release gates pending.
