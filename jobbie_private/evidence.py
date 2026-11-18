@@ -13,6 +13,13 @@ PROTECTED = re.compile(r"\b(?:citizenship|citizen|immigration|visa|work authoriz
 METRIC = re.compile(r"\b\d+(?:\.\d+)?\s*(?:%|percent|thousand|million|users|customers|requests)\b|\d+%")
 EXPERIENCE = re.compile(r"^(?:built|developed|created|implemented|contributed|maintained|worked|designed)\b", re.I)
 EDUCATION = re.compile(r"\b(?:bachelor|master|degree|graduat(?:ed|ion|ing)|university)\b", re.I)
+DATE = re.compile(r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|"
+                  r"aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(19|20)\d{2}\b"
+                  r"|\b(19|20)\d{2}[-/]\d{1,2}\b", re.I)
+EMPLOYER = re.compile(r"\b(?:employer|employment at|worked at|engineer at|employed by)\b", re.I)
+PROTECTED_KINDS = (("protected", PROTECTED), ("metric", METRIC), ("education", EDUCATION),
+                   ("dates", DATE), ("employer", EMPLOYER))
+
 
 
 class Evidence:
@@ -29,8 +36,9 @@ class Evidence:
             if not value or len(value) > 800:
                 continue
             start = line.start() + len(line.group()) - len(line.group().lstrip())
-            if PROTECTED.search(value):
-                spans = [("protected", start, start + len(value), value)]
+            protected_kind = next((kind for kind, pattern in PROTECTED_KINDS if pattern.search(value)), None)
+            if protected_kind:
+                spans = [(protected_kind, start, start + len(value), value)]
             elif label := SKILLS_LABEL.match(value):
                 spans = []
                 for item in re.finditer(r"[^,;|]+", value[label.end():]):
@@ -39,17 +47,18 @@ class Evidence:
                         continue
                     token_start = start + label.end() + item.start() + len(item.group()) - len(item.group().lstrip())
                     spans.append(("skill", token_start, token_start + len(token), token.casefold()))
-            elif METRIC.search(value) or EDUCATION.search(value) or EXPERIENCE.match(value):
-                kind = "metric" if METRIC.search(value) else "education" if EDUCATION.search(value) else "experience"
-                spans = [(kind, start, start + len(value), value)]
+            elif EXPERIENCE.match(value):
+                spans = [("experience", start, start + len(value), value)]
             else:
                 continue
             for kind, first, last, claim in spans:
                 source = {"type": "resume", "version_id": version.id, "sha256": version.sha256,
                           "start": first, "end": last, "excerpt": version.text[first:last]}
-                proposal = {"kind": kind, "value": claim if kind != "protected" else "Protected source statement",
+                # Free-form experience lines may also contain employer names or dates.
+                protected = kind != "skill"
+                proposal = {"kind": kind, "value": "Protected source statement" if protected else claim,
                             "privacy": "owner-only", "source": source,
-                            "protected": kind == "protected", "stage": "self-reported"}
+                            "protected": protected, "stage": "self-reported"}
                 proposals.append(self.vault.put("candidate_fact", proposal, f"resume:{version.id}:{first}:{last}",
                                                 parent_id=version.id, requires=("resume_version", version.id)))
                 if len(proposals) >= MAX_PROPOSALS:

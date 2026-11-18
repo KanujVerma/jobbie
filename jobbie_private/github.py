@@ -158,7 +158,10 @@ class GitHubEvidence:
         status = statuses[0] if isinstance(statuses, list) and statuses else None
         if (not isinstance(deployment, dict) or deployment.get("id") != deployment_id
                 or deployment.get("sha") != commit or deployment.get("environment") != "production"
+                or deployment.get("production_environment") is not True
+                or deployment.get("transient_environment") is not False
                 or not isinstance(status, dict) or status.get("state") != "success"
                 or status.get("environment") != "production" or type(status.get("id")) is not int):
             raise ValueError("Pinned successful production deployment evidence is unavailable")
-        return {"id": deployment_id, "status_id": status["id"], "environment": "production"}
+        return {"id": deployment_id, "status_id": status["id"], "environment": "production",
+                "production_environment": True, "transient_environment": False}

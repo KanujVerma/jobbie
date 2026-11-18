@@ -129,7 +129,8 @@ def test_production_requires_exact_successful_deployment(vault):
     deployment_state = {"state": "queued", "id": 23, "environment": "production"}
     def api(path):
         if path == f"{base}/deployments/88":
-            return {"id": 88, "sha": SHA, "environment": "production"}
+            return {"id": 88, "sha": SHA, "environment": "production",
+                    "production_environment": True, "transient_environment": False}
         if path == f"{base}/deployments/88/statuses?per_page=1":
             return [deployment_state]
         return core(path)
@@ -143,3 +144,36 @@ def test_production_requires_exact_successful_deployment(vault):
     assert production.data["stage"] == "production"
     assert production.data["source"]["deployment"]["status_id"] == 23
     assert service.propose(approved.id, SHA).data["stage"] == "prototype"
+
+
+@pytest.mark.parametrize("statement", [
+    "Bachelor degree, graduation December 2026",
+    "Built a parser serving 1000 users",
+    "Employer: Fictional Systems",
+    "Jan 2025 - Mar 2026",
+])
+def test_protected_claims_require_separate_confirmation(vault, statement):
+    evidence = Evidence(vault)
+    fact = evidence.propose_resume(upload(vault, statement).id)[0]
+    with pytest.raises(ValueError, match="Protected"):
+        evidence.decide(fact.id, "confirm", "regular")
+    evidence.decide(fact.id, "confirm", "protected", confirm_protected=True)
+    assert not evidence.active()
+    assert evidence.active(include_protected=True)[0].id == fact.id
+
+
+def test_transient_named_production_is_never_promoted(vault):
+    base = f"/repos/{REPO}"
+    core = transport(["service.py"])
+    def api(path):
+        if path == f"{base}/deployments/88":
+            return {"id": 88, "sha": SHA, "environment": "production",
+                    "production_environment": False, "transient_environment": True}
+        if path == f"{base}/deployments/88/statuses?per_page=1":
+            return [{"state": "success", "id": 23, "environment": "production"}]
+        return core(path)
+
+    service = GitHubEvidence(vault, api)
+    approved = service.approve(REPO_SPEC, "approval", confirmed=True)
+    with pytest.raises(ValueError, match="deployment"):
+        service.propose(approved.id, SHA, 88)
