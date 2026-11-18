@@ -40,6 +40,7 @@ class Ranked:
     matched: tuple[str, ...]
     missing: tuple[str, ...]
     fact_ids: tuple[str, ...]
+    preferred_location: bool = False
 
 
 def mentioned(text: str, value: str) -> bool:
@@ -80,7 +81,8 @@ def source_freshness(listing: Listing, now: datetime) -> int | None:
 
 
 def rank_listing(listing: Listing, skills: dict[str, tuple[str, ...]], filters: dict, now: datetime,
-                 roles: tuple[str, ...] = DEFAULT_ROLES) -> Ranked:
+                 roles: tuple[str, ...] = DEFAULT_ROLES,
+                 target_locations: tuple[str, ...] = ()) -> Ranked:
     job = listing.job
     eligibility = classify_eligibility(job, filters)
     if eligibility.status != "eligible":
@@ -92,9 +94,11 @@ def rank_listing(listing: Listing, skills: dict[str, tuple[str, ...]], filters: 
     missing = tuple(skill for skill in evidence if skill not in matching)
     supported = tuple(sorted({key for name in matching for key in skills[name]}))
     geography = None
+    preferred_location = False
     if "US_LOCATION_CONFIRMED" in eligibility.reasons:
         entries = re.split(r"[;\n|]", job.location or "")
         locations = [entry.casefold().strip() for entry in entries if _check_single_location(entry)[0] is True]
+        preferred_location = any(mentioned(entry, target) for entry in locations for target in target_locations)
         if any(BAY.search(entry) or (CALIFORNIA.search(entry) and BAY_CITIES.search(entry)) for entry in locations):
             geography = 15
         elif any(CALIFORNIA.search(entry) or PRIORITY.search(entry) for entry in locations):
@@ -108,7 +112,7 @@ def rank_listing(listing: Listing, skills: dict[str, tuple[str, ...]], filters: 
     }
     score = sum(points for points in weights.values() if points is not None)
     known = sum(WEIGHTS[key] for key, points in weights.items() if points is not None)
-    return Ranked(listing, eligibility, weights, score, known, matching, missing, supported)
+    return Ranked(listing, eligibility, weights, score, known, matching, missing, supported, preferred_location)
 
 
 def display(value: str, limit: int = 120) -> str:
@@ -124,14 +128,15 @@ class Ranking:
         self.filters = filters or {}
         self.clock = clock
 
-    def _context(self) -> tuple[dict, tuple[str, ...]]:
+    def _context(self) -> tuple[dict, tuple[str, ...], tuple[str, ...]]:
         skills: dict[str, list[str]] = {}
         for record in Evidence(self.vault).active():
             if record.data["kind"] == "skill":
                 skills.setdefault(record.data["value"], []).append(record.id)
         profile = self.vault.profile()
         roles = tuple(profile.data.get("target_roles", ())) if profile else ()
-        return {key: tuple(value) for key, value in skills.items()}, roles or DEFAULT_ROLES
+        locations = tuple(profile.data.get("target_locations", ())) if profile else ()
+        return {key: tuple(value) for key, value in skills.items()}, roles or DEFAULT_ROLES, locations
 
     def _selection(self, snapshot_id: str) -> tuple[Listing, dict]:
         if not RECORD_ID.fullmatch(snapshot_id):
@@ -148,17 +153,18 @@ class Ranking:
         return current, ref
 
     def search(self, query: str, *, top: bool) -> Message:
-        skills, roles = self._context()
+        skills, roles, locations = self._context()
         now = self.clock()
         feedback = {}
         for event in self.vault.records("rank_feedback", limit=10_000):
             feedback.setdefault(event.data["job_id"], event.data["rating"])
-        ranks = [rank_listing(item, skills, self.filters, now, roles) for item in self.reader.find(query)
+        ranks = [rank_listing(item, skills, self.filters, now, roles, locations) for item in self.reader.find(query)
                  if feedback.get(item.id) != "not_relevant"]
         visible = [item for item in ranks if item.eligibility.status != "excluded"
                    and (not top or item.eligibility.status == "eligible")]
         visible.sort(key=lambda row: (row.eligibility.status != "eligible", -(row.score or 0),
-                                      -row.known_weight, feedback.get(row.listing.id) != "relevant", row.listing.id))
+                                      -row.known_weight, not row.preferred_location,
+                                      feedback.get(row.listing.id) != "relevant", row.listing.id))
         if not visible:
             return Message("No matching listings in the approved catalogue snapshot.")
         descriptions, rows = [], []
@@ -187,8 +193,8 @@ class Ranking:
 
     def explain(self, snapshot_id: str) -> str:
         item, _ = self._selection(snapshot_id)
-        skills, roles = self._context()
-        match = rank_listing(item, skills, self.filters, self.clock(), roles)
+        skills, roles, locations = self._context()
+        match = rank_listing(item, skills, self.filters, self.clock(), roles, locations)
         lines = [f"{display(item.job.title)} | {display(item.job.company, 60)}",
                  f"Catalogue job `{item.id}` · snapshot `{item.snapshot_sha[:12]}`",
                  f"Source: {display(item.source_id, 100)}",
@@ -200,6 +206,8 @@ class Ranking:
             lines.append("Matched posting skills: " + (", ".join(match.matched) or "none confirmed"))
             if match.missing:
                 lines.append("Posting skills without confirmed evidence: " + ", ".join(match.missing))
+            if match.preferred_location:
+                lines.append("Owner location preference matched.")
             if match.fact_ids:
                 lines.append("Verified fact IDs: " + ", ".join(f"`{key}`" for key in match.fact_ids[:12]))
         return "\n".join(lines)

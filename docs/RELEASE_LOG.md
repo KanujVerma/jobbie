@@ -241,3 +241,13 @@ Adds a separate read-only catalogue projection, deterministic eligibility-first 
 Final geography checks cover New York City and additional Bay Area city labels, with the latter requiring California source evidence for ambiguous city names. Six focused geographic cases now pass.
 
 Review reproduced geography scoring that combined city and state evidence from different locations. Geography now scores individual US locations. Regressions cover mixed-state lists and the distinct Tampa Bay region.
+
+## Phase 3 stack integration audit
+
+A signed loopback interaction exercised the actual WSGI endpoint, persisted deferred work, reopened the database from the worker path, parsed a synthetic DOCX, confirmed its fact through the owner console, and used it in the ranking explanation. The same result supported private saving, then dropped the fact after revocation. Authenticated download, backup restore and derived record removal passed. The separate catalogue file retained its original bytes. Provider-facing calls used fixtures.
+
+The audit reproduced a wrong-key startup that could mix ciphertext or consume an unreadable queued task. PRs #39 and #40 now bind the worker and vault to the retained database key and authenticate retained encrypted rows when adopting an unbound store. PR #42 now uses explicit target locations to break ranking ties. Existing eligibility and geography weights remain authoritative.
+
+The stack remains isolated with `BLOCKED_LIVE` owner setup and host-specific engineering described in the [release checklist](phases/PHASE-3.md#phase-3-release-gates). [Issue #8](https://github.com/KanujVerma/jobbie/issues/8) records exact-head CI and review results. [Phase 2 run 44286689134](https://github.com/KanujVerma/jobbie/actions/runs/44286689134) is a degraded scheduled receipt. Keep the 72-hour parity and cutover gates open.
+
+Local full-suite verification for the audited stack passed 1,332 tests. Configuration validation passed. The catalogue code and config fingerprints match the published Phase 2 receipt.

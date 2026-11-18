@@ -4,19 +4,13 @@ Read AGENTS, STATUS, PHASES, exact specs/prompts, DECISIONS/CONTRACTS/SECURITY/O
 
 ## Active scope
 
-Build P3-A, P3-B, P3-C and P3-D as separate reviewable feature branches. Keep the stack off main while Phase 2 is in shadow and private deployment awaits owner authorization. P3-A adds the interaction boundary and durable tasks. [Stack plan](superpowers/plans/2026-11-18-phase-3-stack.md)
+Phase 3 is implemented in [#39](https://github.com/KanujVerma/jobbie/pull/39) → [#40](https://github.com/KanujVerma/jobbie/pull/40) → [#41](https://github.com/KanujVerma/jobbie/pull/41) → [#42](https://github.com/KanujVerma/jobbie/pull/42). [Issue #8](https://github.com/KanujVerma/jobbie/issues/8) records current exact-head CI and review. Keep this stack isolated pending owner release authorization. [Stack plan](superpowers/plans/2026-11-18-phase-3-stack.md)
 
+Run the full private test suite and the loopback integration test from the P3-D head. Synthetic fixtures exercise real signing, parsing, SQLite, evidence decisions and ranking. The vault and worker verify the database key before writes or claims. Location preferences break score and evidence-weight ties. [Integration test](../tests/test_p3_integration.py)
 
-P3-B enables the encrypted local vault and owner console with a verified local backup/restore path. P3 private data and credentials stay outside Git.
+Choose an owner-approved persistent host and approve a private Discord pilot before production setup. Configure and prove TLS ingress, supervised processes, key and backup custody, and a parser filesystem and network sandbox. Start the private service on an isolated pinned release with a verified read-only catalogue copy. After owner approval and live pilot proof, integrate #39 through #42 in order and recheck each new base, head and Phase 2 fingerprint. [Release checklist](phases/PHASE-3.md#phase-3-release-gates)
 
-
-P3-C adds owner-confirmed facts and approved commit evidence. Use current fact decisions on every match and preserve the application ledger boundary.
-
-P3-D adds versioned read-only jobs, ranking, Save, Explain and relevance feedback to the isolated stack. Live activation needs owner-approved credentials, hosting and a verified catalogue snapshot. The next independent planned work is the Phase 4 benchmark after Phase 3 release authorization. [Phase 4 contract](phases/PHASE-4.md)
-
-P2-C2 scheduled shadow reliability. The original C2 bootstrap and cache restore have live receipts. Workday HTTP 429 and rows without posting URLs can still leave a scan degraded. Preserve the 13 enabled original sources, two historical disabled entries, legacy ACK history, and encrypted checkpoint lineage. Keep public feeds off and use ordinary scheduled runs for production evidence.
-
-After the reliability PR merges, inspect the first ordinary main run containing the fix. Record source coverage and errors, parity, job ACK counts, legacy state persistence, parent checkpoint restore, fresh exact-key restore, and publication. A partial scan breaks the qualifying 72-hour window. Keep legacy JSON as delivery authority and hold cutover for exact owner approval. [Current release evidence](RELEASE_LOG.md#p2-c2-scheduled-shadow-reliability)
+Phase 2's [first ordinary post-#38 scan](https://github.com/KanujVerma/jobbie/actions/runs/44286689134) was degraded under `BLOCKED_SOURCE_SCAN`. Five Workday sources were incomplete. It retained historical ACKs and verified encrypted checkpoint custody. Keep the 72-hour healthy-parity and owner cutover gates open. [Phase 2 receipt](https://github.com/KanujVerma/jobbie/issues/7#issuecomment-6981493023)
 
 ## Historical releases and C2 development
 
