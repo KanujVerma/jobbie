@@ -57,6 +57,7 @@ class Command:
     handler: Callable[[Interaction], str]
     options: tuple[str, ...] = ()
     deferred: bool = False
+    attachments: tuple[str, ...] = ()
 
 
 def response_data(content: str) -> dict:
@@ -93,7 +94,8 @@ class DiscordEndpoint:
             spec = {"name": command.path[-1], "description": command.description}
             if command.options:
                 spec["options"] = [{"name": name, "description": name.replace("_", " "),
-                                    "type": 3, "required": True} for name in command.options]
+                                    "type": 11 if name in command.attachments else 3,
+                                    "required": True} for name in command.options]
             if len(command.path) == 1:
                 roots[command.path[0]] = spec
             else:
@@ -196,11 +198,22 @@ class DiscordEndpoint:
             raise ValueError("Invalid arguments")
         values = {}
         for option in options:
-            if (not isinstance(option, dict) or option.get("type") != 3
-                    or option.get("name") not in command.options
-                    or not user_text(option.get("value"), 300)):
+            if not isinstance(option, dict) or option.get("name") not in command.options:
                 raise ValueError("Invalid argument")
-            values[option["name"]] = option["value"]
+            name, value = option["name"], option.get("value")
+            if name in command.attachments:
+                if option.get("type") != 11 or not snowflake(value):
+                    raise ValueError("Invalid attachment")
+                resolved = data.get("resolved")
+                files = resolved.get("attachments") if isinstance(resolved, dict) else None
+                file = files.get(value) if isinstance(files, dict) else None
+                if not isinstance(file, dict) or file.get("id") != value:
+                    raise ValueError("Attachment was not resolved")
+                values[name] = {key: file.get(key) for key in ("id", "size", "content_type", "url")}
+            else:
+                if option.get("type") != 3 or not user_text(value, 300):
+                    raise ValueError("Invalid argument")
+                values[name] = value
         if set(values) != set(command.options):
             raise ValueError("Duplicate or missing argument")
         return command, values
