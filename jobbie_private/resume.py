@@ -29,11 +29,15 @@ def validate_format(media_type: str, body: bytes) -> None:
 
 def parse_resume(media_type: str, body: bytes) -> str:
     validate_format(media_type, body)
-    worker = str(Path(__file__).with_name("resume_worker.py").resolve())
+    worker = Path(__file__).with_name("resume_worker.py").resolve()
+    command = [sys.executable, "-I", "-B", str(worker), media_type]
+    if os.environ.get("JOBBIE_MAC_PARSER_SANDBOX") == "1":
+        from .mac_parser import sandbox_command
+        command = sandbox_command(command, worker=worker)
     with TemporaryDirectory() as isolated:
         try:
             result = subprocess.run(
-                [sys.executable, "-I", worker, media_type], input=body, stdout=subprocess.PIPE,
+                command, input=body, stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL, cwd=isolated, env={"PATH": os.defpath}, timeout=6, check=True,
             )
             text = result.stdout.decode("utf-8")

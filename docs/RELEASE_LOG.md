@@ -251,3 +251,11 @@ The audit reproduced a wrong-key startup that could mix ciphertext or consume an
 The stack remains isolated with `BLOCKED_LIVE` owner setup and host-specific engineering described in the [release checklist](phases/PHASE-3.md#phase-3-release-gates). [Issue #8](https://github.com/KanujVerma/jobbie/issues/8) records exact-head CI and review results. [Phase 2 run 44286689134](https://github.com/KanujVerma/jobbie/actions/runs/44286689134) is a degraded scheduled receipt. Keep the 72-hour parity and cutover gates open.
 
 Local full-suite verification for the audited stack passed 1,332 tests. Configuration validation passed. The catalogue code and config fingerprints match the published Phase 2 receipt.
+
+## Phase 3 Mac synthetic pilot preparation
+
+Prepared an owner-only synthetic bundle and separate supervised loopback listeners. Local tests exercised guild-scoped signed requests, forged and unauthorized requests, transfer and body limits, slow-client deadlines, loopback downloads, queued task recovery after worker process replacement, redacted logs and catalogue hash preservation. Seatbelt runs the actual PDF and DOCX parser and denied private-file reads, writes and TCP connections in a local probe.
+
+Tailscale's Standalone macOS client is installed. Read-only checks found it disconnected, with HTTPS capability, an existing 443 listener and no active public Funnel route. Port 8443 is reserved for the proposed pilot upon approval. Discord setup and live command receipts remain `BLOCKED_OWNER_APPROVAL`. The runbook records the approval, costs, configuration and scoped rollback. [Mac pilot runbook](P3-MAC-PILOT.md)
+
+Local verification passed 1,337 tests and configuration validation. The sandbox-enabled focused run passed seven tests, including the full private flow with fixture transports. Git diff confirms the Phase 2 fingerprint inputs and state are outside the pilot patch.

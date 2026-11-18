@@ -43,6 +43,8 @@ The tests exercise 46 ranking scenarios from 23 preserved Workday and Microsoft 
 
 ### Phase 3 release gates
 
+The temporary Mac pilot has a separate approval and verification checklist. [Mac pilot runbook](../P3-MAC-PILOT.md)
+
 Status is `BLOCKED_LIVE`. The four-PR stack and exact-head checks are tracked in [issue #8](https://github.com/KanujVerma/jobbie/issues/8). The [loopback integration test](../../tests/test_p3_integration.py) exercises real signature verification, upload parsing, key-bound SQLite, confirmation and revocation, ranking controls, scoped download and backup restore using fictional data and provider fixtures. The preserved source scenarios and eligibility fixtures exercise scoring independently.
 
 | Gate | Owner decision or provisioning | Host-side engineering and acceptance |

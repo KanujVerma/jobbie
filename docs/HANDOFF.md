@@ -8,6 +8,8 @@ Phase 3 is implemented in [#39](https://github.com/KanujVerma/jobbie/pull/39) â†
 
 Run the full private test suite and the loopback integration test from the P3-D head. Synthetic fixtures exercise real signing, parsing, SQLite, evidence decisions and ranking. The vault and worker verify the database key before writes or claims. Location preferences break score and evidence-weight ties. [Integration test](../tests/test_p3_integration.py)
 
+The current pilot uses the existing Mac and a private synthetic bundle. Obtain one consolidated owner approval for the dedicated Funnel port and Discord app before external setup. [Mac pilot runbook](P3-MAC-PILOT.md)
+
 Choose an owner-approved persistent host and approve a private Discord pilot before production setup. Configure and prove TLS ingress, supervised processes, key and backup custody, and a parser filesystem and network sandbox. Start the private service on an isolated pinned release with a verified read-only catalogue copy. After owner approval and live pilot proof, integrate #39 through #42 in order and recheck each new base, head and Phase 2 fingerprint. [Release checklist](phases/PHASE-3.md#phase-3-release-gates)
 
 Phase 2's [first ordinary post-#38 scan](https://github.com/KanujVerma/jobbie/actions/runs/44286689134) was degraded under `BLOCKED_SOURCE_SCAN`. Five Workday sources were incomplete. It retained historical ACKs and verified encrypted checkpoint custody. Keep the 72-hour healthy-parity and owner cutover gates open. [Phase 2 receipt](https://github.com/KanujVerma/jobbie/issues/7#issuecomment-6981493023)

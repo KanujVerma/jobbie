@@ -90,9 +90,13 @@ def default_commands(store: TaskStore, clock: Callable[[], float] = time.time) -
 
 class DiscordEndpoint:
     def __init__(self, key: Ed25519PublicKey, application: str, owner: str, store: TaskStore,
-                 commands: tuple[Command, ...], *, clock: Callable[[], float] = time.time):
+                 commands: tuple[Command, ...], *, guild: str | None = None,
+                 clock: Callable[[], float] = time.time):
         if not snowflake(application) or not snowflake(owner):
             raise ValueError("Discord application and owner IDs must be snowflakes")
+        if guild is not None and not snowflake(guild):
+            raise ValueError("Discord guild ID must be a snowflake")
+        self.guild = guild
         self.key, self.application, self.owner, self.store = key, application, owner, store
         self.commands = {command.path: command for command in commands}
         if len(self.commands) != len(commands):
@@ -183,6 +187,8 @@ class DiscordEndpoint:
     def _owner_interaction(self, document: dict) -> bool:
         if document.get("application_id") != self.application:
             return False
+        if self.guild is not None and document.get("guild_id") != self.guild:
+            return False
         if "member" in document:
             member = document["member"]
             if not isinstance(member, dict) or "user" in document:
@@ -232,7 +238,7 @@ class DiscordEndpoint:
                 file = files.get(value) if isinstance(files, dict) else None
                 if not isinstance(file, dict) or file.get("id") != value:
                     raise ValueError("Attachment was not resolved")
-                values[name] = {key: file.get(key) for key in ("id", "size", "content_type", "url")}
+                values[name] = {key: file.get(key) for key in ("id", "size", "content_type", "url", "filename") if key in file}
             else:
                 if option.get("type") != 3 or not user_text(value, 300):
                     raise ValueError("Invalid argument")

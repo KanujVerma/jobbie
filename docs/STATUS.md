@@ -17,6 +17,8 @@ A loopback test took a signed synthetic resume upload through the durable worker
 
 Live readiness requires owner approval of a persistent host, HTTPS ingress, Discord registration and credentials, private storage and backup custody, and the read-only catalogue snapshot. Host-side engineering still needs to configure and verify the supervised processes, parser sandbox, ingress limits, redaction and restore on that host. Approved repository access is needed only for that evidence feature. [Release checklist](phases/PHASE-3.md#phase-3-release-gates)
 
+The macOS synthetic pilot bundle is prepared and verified locally. Public Funnel and dedicated Discord setup remain `BLOCKED_OWNER_APPROVAL`. [Mac pilot runbook](P3-MAC-PILOT.md)
+
 Phase 2's [first ordinary post-#38 scan](https://github.com/KanujVerma/jobbie/actions/runs/44286689134) remained degraded with five Workday sources incomplete. Legacy JSON remains the delivery authority. The 72-hour healthy parity and exact cutover approval gates remain open. [Recorded receipt](https://github.com/KanujVerma/jobbie/issues/7#issuecomment-6981493023)
 
 ## Scheduled catalogue shadow through 2026-11-17 UTC

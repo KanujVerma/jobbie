@@ -98,7 +98,8 @@ def endpoint_from_env(vault: PrivateStore) -> DiscordEndpoint:
             pass
         else:
             commands += ranking_commands(Ranking(reader, vault, filters=filters))
-    return DiscordEndpoint(key, os.environ["JOBBIE_DISCORD_APPLICATION_ID"], vault.owner, store, commands)
+    return DiscordEndpoint(key, os.environ["JOBBIE_DISCORD_APPLICATION_ID"], vault.owner, store, commands,
+                           guild=os.environ.get("JOBBIE_DISCORD_GUILD_ID"))
 
 
 def edit_original(application: str, token: str, reply: dict, expires: int) -> None:
