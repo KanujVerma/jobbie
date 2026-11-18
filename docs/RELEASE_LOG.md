@@ -205,6 +205,8 @@ Rollback is a code revert preserving both ledgers, existing encrypted checkpoint
 
 ## P3-A signed Discord interactions
 
+The queue now verifies its database encryption key before startup writes or task claims. Legacy stores authenticate retained ciphertext before the first binding. A wrong or mixed key fails closed.
+
 Adds the owner-only Discord request boundary, separate encrypted durable tasks, and optional command manifest. Live registration, HTTPS and worker activation are `BLOCKED_LIVE`. The new workflow tests the stack without changing legacy alert scope or Phase 2 fingerprint inputs. Roll back by stopping the private service and removing the Discord interaction endpoint configuration when authorized.
 
 Local regression passed 1,187 tests, including 12 signed interaction cases. Configuration validation and a Plaid dry run passed. The dry run fetched 142 rows, recorded zero alerts, and preserved config, legacy state and checkpoint hashes.
@@ -214,6 +216,8 @@ Independent review found two issues in the first revision. In-flight expiry now 
 Hosted review reproduced an acknowledgement race. The original-response edit now retries only an explicit Discord unknown-message or unknown-webhook rejection, within the interaction lifetime. Transport ambiguity stays uncertain and is never retried. The receipt and the retry regression cover the original timing case.
 
 ## P3-B private storage
+
+The vault checks the same database key binding before owner-console or service writes. Existing ciphertext remains readable only with its matching key, including after backup restore.
 
 Adds owner-scoped encrypted records, immutable resume and job versions, saved jobs, application records and append-only status attempts. Resume validation and parsing run with bounded upload size, isolated environment, CPU and wall limits, and Linux parser memory bounds. Downloads require a separate owner bearer and a short-lived signed ticket. Parent-scoped status is derived from explicit owner events. SQLite online backup retains encrypted records. Roll back by disabling P3-B handlers and keeping the private encrypted store. Live host, HTTPS, worker, operator setup and testing remain `BLOCKED_LIVE`.
 

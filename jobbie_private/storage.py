@@ -17,7 +17,7 @@ from uuid import uuid4
 from cryptography.fernet import Fernet
 
 from .discord import snowflake
-from .tasks import private_file
+from .tasks import private_file, verify_database_key
 
 DOWNLOAD_TTL = 300
 STATUSES = frozenset({"applied", "interviewing", "rejected", "withdrawn", "offer"})
@@ -73,6 +73,7 @@ class PrivateStore:
         self.owner = owner
         self.path = private_file(path)
         with self.connect() as db:
+            verify_database_key(db, self.cipher)
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS private_records_v1 (
                     id TEXT PRIMARY KEY, owner TEXT NOT NULL, kind TEXT NOT NULL,

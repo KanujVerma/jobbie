@@ -212,3 +212,17 @@ def test_edit_never_retries_unknown_transport_outcome(monkeypatch):
     with pytest.raises(TimeoutError):
         edit_original(APP, "fixture-token", {"content": "safe"}, int(time.time()) + 60)
     assert len(connections) == 1
+
+
+@pytest.mark.parametrize("legacy_database", [False, True])
+def test_worker_rejects_wrong_key_without_claiming_tasks(rig, legacy_database):
+    assert handle(rig, find())[0] == 200
+    if legacy_database:
+        with rig.store.connect() as database:
+            database.execute("DROP TABLE IF EXISTS jobbie_private_key_v1")
+    with pytest.raises(ValueError, match="Private database encryption key"):
+        TaskStore(rig.database, Fernet.generate_key())
+    restarted = TaskStore(rig.database, rig.secret)
+    assert restarted.status(OWNER, find()["id"], rig.clock.now) == "queued"
+    assert rig.endpoint.work_once(lambda *_: None)
+    assert rig.calls == ["@everyone"]

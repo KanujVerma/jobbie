@@ -196,3 +196,15 @@ def test_attachment_fetch_has_a_total_process_deadline(tmp_path, monkeypatch, pr
     }
     with pytest.raises(ValueError, match="could not be read"):
         resume.fetch_attachment(attachment)
+
+
+@pytest.mark.parametrize("legacy_database", [False, True])
+def test_vault_rejects_wrong_key_before_writing_valid_data(vault, legacy_database):
+    saved = vault.set_profile({"display_name": "Synthetic owner"}, "initial")
+    if legacy_database:
+        with vault.connect() as database:
+            database.execute("DROP TABLE IF EXISTS jobbie_private_key_v1")
+    with pytest.raises(ValueError, match="Private database encryption key"):
+        PrivateStore(vault.path, Fernet.generate_key(), OWNER)
+    recovered = PrivateStore(vault.path, vault.key, OWNER)
+    assert recovered.profile() == saved
