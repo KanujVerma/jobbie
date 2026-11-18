@@ -1,2 +1,3 @@
 # Optional private service. Install separately from the alert worker.
 cryptography>=50.0.2,<51
+pypdf>=7.1,<8

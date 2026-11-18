@@ -17,7 +17,7 @@ MAX_REQUESTS = 10
 _KEY_MARKER = b"jobbie-private-db-key-v1"
 
 
-def private_file(path: Path) -> Path:
+def private_file(path: Path, *, new: bool = False) -> Path:
     path = Path(path).expanduser().absolute()
     root = Path(__file__).resolve().parents[1]
     if path.resolve().is_relative_to(root):
@@ -29,7 +29,8 @@ def private_file(path: Path) -> Path:
     try:
         fd = os.open(path, flags, 0o600)
     except FileExistsError:
-        pass
+        if new:
+            raise
     else:
         os.close(fd)
     info = path.lstat()

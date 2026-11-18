@@ -214,3 +214,13 @@ Local regression passed 1,187 tests, including 12 signed interaction cases. Conf
 Independent review found two issues in the first revision. In-flight expiry now preserves an uncertain outcome across restart, and the documentation guard now covers private code and its requirements. Focused regressions failed before both corrections and passed afterward.
 
 Hosted review reproduced an acknowledgement race. The original-response edit now retries only an explicit Discord unknown-message or unknown-webhook rejection, within the interaction lifetime. Transport ambiguity stays uncertain and is never retried. The receipt and the retry regression cover the original timing case.
+
+## P3-B private storage
+
+The vault checks the same database key binding before owner-console or service writes. Existing ciphertext remains readable only with its matching key, including after backup restore.
+
+Adds owner-scoped encrypted records, immutable resume and job versions, saved jobs, application records and append-only status attempts. Resume validation and parsing run with bounded upload size, isolated environment, CPU and wall limits, and Linux parser memory bounds. Downloads require a separate owner bearer and a short-lived signed ticket. Parent-scoped status is derived from explicit owner events. SQLite online backup retains encrypted records. Roll back by disabling P3-B handlers and keeping the private encrypted store. Live host, HTTPS, worker, operator setup and testing remain `BLOCKED_LIVE`.
+
+Local regression passed 1,206 tests, including 17 private storage, parsing and upload checks. Config validation passed. No Discord, private GitHub, or hosted data services were contacted by these tests.
+
+Independent review reproduced a slow Discord attachment body extending the worker's socket timeout. Attachment reads now use a subprocess-wide wall deadline. Regressions cover stalled headers and a partial response, preserve private data, and leave the worker free to process the next task.
