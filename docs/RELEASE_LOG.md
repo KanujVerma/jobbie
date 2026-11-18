@@ -201,3 +201,10 @@ The candidate Applied Materials dry run retained 1,999 observations with zero ca
 Local `python -m pytest -p no:cacheprovider -q` passed 1,175 tests. `python main.py validate-config` passed. The ordinary CLI dry run scoped to Plaid exited 0 with 142 rows and zero job ACKs. The same config, state and catalogue metadata hashes remained unchanged.
 
 Rollback is a code revert preserving both ledgers, existing encrypted checkpoints and configuration. The first ordinary run at or after the merge supplies the live coverage, parity, ACK and checkpoint receipt. The 72-hour gate and exact cutover approval remain open.
+
+
+## P3-A signed Discord interactions
+
+Adds the owner-only Discord request boundary, separate encrypted durable tasks, and optional command manifest. Live registration, HTTPS and worker activation are `BLOCKED_LIVE`. The new workflow tests the stack without changing legacy alert scope or Phase 2 fingerprint inputs. Roll back by stopping the private service and removing the Discord interaction endpoint configuration when authorized.
+
+Local regression passed 1,187 tests, including 12 signed interaction cases. Configuration validation and a Plaid dry run passed. The dry run fetched 142 rows, recorded zero alerts, and preserved config, legacy state and checkpoint hashes.
