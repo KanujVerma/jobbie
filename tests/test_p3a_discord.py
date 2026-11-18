@@ -157,3 +157,16 @@ def test_manifest_only_contains_usable_commands(rig):
     assert set(manifest) == {"health", "settings", "tasks", "jobs"}
     assert manifest["jobs"]["options"][0]["name"] == "find"
     assert manifest["jobs"]["options"][0]["options"][0]["type"] == 3
+
+
+def test_in_flight_reply_expiry_remains_uncertain(rig):
+    handle(rig, find())
+
+    def timeout(*args):
+        rig.clock.now += 900
+        handle(rig, interaction(2))
+        raise TimeoutError
+
+    assert rig.endpoint.work_once(timeout)
+    assert rig.store.status(OWNER, find()["id"], rig.clock.now) == "reply_uncertain"
+    assert not rig.endpoint.work_once(lambda *args: pytest.fail("unsafe retry"))

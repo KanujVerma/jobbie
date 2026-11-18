@@ -208,3 +208,5 @@ Rollback is a code revert preserving both ledgers, existing encrypted checkpoint
 Adds the owner-only Discord request boundary, separate encrypted durable tasks, and optional command manifest. Live registration, HTTPS and worker activation are `BLOCKED_LIVE`. The new workflow tests the stack without changing legacy alert scope or Phase 2 fingerprint inputs. Roll back by stopping the private service and removing the Discord interaction endpoint configuration when authorized.
 
 Local regression passed 1,187 tests, including 12 signed interaction cases. Configuration validation and a Plaid dry run passed. The dry run fetched 142 rows, recorded zero alerts, and preserved config, legacy state and checkpoint hashes.
+
+Independent review found two issues in the first revision. In-flight expiry now preserves an uncertain outcome across restart, and the documentation guard now covers private code and its requirements. Focused regressions failed before both corrections and passed afterward.

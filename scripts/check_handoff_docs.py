@@ -23,6 +23,7 @@ FUNCTIONAL_ROOT_FILES = frozenset({
     "companies.yaml",
     "requirements.txt",
     "requirements-dev.txt",
+    "requirements-phase3.txt",
 })
 
 
@@ -31,7 +32,7 @@ def functional_source_changed(path: str) -> bool:
     path = str(PurePosixPath(path))
     if path in FUNCTIONAL_ROOT_FILES:
         return True
-    if path.startswith(("src/", "tests/")):
+    if path.startswith(("src/", "tests/", "jobbie_private/")):
         # All source and fixture formats affect runtime/test behavior, HTML included.
         return True
     if path.startswith("scripts/"):

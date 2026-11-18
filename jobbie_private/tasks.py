@@ -68,7 +68,9 @@ class TaskStore:
 
     def _expire(self, db, now: int) -> None:
         db.execute("UPDATE discord_tasks SET status='expired', payload=NULL "
-                   "WHERE expires<=? AND status IN ('queued','running')", (now,))
+                   "WHERE expires<=? AND status='queued'", (now,))
+        db.execute("UPDATE discord_tasks SET status='reply_uncertain' "
+                   "WHERE expires<=? AND status='running'", (now,))
         db.execute("DELETE FROM discord_tasks WHERE expires<=?", (now - RETENTION,))
         db.execute("DELETE FROM interaction_receipts WHERE received<=?", (now - RETENTION,))
 
@@ -96,15 +98,17 @@ class TaskStore:
                              (owner, key)).fetchone()
         if row is None or row["expires"] <= now - RETENTION:
             return None
-        if row["expires"] <= now and row["status"] in ("queued", "running"):
-            return "expired"
+        if row["expires"] <= now:
+            return {"queued": "expired", "running": "reply_uncertain"}.get(row["status"], row["status"])
         return row["status"]
 
     def recent(self, owner: str, now: int) -> list[tuple[str, str]]:
         with self.connect() as db:
             return [(row["id"], row["status"]) for row in db.execute("""
-                SELECT id, CASE WHEN expires<=? AND status IN ('queued','running')
-                    THEN 'expired' ELSE status END AS status
+                SELECT id, CASE WHEN expires<=? THEN
+                    CASE status WHEN 'queued' THEN 'expired' WHEN 'running' THEN 'reply_uncertain'
+                         ELSE status END
+                    ELSE status END AS status
                 FROM discord_tasks WHERE owner=? AND expires>?
                 ORDER BY expires DESC,id DESC LIMIT 10
             """, (now, owner, now - RETENTION))]
@@ -125,5 +129,6 @@ class TaskStore:
         if status not in {"done", "failed", "expired", "reply_uncertain"}:
             raise ValueError("Unknown terminal task status")
         with self.connect() as db:
-            db.execute("UPDATE discord_tasks SET status=? WHERE owner=? AND id=? AND status='running'",
+            db.execute("UPDATE discord_tasks SET status=? WHERE owner=? AND id=? "
+                       "AND status IN ('running','reply_uncertain')",
                        (status, owner, key))

@@ -126,3 +126,8 @@ def test_git_mv_out_of_src_remains_detectable(tmp_path, monkeypatch):
     files = changed_paths("HEAD~1", "HEAD")
     assert {"src/scheduler.py", "archive/scheduler.py"} <= files
     assert missing_handoff_documents(files) == set(REQUIRED)
+
+
+def test_private_service_changes_require_handoff_docs():
+    for path in ("jobbie_private/discord.py", "requirements-phase3.txt"):
+        assert missing_handoff_documents({path}) == REQUIRED
