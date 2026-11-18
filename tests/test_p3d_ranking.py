@@ -169,3 +169,17 @@ def test_catalogue_payload_digest_is_verified_readonly(tmp_path):
         catalogue.db.commit()
     with pytest.raises(ValueError, match="digest"):
         CatalogueReader(path).find()
+
+
+@pytest.mark.parametrize(("location", "points"), [
+    ("New York, NY", 10),
+    ("San Mateo, CA", 15),
+    ("Fremont, CA", 15),
+    ("Los Angeles, CA", 10),
+    ("Miami, FL", 10),
+    ("Madison, WI", 5),
+])
+def test_geography_prioritizes_verified_locales(location, points):
+    result = rank_listing(listing(eligible_job(location=location)), {}, {}, NOW)
+    assert result.eligibility.status == "eligible"
+    assert result.weights["geography"] == points

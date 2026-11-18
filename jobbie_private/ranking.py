@@ -21,8 +21,12 @@ DEFAULT_ROLES = ("software engineer", "software developer", "backend engineer", 
 SKILLS = ("python", "javascript", "typescript", "java", "c++", "c#", "sql", "postgresql", "react",
           "node.js", "aws", "azure", "kubernetes", "docker", "git", "golang", "rust", "swift",
           "pytorch", "tensorflow", "redis", "graphql", "linux", "html", "css", "spark", "terraform")
-BAY = re.compile(r"\b(?:san francisco|san jose|oakland|mountain view|palo alto|santa clara|bay area|sunnyvale)\b")
-PRIORITY = re.compile(r"\b(?:california|new york city|manhattan|brooklyn|chicago|texas|florida)\b|,\s*(?:ca|tx|fl)\b")
+BAY = re.compile(r"\b(?:san francisco|bay area)\b")
+BAY_CITIES = re.compile(r"\b(?:san jose|oakland|mountain view|palo alto|santa clara|sunnyvale|"
+                        r"san mateo|redwood city|cupertino|menlo park|fremont|berkeley)\b")
+CALIFORNIA = re.compile(r"\b(?:california|ca)\b")
+PRIORITY = re.compile(r"\b(?:new york city|nyc|manhattan|brooklyn|chicago|texas|florida)\b"
+                      r"|\bnew york,\s*ny\b|,\s*(?:tx|fl)\b")
 
 
 @dataclass(frozen=True)
@@ -89,7 +93,13 @@ def rank_listing(listing: Listing, skills: dict[str, tuple[str, ...]], filters: 
     location = job.location.casefold()
     geography = None
     if "US_LOCATION_CONFIRMED" in eligibility.reasons:
-        geography = 15 if BAY.search(location) else 10 if PRIORITY.search(location) else 5
+        california = CALIFORNIA.search(location)
+        if BAY.search(location) or (california and BAY_CITIES.search(location)):
+            geography = 15
+        elif california or PRIORITY.search(location):
+            geography = 10
+        else:
+            geography = 5
     weights = {
         "role": role, "skills": 25 * len(matching) // len(evidence) if evidence else None,
         "geography": geography, "salary": annual_base_preference(listing),
