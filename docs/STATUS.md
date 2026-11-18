@@ -9,6 +9,9 @@ P3-A adds a separate signed Discord endpoint and worker. The enabled manifest co
 
 P3-B adds owner-scoped encrypted profiles, resumes, job snapshots, saved-job and application ledgers, and isolated upload processing. Discord profile and application views and deferred resume upload use these backends. Owner-hosted storage and Discord activation remain `BLOCKED_LIVE`.
 
+
+P3-C adds private candidate proposals with versioned source spans, explicit decisions and deletion or revocation invalidation. GitHub evidence requires a per-repository approval and pinned commit. Owner repository access and Discord registration remain `BLOCKED_LIVE`.
+
 ## Scheduled catalogue shadow through 2026-11-17 UTC
 
 The first ordinary C2 run bootstrapped and published encrypted custody. Across 21 ordinary runs through [44164832540](https://github.com/KanujVerma/jobbie/actions/runs/44164832540), 21 verified a fresh exact-key cache restore, 7 reported healthy parity, and 14 were degraded. The longest consecutive healthy stretch in the public logs was about 26 hours, and the last healthy run was [43767315174](https://github.com/KanujVerma/jobbie/actions/runs/43767315174). These are public run counters. The authenticated 72-hour audit remains open.

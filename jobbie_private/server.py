@@ -16,6 +16,8 @@ from cryptography.fernet import InvalidToken
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from .discord import DiscordEndpoint, MAX_BODY, ReplyUnavailable, default_commands, reject_duplicate
+from .evidence import Evidence, evidence_commands
+from .github import GitHubEvidence, GitHubRead
 from .profile import DownloadRoute, private_commands, safe_profile
 from .storage import PrivateStore, STATUSES
 from .tasks import TaskStore
@@ -81,7 +83,7 @@ def endpoint_from_env(vault: PrivateStore) -> DiscordEndpoint:
     store = TaskStore(vault.path, vault.key)
     key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(os.environ["JOBBIE_DISCORD_PUBLIC_KEY"]))
     return DiscordEndpoint(key, os.environ["JOBBIE_DISCORD_APPLICATION_ID"], vault.owner, store,
-                           (*default_commands(store), *private_commands(vault)))
+                           (*default_commands(store), *private_commands(vault), *evidence_commands(vault)))
 
 
 def edit_original(application: str, token: str, reply: dict, expires: int) -> None:
@@ -128,6 +130,30 @@ def owner_action(args, vault: PrivateStore) -> None:
             event = vault.record_attempt(args.application_id, args.status, args.request_id,
                                          confirmed=args.owner_confirms is True)
             print(event.id)
+        case "facts-propose":
+            rows = Evidence(vault).propose_resume(args.version_id)
+            print(json.dumps([row.id for row in rows]))
+        case "fact-inspect":
+            print(json.dumps(Evidence(vault).inspect(args.fact_id), ensure_ascii=True))
+        case "fact-decide":
+            event = Evidence(vault).decide(args.fact_id, args.decision, args.request_id,
+                                           confirm_protected=args.confirm_protected,
+                                           replacement_id=args.replacement_id)
+            print(event.id)
+        case "github-approve":
+            body = sys.stdin.buffer.read(4097)
+            if len(body) > 4096:
+                raise ValueError("Repository approval input exceeds limit")
+            spec = json.loads(body, object_pairs_hook=reject_duplicate)
+            print(GitHubEvidence(vault, None).approve(spec, args.request_id,
+                                                      confirmed=args.owner_confirms).id)
+        case "github-revoke":
+            print(GitHubEvidence(vault, None).revoke(args.approval_id, args.request_id,
+                                                     confirmed=args.owner_confirms).id)
+        case "github-propose":
+            read = GitHubRead(os.environ.get("JOBBIE_GITHUB_READ_TOKEN"))
+            proposal = GitHubEvidence(vault, read).propose(args.approval_id, args.commit, args.deployment_id)
+            print(proposal.id)
         case "backup":
             vault.backup(args.destination)
             print("Encrypted database backup created.")
@@ -151,6 +177,25 @@ def main() -> None:
     attempt.add_argument("status", choices=sorted(STATUSES))
     attempt.add_argument("--request-id", required=True)
     attempt.add_argument("--owner-confirms", action="store_true", required=True)
+    modes.add_parser("facts-propose").add_argument("version_id")
+    modes.add_parser("fact-inspect").add_argument("fact_id")
+    decision = modes.add_parser("fact-decide")
+    decision.add_argument("fact_id")
+    decision.add_argument("decision", choices=("confirm", "revoke", "correct"))
+    decision.add_argument("--request-id", required=True)
+    decision.add_argument("--confirm-protected", action="store_true")
+    decision.add_argument("--replacement-id")
+    approve = modes.add_parser("github-approve")
+    approve.add_argument("--request-id", required=True)
+    approve.add_argument("--owner-confirms", action="store_true", required=True)
+    revoke = modes.add_parser("github-revoke")
+    revoke.add_argument("approval_id")
+    revoke.add_argument("--request-id", required=True)
+    revoke.add_argument("--owner-confirms", action="store_true", required=True)
+    github = modes.add_parser("github-propose")
+    github.add_argument("approval_id")
+    github.add_argument("commit")
+    github.add_argument("--deployment-id", type=int)
     args = parser.parse_args()
     try:
         vault = PrivateStore(Path(os.environ["JOBBIE_PRIVATE_DB"]), os.environ["JOBBIE_PRIVATE_KEY"].encode(),
