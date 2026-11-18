@@ -220,3 +220,10 @@ Adds owner-scoped encrypted records, immutable resume and job versions, saved jo
 Local regression passed 1,206 tests, including 17 private storage, parsing and upload checks. Config validation passed. No Discord, private GitHub, or hosted data services were contacted by these tests.
 
 Independent review reproduced a slow Discord attachment body extending the worker's socket timeout. Attachment reads now use a subprocess-wide wall deadline. Regressions cover stalled headers and a partial response, preserve private data, and leave the worker free to process the next task.
+
+
+## P3-C owner evidence
+
+Resume proposals retain exact character spans and immutable version hashes. Explicit owner confirmation controls their use, and protected claims require their own confirmation and stay out of ranking. Corrections replace the old decision atomically. Deleting a resume removes derived proposal payloads. GitHub proposals are tied to approved repository and author IDs, a pinned commit with code paths, verification metadata, and optional pinned production deployment evidence. GitHub patches stay out of storage and output. Roll back by disabling evidence commands and retaining encrypted records. External owner approvals and credentials remain `BLOCKED_LIVE`.
+
+Local regression passed 1,220 tests including 10 candidate and repository evidence checks. Config validation passed. GitHub evidence contract tests used network-free provider fixtures.

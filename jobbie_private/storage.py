@@ -110,12 +110,17 @@ class PrivateStore:
         return hmac.digest(self.index_key, self._json(["parent", self.owner, kind, key]), "sha256")
 
     def put(self, kind: str, data: dict, request_id: str | None = None, *,
-            parent_id: str | None = None) -> Record:
+            parent_id: str | None = None, requires: tuple[str, str] | None = None) -> Record:
         """Append an immutable encrypted record with scoped idempotency."""
         idem = (hmac.digest(self.index_key, self._json([self.owner, kind, request_id]), "sha256")
                 if request_id is not None else None)
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
+            if requires is not None and db.execute(
+                "SELECT 1 FROM private_records_v1 WHERE owner=? AND kind=? AND id=? AND sealed IS NOT NULL",
+                (self.owner, *requires),
+            ).fetchone() is None:
+                raise ValueError("Private source record unavailable")
             if idem is not None:
                 old = db.execute("SELECT * FROM private_records_v1 WHERE owner=? AND kind=? AND idem=?",
                                  (self.owner, kind, idem)).fetchone()
@@ -190,8 +195,11 @@ class PrivateStore:
 
     def delete_resume(self, version_id: str) -> bool:
         with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
             result = db.execute("UPDATE private_records_v1 SET sealed=NULL WHERE owner=? AND kind='resume_version' "
                                 "AND id=? AND sealed IS NOT NULL", (self.owner, version_id))
+            db.execute("UPDATE private_records_v1 SET sealed=NULL WHERE owner=? AND kind='candidate_fact' "
+                       "AND parent=? AND sealed IS NOT NULL", (self.owner, self._parent("candidate_fact", version_id)))
             return result.rowcount == 1
 
     def _signature(self, version_id: str, expiry: int) -> str:

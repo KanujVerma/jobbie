@@ -9,6 +9,9 @@ Build P3-A, P3-B, P3-C and P3-D as separate reviewable feature branches. Keep th
 
 P3-B enables the encrypted local vault and owner console with a verified local backup/restore path. Next build P3-C candidate fact proposals and commit-attributed repository evidence. P3 private data and credentials stay outside Git.
 
+
+P3-C adds owner-confirmed facts and approved commit evidence. Next implement P3-D read-only catalogue search, scoring and working controls. Use current fact decisions on every match and preserve the application ledger boundary.
+
 P2-C2 scheduled shadow reliability. The original C2 bootstrap and cache restore have live receipts. Workday HTTP 429 and rows without posting URLs can still leave a scan degraded. Preserve the 13 enabled original sources, two historical disabled entries, legacy ACK history, and encrypted checkpoint lineage. Keep public feeds off and use ordinary scheduled runs for production evidence.
 
 After the reliability PR merges, inspect the first ordinary main run containing the fix. Record source coverage and errors, parity, job ACK counts, legacy state persistence, parent checkpoint restore, fresh exact-key restore, and publication. A partial scan breaks the qualifying 72-hour window. Keep legacy JSON as delivery authority and hold cutover for exact owner approval. [Current release evidence](RELEASE_LOG.md#p2-c2-scheduled-shadow-reliability)
