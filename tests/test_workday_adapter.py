@@ -191,6 +191,35 @@ def test_http_error_second_page_yields_first_20():
     assert len(jobs) == 20
 
 
+@resp_lib.activate
+def test_missing_posting_path_keeps_valid_rows_and_marks_scan_incomplete():
+    postings = [_make_posting(1), {}, _make_posting(2)]
+    resp_lib.add(resp_lib.POST, _ENDPOINT, json=_page(postings, 3), status=200)
+    adapter = _make_adapter()
+    adapter.config["fetch_details"] = False
+
+    jobs = list(adapter.fetch())
+
+    assert [job.id for job in jobs] == ["Micron::workday::JR10001", "Micron::workday::JR10002"]
+    assert adapter.fetch_errors == ["Workday posting missing externalPath"]
+
+
+@resp_lib.activate
+def test_throttled_detail_keeps_current_page_without_more_workday_requests():
+    postings = [_make_posting(i) for i in range(20)]
+    resp_lib.add(resp_lib.POST, _ENDPOINT, json=_page(postings, 21), status=200,
+                 match=[matchers.json_params_matcher({"offset": 0}, strict_match=False)])
+    detail_url = f"{_BASE_URL}/wday/cxs/micron/External{postings[0]['externalPath']}"
+    resp_lib.add(resp_lib.GET, detail_url, status=429, headers={"Retry-After": "3600"})
+
+    adapter = _make_adapter()
+    jobs = list(adapter.fetch())
+
+    assert len(jobs) == 20
+    assert adapter.fetch_errors == ["HTTP 429"]
+    assert len(resp_lib.calls) == 2
+
+
 # ---------------------------------------------------------------------------
 # _parse_posted_on — relative date parsing
 # ---------------------------------------------------------------------------

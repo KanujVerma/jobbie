@@ -189,3 +189,15 @@ Documentation reconciliation candidate: completed UX/intake/source baselines/C1 
 PR36 merged2026-11-12T04:41:10Z at830dcd13d05433b286e7b810385807481e9cc744 after exactfe8f7f7 CI/test43155934557/public-read43155934550 and completed hosted clean review. Merged tree equals reviewed; postmerge43156415856passed. Workflow active/secret provisioned; ordinary bootstrap/parity/custody PENDING_LIVE, real72h not started, cutover not approved. No source/feed/legacy authority change.
 
 Documentation reconciliation final checks:1171tests45.23s, config/read-only health/Plaid dry-run pass with unchanged config/state hashes. No executable/config/workflow change; fresh exact-head doc PR gates required.
+
+## P2-C2 scheduled shadow reliability
+
+Baseline `b6eba3a4fa3be5bd5631369946cef9847c136165`. [Run 44164832540](https://github.com/KanujVerma/jobbie/actions/runs/44164832540) published verified custody with degraded source parity after Workday HTTP 429s. [Run 43790517896](https://github.com/KanujVerma/jobbie/actions/runs/43790517896) recorded two Applied Materials identity rejects. A bounded local Applied Materials dry run on the same source code observed 2,000 returned rows, one empty posting URL, 1,999 retained observations, zero ACKs, and unchanged company config, legacy state and checkpoint bytes. The local reject establishes one failure mode. The exact historical rejected rows were unavailable.
+
+The HTTP client now waits for valid `Retry-After` seconds or HTTP dates up to the existing 30-second budget. It surfaces the 429 when the provider requires a longer wait. A terminal Workday detail 429 stops further calls to that tenant after preserving usable rows already in the page. A missing Workday `externalPath` records an incomplete source scan and preserves surrounding usable rows. The catalogue continues to reject unsafe URLs. The original scheduled 429 response headers were unavailable, and continuing provider-side throttling can still block coverage.
+
+The candidate Applied Materials dry run retained 1,999 observations with zero catalogue rejects, zero identity conflicts, zero job ACKs and zero feed leads. The single-source CLI exited 1 because it correctly classified the scan as incomplete. The run used memory-only shadow with no webhook and a no-retry diagnostic transport. Company config, legacy state and both catalogue metadata files passed before/after SHA-256 checks. No database file was created. The first full test run found an Ashby fixture expecting a retry sooner than its valid `Retry-After`. The fixture now covers both an in-budget retry and an out-of-budget failure.
+
+Local `python -m pytest -p no:cacheprovider -q` passed 1,175 tests. `python main.py validate-config` passed. The ordinary CLI dry run scoped to Plaid exited 0 with 142 rows and zero job ACKs. The same config, state and catalogue metadata hashes remained unchanged.
+
+Rollback is a code revert preserving both ledgers, existing encrypted checkpoints and configuration. The first ordinary run at or after the merge supplies the live coverage, parity, ACK and checkpoint receipt. The 72-hour gate and exact cutover approval remain open.
