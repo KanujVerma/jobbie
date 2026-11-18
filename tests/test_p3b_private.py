@@ -179,3 +179,20 @@ def test_resume_attachment_command_uses_verified_resolved_file(vault, monkeypatc
     assert endpoint.work_once(lambda *_: None)
     assert received[0]["id"] == APP
     assert vault.records("resume_version")[0].data["text"] == TEXT
+
+
+@pytest.mark.parametrize("progress", ["", "partial response"])
+def test_attachment_fetch_has_a_total_process_deadline(tmp_path, monkeypatch, progress):
+    import jobbie_private.resume as resume
+    worker = tmp_path / "trickle.py"
+    worker.write_text("import time\nprint(" + repr(progress) + ", flush=True)\ntime.sleep(10)\n")
+    monkeypatch.setattr(resume, "ATTACHMENT_WORKER", worker, raising=False)
+    monkeypatch.setattr(resume, "ATTACHMENT_TIMEOUT", 0.5, raising=False)
+    monkeypatch.setattr(resume.http.client, "HTTPSConnection",
+                        lambda *_args, **_kwargs: pytest.fail("worker network call ran in parent"))
+    attachment = {
+        "id": "100000000000000002", "content_type": PDF, "size": 50,
+        "url": "https://cdn.discordapp.com/attachments/100000000000000001/100000000000000002/file.pdf",
+    }
+    with pytest.raises(ValueError, match="could not be read"):
+        resume.fetch_attachment(attachment)

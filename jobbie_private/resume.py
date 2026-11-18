@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import http.client
+import json
 import os
 from pathlib import Path
 import re
@@ -14,6 +15,8 @@ PDF = "application/pdf"
 DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 MAX_UPLOAD = 5 * 1024 * 1024
 MAX_TEXT = 100_000
+ATTACHMENT_TIMEOUT = 8
+ATTACHMENT_WORKER = Path(__file__).resolve()
 ATTACHMENT_HOSTS = {"cdn.discordapp.com", "media.discordapp.net"}
 ATTACHMENT_PATH = re.compile(r"/attachments/[0-9]{17,20}/[0-9]{17,20}/[^/?#\\]{1,240}")
 
@@ -41,7 +44,7 @@ def parse_resume(media_type: str, body: bytes) -> str:
     return text
 
 
-def fetch_attachment(attachment: dict) -> tuple[str, bytes]:
+def _attachment_request(attachment: dict):
     media_type, length, url = attachment.get("content_type"), attachment.get("size"), attachment.get("url")
     if media_type not in (PDF, DOCX) or type(length) is not int or not 0 < length <= MAX_UPLOAD:
         raise ValueError("Attachment format or size is unsupported")
@@ -54,6 +57,11 @@ def fetch_attachment(attachment: dict) -> tuple[str, bytes]:
     segments = parsed.path.split("/")
     if segments[3] != attachment.get("id"):
         raise ValueError("Attachment identity changed")
+    return media_type, length, parsed
+
+
+def _download(attachment: dict) -> bytes:
+    media_type, length, parsed = _attachment_request(attachment)
     conn = http.client.HTTPSConnection(parsed.netloc, timeout=3)
     try:
         target = parsed.path + ("?" + parsed.query if parsed.query else "")
@@ -72,4 +80,25 @@ def fetch_attachment(attachment: dict) -> tuple[str, bytes]:
     if len(body) != length:
         raise ValueError("Discord attachment size changed")
     validate_format(media_type, body)
-    return media_type, body
+    return body
+
+
+def fetch_attachment(attachment: dict) -> tuple[str, bytes]:
+    media_type, length, _ = _attachment_request(attachment)
+    record = {key: attachment[key] for key in ("id", "content_type", "size", "url")}
+    try:
+        result = subprocess.run(
+            [sys.executable, "-I", str(ATTACHMENT_WORKER)], input=json.dumps(record).encode(),
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env={"PATH": os.defpath},
+            timeout=ATTACHMENT_TIMEOUT, check=True,
+        )
+    except (subprocess.SubprocessError, OSError):
+        raise ValueError("Discord attachment could not be read") from None
+    if len(result.stdout) != length:
+        raise ValueError("Discord attachment size changed")
+    validate_format(media_type, result.stdout)
+    return media_type, result.stdout
+
+
+if __name__ == "__main__":
+    sys.stdout.buffer.write(_download(json.loads(sys.stdin.buffer.read(4096))))
