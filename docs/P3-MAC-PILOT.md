@@ -11,7 +11,7 @@ PILOT_DIR="$HOME/Library/Application Support/Jobbie Phase 3 Synthetic Pilot"
 python -m jobbie_private.pilot init "$PILOT_DIR"
 ```
 
-The built-in local tests run separate server, download and worker processes without LaunchAgents or system settings. The supervisor restarts a failed process twice, then shuts down its children if the restart limit is exceeded. It holds an exclusive lock per pilot directory. A restart resumes queued work and preserves the existing task ownership rules for uncertain in-flight work.
+The built-in local tests run separate server, download and worker processes without LaunchAgents or system settings. The supervisor restarts a failed process twice, then shuts down its children if the restart limit is exceeded. Each role runs in its own process group. Shutdown and replacement terminate the old group, including reply and download subprocesses. The supervisor holds an exclusive lock per pilot directory. A restart resumes queued work and preserves the existing task ownership rules for uncertain in-flight work.
 
 The interaction listener binds to `127.0.0.1:18765` and accepts only `POST /interactions`. It limits requests to eight in flight, a two-second server deadline and the existing 64 KiB body cap. The signed app, configured owner and approved guild gate commands. Discord's signed PING remains side-effect free. Private downloads use `127.0.0.1:18766` with both a separate bearer and a signed 5-minute ticket. Keep 18766 outside Funnel. Logs record status, elapsed time and worker outcome without bodies, tokens, owner IDs, query strings or document data.
 

@@ -232,3 +232,52 @@ def test_registration_targets_only_configured_guild_and_preserves_existing_comma
     already_present = False
     pilot.register_commands(root, env)
     assert methods == ["GET", "GET", "PUT"]
+
+
+@pytest.mark.parametrize("lifecycle", ["shutdown", "replacement"])
+def test_supervisor_reaps_worker_descendants(tmp_path, lifecycle):
+    child = tmp_path / "role.py"
+    child.write_text("""import json, os, subprocess, sys, time
+if sys.argv[1] == "worker":
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    print(json.dumps({"event":"fixture_descendant","pid":child.pid,"parent":os.getpid()}), flush=True)
+time.sleep(60)
+""")
+    script = """import subprocess, sys
+from jobbie_private import pilot
+launch = subprocess.Popen
+def substitute(args, **kwargs):
+    if args[1:4] == ["-m", "jobbie_private.pilot", "_child"]:
+        args = [sys.executable, sys.argv[1], args[4]]
+    return launch(args, **kwargs)
+pilot.subprocess.Popen = substitute
+pilot._supervise({}, offline=True, ports=(0, 0))
+"""
+    log = tmp_path / "supervisor.jsonl"
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
+    with log.open("w") as output:
+        supervisor = subprocess.Popen([sys.executable, "-c", script, str(child)],
+                                      env=env, stdout=output, stderr=subprocess.DEVNULL)
+        try:
+            descendant = read_event(log, lambda x: x.get("event") == "fixture_descendant")
+            if lifecycle == "shutdown":
+                supervisor.terminate()
+                supervisor.wait(timeout=8)
+            else:
+                os.kill(descendant["parent"], signal.SIGKILL)
+                read_event(log, lambda x: x.get("event") == "process_started"
+                           and x.get("role") == "worker" and x.get("restart") == 1)
+            state = subprocess.run(["ps", "-o", "stat=", "-p", str(descendant["pid"])],
+                                   capture_output=True, text=True, timeout=5).stdout.strip()
+            assert not state or state.startswith("Z"), f"{lifecycle} left a live descendant"
+        finally:
+            if supervisor.poll() is None:
+                supervisor.terminate()
+                supervisor.wait(timeout=8)
+            for line in log.read_text().splitlines():
+                event = json.loads(line)
+                if event.get("event") == "fixture_descendant":
+                    try:
+                        os.kill(event["pid"], signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass

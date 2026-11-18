@@ -259,3 +259,5 @@ Prepared an owner-only synthetic bundle and separate supervised loopback listene
 Tailscale's Standalone macOS client is installed. Read-only checks found it disconnected, with HTTPS capability, an existing 443 listener and no active public Funnel route. Port 8443 is reserved for the proposed pilot upon approval. Discord setup and live command receipts remain `BLOCKED_OWNER_APPROVAL`. The runbook records the approval, costs, configuration and scoped rollback. [Mac pilot runbook](P3-MAC-PILOT.md)
 
 Local verification passed 1,337 tests and configuration validation. The sandbox-enabled focused run passed seven tests, including the full private flow with fixture transports. Git diff confirms the Phase 2 fingerprint inputs and state are outside the pilot patch.
+
+Independent review reproduced a Discord reply descendant surviving supervisor shutdown. Each role now has its own process group. Shutdown and replacement terminate the complete old group. Both lifecycle regressions failed before the correction and passed after it. The sandbox-enabled focused suite passed nine tests.

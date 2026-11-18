@@ -270,6 +270,45 @@ def supervise(env: dict[str, str], *, offline: bool, ports=(PUBLIC_PORT, DOWNLOA
         _supervise(env, offline=offline, ports=ports)
 
 
+def _signal_group(process: subprocess.Popen, sig: int) -> bool:
+    """The leader owns a separate process group even after it exits."""
+    try:
+        os.killpg(process.pid, sig)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        # macOS may return EPERM for a group containing only zombies. Check
+        # numeric group membership without inspecting process names or arguments.
+        listing = subprocess.check_output(["/bin/ps", "-axo", "pgid=,stat="], text=True, timeout=2)
+        for line in listing.splitlines():
+            group, state = line.split(maxsplit=1)
+            if group == str(process.pid) and not state.startswith("Z"):
+                raise
+        return False
+    return True
+
+
+def _stop_groups(processes) -> None:
+    groups = tuple(processes)
+    for process in groups:
+        _signal_group(process, signal.SIGTERM)
+
+    deadline = time.monotonic() + 3
+    remaining = groups
+    while remaining:
+        for process in remaining:
+            process.poll()
+        remaining = tuple(process for process in remaining if _signal_group(process, 0))
+        if not remaining or time.monotonic() >= deadline:
+            break
+        time.sleep(0.05)
+
+    for process in remaining:
+        _signal_group(process, signal.SIGKILL)
+    for process in groups:
+        process.wait(timeout=3)
+
+
 def _supervise(env: dict[str, str], *, offline: bool, ports) -> None:
     invocation = [sys.executable, "-m", "jobbie_private.pilot", "_child"]
     roles = {"http": ports[0], "downloads": ports[1], "worker": 0}
@@ -285,31 +324,31 @@ def _supervise(env: dict[str, str], *, offline: bool, ports) -> None:
     try:
         while not stopping:
             for role, port in roles.items():
+                if stopping:
+                    break
                 proc = processes.get(role)
                 if proc is not None and proc.poll() is None:
                     continue
                 if proc is not None:
+                    _stop_groups((proc,))
                     restarts[role] += 1
                     if restarts[role] > 2:
                         raise RuntimeError("Pilot process restart limit reached")
+                if stopping:
+                    break
                 args = [*invocation, role, "--port", str(port)]
                 if offline:
                     args.append("--offline")
-                processes[role] = subprocess.Popen(args, cwd=ROOT, env=env, stderr=subprocess.DEVNULL)
+                processes[role] = subprocess.Popen(args, cwd=ROOT, env=env, stderr=subprocess.DEVNULL,
+                                                   start_new_session=True)
                 report("process_started", role=role, pid=processes[role].pid, restart=restarts[role])
             time.sleep(0.3)
     finally:
-        for proc in processes.values():
-            if proc.poll() is None:
-                proc.terminate()
-        for proc in processes.values():
-            try:
-                proc.wait(timeout=3)
-            except subprocess.TimeoutExpired:
-                proc.kill()
-                proc.wait()
-        for sig, handler in previous.items():
-            signal.signal(sig, handler)
+        try:
+            _stop_groups(processes.values())
+        finally:
+            for sig, handler in previous.items():
+                signal.signal(sig, handler)
 
 
 def run_local(args, root: Path) -> None:
