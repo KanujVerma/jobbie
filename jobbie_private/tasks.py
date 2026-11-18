@@ -8,12 +8,13 @@ from pathlib import Path
 import sqlite3
 import stat
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 TASK_LIFETIME = 15 * 60
 RETENTION = 24 * 60 * 60
 RATE_WINDOW = 60
 MAX_REQUESTS = 10
+_KEY_MARKER = b"jobbie-private-db-key-v1"
 
 
 def private_file(path: Path) -> Path:
@@ -37,11 +38,38 @@ def private_file(path: Path) -> Path:
     return path
 
 
+def verify_database_key(db: sqlite3.Connection, cipher: Fernet) -> None:
+    """Bind one key to the database before either process can change private data."""
+    db.execute("BEGIN IMMEDIATE")
+    db.execute("CREATE TABLE IF NOT EXISTS jobbie_private_key_v1 "
+               "(id INTEGER PRIMARY KEY CHECK(id=1), encrypted_marker BLOB NOT NULL)")
+    marker = db.execute("SELECT encrypted_marker FROM jobbie_private_key_v1 WHERE id=1").fetchone()
+    try:
+        if marker is not None:
+            if cipher.decrypt(marker[0]) != _KEY_MARKER:
+                raise InvalidToken
+            return
+
+        # An existing unbound store must authenticate all retained ciphertext
+        # before recording a key, otherwise mixed-key data could be adopted.
+        tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        if "discord_tasks" in tables:
+            for (payload,) in db.execute("SELECT payload FROM discord_tasks WHERE payload IS NOT NULL"):
+                cipher.decrypt(payload)
+        if "private_records_v1" in tables:
+            for (sealed,) in db.execute("SELECT sealed FROM private_records_v1 WHERE sealed IS NOT NULL"):
+                cipher.decrypt(sealed)
+    except (InvalidToken, TypeError):
+        raise ValueError("Private database encryption key does not match retained data") from None
+    db.execute("INSERT INTO jobbie_private_key_v1 VALUES (1,?)", (cipher.encrypt(_KEY_MARKER),))
+
+
 class TaskStore:
     def __init__(self, path: Path, key: bytes):
         self.cipher = Fernet(key)
         self.path = private_file(path)
         with self.connect() as db:
+            verify_database_key(db, self.cipher)
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS interaction_receipts (
                     id TEXT PRIMARY KEY, owner TEXT NOT NULL, received INTEGER NOT NULL
