@@ -233,3 +233,31 @@ Resume proposals retain exact character spans and immutable version hashes. Expl
 Local regression passed 1,220 tests including 10 candidate and repository evidence checks. Config validation passed. GitHub evidence contract tests used network-free provider fixtures.
 
 Independent review found two evidence classification defects. Protected education, metrics, employer names and dates now require explicit protected confirmation and stay out of ranking. Historical production evidence now requires affirmative production metadata and a non-transient deployment. Five new regressions pass.
+
+## P3-D read-only ranking and controls
+
+Adds a separate read-only catalogue projection, deterministic eligibility-first ranking, source-backed explanation, immutable selections and owner feedback. The existing webhook and Phase 2 fingerprint inputs stay outside this branch. Validation includes 46 observed-source scenarios from 23 historical listings, 40 existing eligibility fixture cases, and focused tests for expiry, missing facts, revocation, feedback, and signed controls. Roll back private job commands by removing the snapshot mount setting and refreshing the manifest when authorized. The private HTTPS endpoint, snapshot mount and Discord setup remain `BLOCKED_LIVE`.
+
+Final geography checks cover New York City and additional Bay Area city labels, with the latter requiring California source evidence for ambiguous city names. Six focused geographic cases now pass.
+
+Review reproduced geography scoring that combined city and state evidence from different locations. Geography now scores individual US locations. Regressions cover mixed-state lists and the distinct Tampa Bay region.
+
+## Phase 3 stack integration audit
+
+A signed loopback interaction exercised the actual WSGI endpoint, persisted deferred work, reopened the database from the worker path, parsed a synthetic DOCX, confirmed its fact through the owner console, and used it in the ranking explanation. The same result supported private saving, then dropped the fact after revocation. Authenticated download, backup restore and derived record removal passed. The separate catalogue file retained its original bytes. Provider-facing calls used fixtures.
+
+The audit reproduced a wrong-key startup that could mix ciphertext or consume an unreadable queued task. PRs #39 and #40 now bind the worker and vault to the retained database key and authenticate retained encrypted rows when adopting an unbound store. PR #42 now uses explicit target locations to break ranking ties. Existing eligibility and geography weights remain authoritative.
+
+The stack remains isolated with `BLOCKED_LIVE` owner setup and host-specific engineering described in the [release checklist](phases/PHASE-3.md#phase-3-release-gates). [Issue #8](https://github.com/KanujVerma/jobbie/issues/8) records exact-head CI and review results. [Phase 2 run 44286689134](https://github.com/KanujVerma/jobbie/actions/runs/44286689134) is a degraded scheduled receipt. Keep the 72-hour parity and cutover gates open.
+
+Local full-suite verification for the audited stack passed 1,332 tests. Configuration validation passed. The catalogue code and config fingerprints match the published Phase 2 receipt.
+
+## Phase 3 Mac synthetic pilot preparation
+
+Prepared an owner-only synthetic bundle and separate supervised loopback listeners. Local tests exercised guild-scoped signed requests, forged and unauthorized requests, transfer and body limits, slow-client deadlines, loopback downloads, queued task recovery after worker process replacement, redacted logs and catalogue hash preservation. Seatbelt runs the actual PDF and DOCX parser and denied private-file reads, writes and TCP connections in a local probe.
+
+Tailscale's Standalone macOS client is installed. Read-only checks found it disconnected, with HTTPS capability, an existing 443 listener and no active public Funnel route. Port 8443 is reserved for the proposed pilot upon approval. Discord setup and live command receipts remain `BLOCKED_OWNER_APPROVAL`. The runbook records the approval, costs, configuration and scoped rollback. [Mac pilot runbook](P3-MAC-PILOT.md)
+
+Local verification passed 1,337 tests and configuration validation. The sandbox-enabled focused run passed seven tests, including the full private flow with fixture transports. Git diff confirms the Phase 2 fingerprint inputs and state are outside the pilot patch.
+
+Independent review reproduced a Discord reply descendant surviving supervisor shutdown. Each role now has its own process group. Shutdown and replacement terminate the complete old group. Both lifecycle regressions failed before the correction and passed after it. The sandbox-enabled focused suite passed nine tests.

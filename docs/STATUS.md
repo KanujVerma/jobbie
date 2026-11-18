@@ -4,13 +4,22 @@ Phase 2 remains **PARTIAL**. Verify current GitHub main and Actions before actin
 
 ## Isolated Phase 3 stack
 
-P3-A adds a separate signed Discord endpoint and worker. The enabled manifest contains health, settings, and deferred task status. Additional commands and controls enter the manifest as their private backends arrive. Live Discord registration, HTTPS hosting, and keys are `BLOCKED_LIVE` pending owner setup and approval. [Phase 3 contract](phases/PHASE-3.md)
+**Implemented and exercised locally. Live release is `BLOCKED_LIVE`.** The four PRs remain open in dependency order. Use the release tracker for exact current heads, CI and review receipts. [Phase 3 tracker](https://github.com/KanujVerma/jobbie/issues/8)
 
+| Slot | Private capability |
+| --- | --- |
+| [P3-A #39](https://github.com/KanujVerma/jobbie/pull/39) | Signed owner interactions, ephemeral replies and durable deferred tasks |
+| [P3-B #40](https://github.com/KanujVerma/jobbie/pull/40) | Key-bound encrypted SQLite, resume versioning, deletion, backup and owner-controlled application records |
+| [P3-C #41](https://github.com/KanujVerma/jobbie/pull/41) | Candidate proposals, explicit decisions and approved commit-specific GitHub evidence |
+| [P3-D #42](https://github.com/KanujVerma/jobbie/pull/42) | Read-only ranking, current evidence explanations, location preference tie-breaks and working View, Save and Explain controls |
 
-P3-B adds owner-scoped encrypted profiles, resumes, job snapshots, saved-job and application ledgers, and isolated upload processing. Discord profile and application views and deferred resume upload use these backends. Owner-hosted storage and Discord activation remain `BLOCKED_LIVE`.
+A loopback test took a signed synthetic resume upload through the durable worker, real document parsing, owner confirmation, personalized search and Explain, Save, revocation, an authenticated download, backup restore and source deletion. Provider-facing transports used fixtures. The catalogue snapshot stayed byte-for-byte identical. [Integration test](../tests/test_p3_integration.py)
 
+Live readiness requires owner approval of a persistent host, HTTPS ingress, Discord registration and credentials, private storage and backup custody, and the read-only catalogue snapshot. Host-side engineering still needs to configure and verify the supervised processes, parser sandbox, ingress limits, redaction and restore on that host. Approved repository access is needed only for that evidence feature. [Release checklist](phases/PHASE-3.md#phase-3-release-gates)
 
-P3-C adds private candidate proposals with versioned source spans, explicit decisions and deletion or revocation invalidation. GitHub evidence requires a per-repository approval and pinned commit. Owner repository access and Discord registration remain `BLOCKED_LIVE`.
+The macOS synthetic pilot bundle is prepared and verified locally. Public Funnel and dedicated Discord setup remain `BLOCKED_OWNER_APPROVAL`. [Mac pilot runbook](P3-MAC-PILOT.md)
+
+Phase 2's [first ordinary post-#38 scan](https://github.com/KanujVerma/jobbie/actions/runs/44286689134) remained degraded with five Workday sources incomplete. Legacy JSON remains the delivery authority. The 72-hour healthy parity and exact cutover approval gates remain open. [Recorded receipt](https://github.com/KanujVerma/jobbie/issues/7#issuecomment-6981493023)
 
 ## Scheduled catalogue shadow through 2026-11-17 UTC
 

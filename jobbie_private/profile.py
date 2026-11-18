@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
 import hmac
+import json
+import os
 import re
 import time
 from typing import Callable
@@ -67,7 +70,15 @@ def private_commands(vault: PrivateStore) -> tuple[Command, ...]:
         if request.owner != vault.owner:
             return "Resume upload unavailable."
         try:
-            media_type, body = fetch_attachment(request.options["file"])
+            file = request.options["file"]
+            pilot = os.environ.get("JOBBIE_PILOT_UPLOADS")
+            if pilot is not None:
+                permitted = json.loads(pilot).get(file.get("filename"))
+                if permitted is None or file.get("size") != permitted["size"]:
+                    return "Pilot uploads use the supplied synthetic PDF or DOCX."
+            media_type, body = fetch_attachment(file)
+            if pilot is not None and hashlib.sha256(body).hexdigest() != permitted["sha256"]:
+                return "Pilot upload did not match the supplied synthetic file."
             text = parse_resume(media_type, body)
             version = vault.store_resume(media_type, body, text, request.key)
         except ValueError:

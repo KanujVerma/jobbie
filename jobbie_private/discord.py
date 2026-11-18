@@ -51,17 +51,28 @@ class Interaction:
 
 
 @dataclass(frozen=True)
+class Message:
+    content: str
+    rows: tuple[dict, ...] = ()
+
+
+@dataclass(frozen=True)
 class Command:
     path: tuple[str, ...]
     description: str
-    handler: Callable[[Interaction], str]
+    handler: Callable[[Interaction], str | Message]
     options: tuple[str, ...] = ()
     deferred: bool = False
     attachments: tuple[str, ...] = ()
 
 
-def response_data(content: str) -> dict:
-    return {"content": content[:1900], "allowed_mentions": {"parse": []}, "flags": EPHEMERAL | 4}
+def response_data(content: str | Message) -> dict:
+    message = content if isinstance(content, Message) else Message(content)
+    bounded = message.content.encode("utf-16-le", errors="replace")[:3800].decode("utf-16-le", errors="ignore")
+    data = {"content": bounded, "allowed_mentions": {"parse": []}, "flags": EPHEMERAL | 4}
+    if message.rows:
+        data["components"] = list(message.rows)
+    return data
 
 
 def default_commands(store: TaskStore, clock: Callable[[], float] = time.time) -> tuple[Command, ...]:
@@ -79,9 +90,13 @@ def default_commands(store: TaskStore, clock: Callable[[], float] = time.time) -
 
 class DiscordEndpoint:
     def __init__(self, key: Ed25519PublicKey, application: str, owner: str, store: TaskStore,
-                 commands: tuple[Command, ...], *, clock: Callable[[], float] = time.time):
+                 commands: tuple[Command, ...], *, guild: str | None = None,
+                 clock: Callable[[], float] = time.time):
         if not snowflake(application) or not snowflake(owner):
             raise ValueError("Discord application and owner IDs must be snowflakes")
+        if guild is not None and not snowflake(guild):
+            raise ValueError("Discord guild ID must be a snowflake")
+        self.guild = guild
         self.key, self.application, self.owner, self.store = key, application, owner, store
         self.commands = {command.path: command for command in commands}
         if len(self.commands) != len(commands):
@@ -91,6 +106,8 @@ class DiscordEndpoint:
     def manifest(self) -> list[dict]:
         roots: dict[str, dict] = {}
         for command in self.commands.values():
+            if command.path[0] == "component":
+                continue
             spec = {"name": command.path[-1], "description": command.description}
             if command.options:
                 spec["options"] = [{"name": name, "description": name.replace("_", " "),
@@ -135,7 +152,7 @@ class DiscordEndpoint:
             return 400, {}
         if document["type"] == 1:
             return 200, {"type": 1}
-        if document["type"] != 2:
+        if document["type"] not in (2, 3):
             return 404, {}
 
         if not self._owner_interaction(document):
@@ -144,7 +161,8 @@ class DiscordEndpoint:
         if not snowflake(interaction_id) or not isinstance(token, str) or not TOKEN.fullmatch(token):
             return 400, {}
         try:
-            command, options = self._parse_command(document.get("data"))
+            parse = self._parse_component if document["type"] == 3 else self._parse_command
+            command, options = parse(document.get("data"))
         except ValueError:
             return 400, {}
         if command is None:
@@ -169,6 +187,8 @@ class DiscordEndpoint:
     def _owner_interaction(self, document: dict) -> bool:
         if document.get("application_id") != self.application:
             return False
+        if self.guild is not None and document.get("guild_id") != self.guild:
+            return False
         if "member" in document:
             member = document["member"]
             if not isinstance(member, dict) or "user" in document:
@@ -177,6 +197,15 @@ class DiscordEndpoint:
         else:
             user = document.get("user")
         return isinstance(user, dict) and user.get("id") == self.owner
+
+    def _parse_component(self, data: object) -> tuple[Command | None, dict]:
+        if not isinstance(data, dict) or data.get("component_type") != 2:
+            raise ValueError("Invalid component")
+        custom_id = data.get("custom_id")
+        match = re.fullmatch(r"(save|explain):([0-9a-f]{32})", custom_id) if isinstance(custom_id, str) else None
+        if match is None:
+            raise ValueError("Invalid component")
+        return self.commands.get(("component", match[1])), {"result": match[2]}
 
     def _parse_command(self, data: object) -> tuple[Command | None, dict]:
         if not isinstance(data, dict) or not user_text(data.get("name"), 32):
@@ -209,7 +238,7 @@ class DiscordEndpoint:
                 file = files.get(value) if isinstance(files, dict) else None
                 if not isinstance(file, dict) or file.get("id") != value:
                     raise ValueError("Attachment was not resolved")
-                values[name] = {key: file.get(key) for key in ("id", "size", "content_type", "url")}
+                values[name] = {key: file.get(key) for key in ("id", "size", "content_type", "url", "filename") if key in file}
             else:
                 if option.get("type") != 3 or not user_text(value, 300):
                     raise ValueError("Invalid argument")
