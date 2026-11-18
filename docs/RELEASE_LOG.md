@@ -217,6 +217,8 @@ Hosted review reproduced an acknowledgement race. The original-response edit now
 
 ## P3-B private storage
 
+The vault checks the same database key binding before owner-console or service writes. Existing ciphertext remains readable only with its matching key, including after backup restore.
+
 Adds owner-scoped encrypted records, immutable resume and job versions, saved jobs, application records and append-only status attempts. Resume validation and parsing run with bounded upload size, isolated environment, CPU and wall limits, and Linux parser memory bounds. Downloads require a separate owner bearer and a short-lived signed ticket. Parent-scoped status is derived from explicit owner events. SQLite online backup retains encrypted records. Roll back by disabling P3-B handlers and keeping the private encrypted store. Live host, HTTPS, worker, operator setup and testing remain `BLOCKED_LIVE`.
 
 Local regression passed 1,206 tests, including 17 private storage, parsing and upload checks. Config validation passed. No Discord, private GitHub, or hosted data services were contacted by these tests.
