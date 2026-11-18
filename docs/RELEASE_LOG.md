@@ -210,3 +210,5 @@ Adds the owner-only Discord request boundary, separate encrypted durable tasks, 
 Local regression passed 1,187 tests, including 12 signed interaction cases. Configuration validation and a Plaid dry run passed. The dry run fetched 142 rows, recorded zero alerts, and preserved config, legacy state and checkpoint hashes.
 
 Independent review found two issues in the first revision. In-flight expiry now preserves an uncertain outcome across restart, and the documentation guard now covers private code and its requirements. Focused regressions failed before both corrections and passed afterward.
+
+Hosted review reproduced an acknowledgement race. The original-response edit now retries only an explicit Discord unknown-message or unknown-webhook rejection, within the interaction lifetime. Transport ambiguity stays uncertain and is never retried. The receipt and the retry regression cover the original timing case.

@@ -21,6 +21,10 @@ TOKEN = re.compile(r"[A-Za-z0-9._-]{1,512}")
 SNOWFLAKE = re.compile(r"[1-9][0-9]{16,19}")
 
 
+class ReplyUnavailable(Exception):
+    """Discord definitively rejected the edit because the original is absent."""
+
+
 def snowflake(value: object) -> bool:
     return isinstance(value, str) and SNOWFLAKE.fullmatch(value) is not None
 
@@ -201,7 +205,7 @@ class DiscordEndpoint:
             raise ValueError("Duplicate or missing argument")
         return command, values
 
-    def work_once(self, deliver: Callable[[str, str, dict], None]) -> bool:
+    def work_once(self, deliver: Callable[[str, str, dict, int], None]) -> bool:
         task = self.store.take(self.owner, int(self.clock()))
         if task is None:
             return False
@@ -228,7 +232,9 @@ class DiscordEndpoint:
             reply = response_data(content)
             # Discord fixes ephemerality at the initial deferred ACK.
             reply["flags"] &= ~EPHEMERAL
-            deliver(self.application, data["token"], reply)
+            deliver(self.application, data["token"], reply, expires)
+        except ReplyUnavailable:
+            self.store.finish(self.owner, task_id, "failed")
         except Exception:
             self.store.finish(self.owner, task_id, "reply_uncertain")
         else:

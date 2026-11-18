@@ -11,7 +11,7 @@ from wsgiref.simple_server import WSGIRequestHandler, make_server
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from .discord import DiscordEndpoint, MAX_BODY, default_commands
+from .discord import DiscordEndpoint, MAX_BODY, ReplyUnavailable, default_commands
 from .tasks import TaskStore
 
 HTTP = {200: "OK", 400: "Bad Request", 401: "Unauthorized", 403: "Forbidden",
@@ -65,17 +65,29 @@ def endpoint_from_env() -> DiscordEndpoint:
                            os.environ["JOBBIE_DISCORD_OWNER_ID"], store, default_commands(store))
 
 
-def edit_original(application: str, token: str, reply: dict) -> None:
-    connection = http.client.HTTPSConnection("discord.com", timeout=3)
-    try:
-        connection.request("PATCH", f"/api/v10/webhooks/{application}/{token}/messages/@original",
-                           body=json.dumps(reply, ensure_ascii=True),
-                           headers={"Content-Type": "application/json"})
-        response = connection.getresponse()
-        if response.status != 200:
+def edit_original(application: str, token: str, reply: dict, expires: int) -> None:
+    path = f"/api/v10/webhooks/{application}/{token}/messages/@original"
+    body = json.dumps(reply, ensure_ascii=True)
+    for delay in (0, 0.25, 0.5, 1, 2):
+        if delay:
+            time.sleep(delay)
+        remaining = expires - time.time()
+        if remaining <= 0:
+            break
+        connection = http.client.HTTPSConnection("discord.com", timeout=min(3, remaining))
+        try:
+            connection.request("PATCH", path, body=body, headers={"Content-Type": "application/json"})
+            response = connection.getresponse()
+            if response.status == 200:
+                return
+            if response.status == 404:
+                detail = json.loads(response.read(4097))
+                if isinstance(detail, dict) and detail.get("code") in (10008, 10015):
+                    continue
             raise OSError("Discord reply did not return success")
-    finally:
-        connection.close()
+        finally:
+            connection.close()
+    raise ReplyUnavailable("Discord original response is unavailable")
 
 
 def main() -> None:

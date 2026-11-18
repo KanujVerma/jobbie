@@ -170,3 +170,45 @@ def test_in_flight_reply_expiry_remains_uncertain(rig):
     assert rig.endpoint.work_once(timeout)
     assert rig.store.status(OWNER, find()["id"], rig.clock.now) == "reply_uncertain"
     assert not rig.endpoint.work_once(lambda *args: pytest.fail("unsafe retry"))
+
+
+def test_edit_waits_for_definitively_missing_original(monkeypatch):
+    import time
+    from jobbie_private.server import edit_original
+
+    provider = iter([(404, b'{"code":10008}'), (200, b'{}')])
+    requests = []
+    class HTTPS:
+        def __init__(self, host, timeout):
+            assert host == "discord.com"
+        def request(self, method, path, **kwargs):
+            requests.append((method, path, kwargs["body"]))
+        def getresponse(self):
+            status, body = next(provider)
+            return SimpleNamespace(status=status, read=lambda _: body)
+        def close(self):
+            pass
+
+    monkeypatch.setattr("jobbie_private.server.http.client.HTTPSConnection", HTTPS)
+    monkeypatch.setattr("jobbie_private.server.time.sleep", lambda _: None)
+    edit_original(APP, "fixture-token", {"content": "safe"}, int(time.time()) + 60)
+    assert len(requests) == 2 and requests[0] == requests[1]
+
+
+def test_edit_never_retries_unknown_transport_outcome(monkeypatch):
+    import time
+    from jobbie_private.server import edit_original
+
+    connections = []
+    class HTTPS:
+        def __init__(self, host, timeout):
+            connections.append(host)
+        def request(self, *args, **kwargs):
+            raise TimeoutError
+        def close(self):
+            pass
+
+    monkeypatch.setattr("jobbie_private.server.http.client.HTTPSConnection", HTTPS)
+    with pytest.raises(TimeoutError):
+        edit_original(APP, "fixture-token", {"content": "safe"}, int(time.time()) + 60)
+    assert len(connections) == 1
