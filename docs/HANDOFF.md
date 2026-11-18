@@ -4,13 +4,15 @@ Read AGENTS, STATUS, PHASES, exact specs/prompts, DECISIONS/CONTRACTS/SECURITY/O
 
 ## Active scope
 
-Build P3-A, P3-B, P3-C and P3-D as separate reviewable feature branches. Keep the stack off main while Phase 2 is in shadow and private deployment awaits owner authorization. P3-A adds the separate interaction boundary and durable tasks. Next implement the encrypted private model and resume upload in P3-B. [Stack plan](superpowers/plans/2026-11-18-phase-3-stack.md)
+Build P3-A, P3-B, P3-C and P3-D as separate reviewable feature branches. Keep the stack off main while Phase 2 is in shadow and private deployment awaits owner authorization. P3-A adds the interaction boundary and durable tasks. [Stack plan](superpowers/plans/2026-11-18-phase-3-stack.md)
 
 
-P3-B enables the encrypted local vault and owner console with a verified local backup/restore path. Next build P3-C candidate fact proposals and commit-attributed repository evidence. P3 private data and credentials stay outside Git.
+P3-B enables the encrypted local vault and owner console with a verified local backup/restore path. P3 private data and credentials stay outside Git.
 
 
-P3-C adds owner-confirmed facts and approved commit evidence. Next implement P3-D read-only catalogue search, scoring and working controls. Use current fact decisions on every match and preserve the application ledger boundary.
+P3-C adds owner-confirmed facts and approved commit evidence. Use current fact decisions on every match and preserve the application ledger boundary.
+
+P3-D adds versioned read-only jobs, ranking, Save, Explain and relevance feedback to the isolated stack. Live activation needs owner-approved credentials, hosting and a verified catalogue snapshot. The next independent planned work is the Phase 4 benchmark after Phase 3 release authorization. [Phase 4 contract](phases/PHASE-4.md)
 
 P2-C2 scheduled shadow reliability. The original C2 bootstrap and cache restore have live receipts. Workday HTTP 429 and rows without posting URLs can still leave a scan degraded. Preserve the 13 enabled original sources, two historical disabled entries, legacy ACK history, and encrypted checkpoint lineage. Keep public feeds off and use ordinary scheduled runs for production evidence.
 

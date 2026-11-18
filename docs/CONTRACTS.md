@@ -102,3 +102,7 @@ C2 schema2: immutable normalized content records + exact compressed scan members
 ## Phase 3 evidence decisions
 
 An evidence proposal has an owner-only scope, a source type, a claim category and an immutable record ID. Resume provenance includes version ID, file digest, and exact extracted-text character offsets. An approved GitHub source binds repository and account IDs, commit SHA, changed code paths, signature status, and retrieval time. Production evidence requires the exact commit to have a successful production deployment status. Independent owner decisions confirm, revoke, or atomically replace a proposal. A deleted source or revoked repository approval makes its facts unavailable. Search reads active facts on demand. Protected claims stay outside ranking.
+
+## Phase 3 read-only job ranking
+
+The versioned reader binds each result to a catalogue UUID, canonical job ID, source ID, exact snapshot SHA and official URL. Eligible jobs use weights of 30 role, 25 skills, 15 geography, 10 annual base pay, 10 posting freshness and 10 company. Unknown dimensions are absent from the available weight. Score describes fit with available evidence. Search presents eligible jobs before review-required jobs and hides excluded jobs. Explain recomputes current owner-confirmed facts. Save, Explain and feedback revalidate the selected source snapshot. Feedback records an owner event and can hide a job or serve as a tie-breaker. Saving a listing creates a saved-job record only.

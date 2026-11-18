@@ -15,10 +15,14 @@ from wsgiref.simple_server import WSGIRequestHandler, make_server
 from cryptography.fernet import InvalidToken
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
+from src.config import load_config
+
+from .catalogue import CatalogueReader
 from .discord import DiscordEndpoint, MAX_BODY, ReplyUnavailable, default_commands, reject_duplicate
 from .evidence import Evidence, evidence_commands
 from .github import GitHubEvidence, GitHubRead
 from .profile import DownloadRoute, private_commands, safe_profile
+from .ranking import Ranking, ranking_commands
 from .storage import PrivateStore, STATUSES
 from .tasks import TaskStore
 
@@ -82,8 +86,19 @@ class QuietRequestHandler(WSGIRequestHandler):
 def endpoint_from_env(vault: PrivateStore) -> DiscordEndpoint:
     store = TaskStore(vault.path, vault.key)
     key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(os.environ["JOBBIE_DISCORD_PUBLIC_KEY"]))
-    return DiscordEndpoint(key, os.environ["JOBBIE_DISCORD_APPLICATION_ID"], vault.owner, store,
-                           (*default_commands(store), *private_commands(vault), *evidence_commands(vault)))
+    commands = (*default_commands(store), *private_commands(vault), *evidence_commands(vault))
+    path = os.environ.get("JOBBIE_P3_CATALOGUE_PATH")
+    if path:
+        reader = CatalogueReader(Path(path))
+        try:
+            reader.verify()
+            filters = load_config().filters
+        except (ValueError, OSError):
+            # Preserve the existing private capabilities if the catalogue input is unavailable.
+            pass
+        else:
+            commands += ranking_commands(Ranking(reader, vault, filters=filters))
+    return DiscordEndpoint(key, os.environ["JOBBIE_DISCORD_APPLICATION_ID"], vault.owner, store, commands)
 
 
 def edit_original(application: str, token: str, reply: dict, expires: int) -> None:

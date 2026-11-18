@@ -229,3 +229,7 @@ Resume proposals retain exact character spans and immutable version hashes. Expl
 Local regression passed 1,220 tests including 10 candidate and repository evidence checks. Config validation passed. GitHub evidence contract tests used network-free provider fixtures.
 
 Independent review found two evidence classification defects. Protected education, metrics, employer names and dates now require explicit protected confirmation and stay out of ranking. Historical production evidence now requires affirmative production metadata and a non-transient deployment. Five new regressions pass.
+
+## P3-D read-only ranking and controls
+
+Adds a separate read-only catalogue projection, deterministic eligibility-first ranking, source-backed explanation, immutable selections and owner feedback. The existing webhook and Phase 2 fingerprint inputs stay outside this branch. Validation includes 46 observed-source scenarios from 23 historical listings, 40 existing eligibility fixture cases, and focused tests for expiry, missing facts, revocation, feedback, and signed controls. Roll back private job commands by removing the snapshot mount setting and refreshing the manifest when authorized. The private HTTPS endpoint, snapshot mount and Discord setup remain `BLOCKED_LIVE`.
