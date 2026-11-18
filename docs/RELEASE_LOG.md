@@ -235,3 +235,5 @@ Independent review found two evidence classification defects. Protected educatio
 Adds a separate read-only catalogue projection, deterministic eligibility-first ranking, source-backed explanation, immutable selections and owner feedback. The existing webhook and Phase 2 fingerprint inputs stay outside this branch. Validation includes 46 observed-source scenarios from 23 historical listings, 40 existing eligibility fixture cases, and focused tests for expiry, missing facts, revocation, feedback, and signed controls. Roll back private job commands by removing the snapshot mount setting and refreshing the manifest when authorized. The private HTTPS endpoint, snapshot mount and Discord setup remain `BLOCKED_LIVE`.
 
 Final geography checks cover New York City and additional Bay Area city labels, with the latter requiring California source evidence for ambiguous city names. Six focused geographic cases now pass.
+
+Review reproduced geography scoring that combined city and state evidence from different locations. Geography now scores individual US locations. Regressions cover mixed-state lists and the distinct Tampa Bay region.

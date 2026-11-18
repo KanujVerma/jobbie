@@ -7,6 +7,7 @@ from decimal import Decimal
 import re
 
 from src.eligibility import EligibilityVerdict, classify_eligibility
+from src.filtering import _check_single_location
 
 from .catalogue import CatalogueReader, Listing, PROJECTION_VERSION
 from .discord import Command, Interaction, Message
@@ -21,9 +22,9 @@ DEFAULT_ROLES = ("software engineer", "software developer", "backend engineer", 
 SKILLS = ("python", "javascript", "typescript", "java", "c++", "c#", "sql", "postgresql", "react",
           "node.js", "aws", "azure", "kubernetes", "docker", "git", "golang", "rust", "swift",
           "pytorch", "tensorflow", "redis", "graphql", "linux", "html", "css", "spark", "terraform")
-BAY = re.compile(r"\b(?:san francisco|bay area)\b")
+BAY = re.compile(r"\b(?:san francisco|sf bay area)\b")
 BAY_CITIES = re.compile(r"\b(?:san jose|oakland|mountain view|palo alto|santa clara|sunnyvale|"
-                        r"san mateo|redwood city|cupertino|menlo park|fremont|berkeley)\b")
+                        r"san mateo|redwood city|cupertino|menlo park|fremont|berkeley|bay area)\b")
 CALIFORNIA = re.compile(r"\b(?:california|ca)\b")
 PRIORITY = re.compile(r"\b(?:new york city|nyc|manhattan|brooklyn|chicago|texas|florida)\b"
                       r"|\bnew york,\s*ny\b|,\s*(?:tx|fl)\b")
@@ -90,13 +91,13 @@ def rank_listing(listing: Listing, skills: dict[str, tuple[str, ...]], filters: 
     matching = tuple(skill for skill in evidence if skills.get(skill))
     missing = tuple(skill for skill in evidence if skill not in matching)
     supported = tuple(sorted({key for name in matching for key in skills[name]}))
-    location = job.location.casefold()
     geography = None
     if "US_LOCATION_CONFIRMED" in eligibility.reasons:
-        california = CALIFORNIA.search(location)
-        if BAY.search(location) or (california and BAY_CITIES.search(location)):
+        entries = re.split(r"[;\n|]", job.location or "")
+        locations = [entry.casefold().strip() for entry in entries if _check_single_location(entry)[0] is True]
+        if any(BAY.search(entry) or (CALIFORNIA.search(entry) and BAY_CITIES.search(entry)) for entry in locations):
             geography = 15
-        elif california or PRIORITY.search(location):
+        elif any(CALIFORNIA.search(entry) or PRIORITY.search(entry) for entry in locations):
             geography = 10
         else:
             geography = 5

@@ -183,3 +183,15 @@ def test_geography_prioritizes_verified_locales(location, points):
     result = rank_listing(listing(eligible_job(location=location)), {}, {}, NOW)
     assert result.eligibility.status == "eligible"
     assert result.weights["geography"] == points
+
+
+@pytest.mark.parametrize(("location", "points"), [
+    ("Fremont, NE; Los Angeles, CA", 10),
+    ("Los Angeles, CA | Fremont, NE", 10),
+    ("Fremont, CA; Los Angeles, CA", 15),
+    ("Tampa Bay Area, FL", 10),
+])
+def test_geography_does_not_join_location_evidence_across_entries(location, points):
+    result = rank_listing(listing(eligible_job(location=location)), {}, {}, NOW)
+    assert result.eligibility.status == "eligible"
+    assert result.weights["geography"] == points
