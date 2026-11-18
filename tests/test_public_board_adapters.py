@@ -159,13 +159,23 @@ def test_http_failure_is_not_empty_healthy_source(platform,status):
 
 @responses.activate
 def test_429_uses_shared_bounded_retry_and_user_agent():
-    responses.add(responses.GET, AS_URL, status=429, headers={'Retry-After':'99999'})
+    responses.add(responses.GET, AS_URL, status=429, headers={'Retry-After':'30'})
     responses.add(responses.GET, AS_URL, json=payload('ashby'))
     with patch('src.http.time.sleep') as sleep:
         assert len(list(adapter('ashby').fetch())) == 1
     sleep.assert_called_once_with(30.0)
     assert responses.calls[0].request.headers['User-Agent'] == 'jobbie-test/1'
     assert len(responses.calls) == 2
+
+
+@responses.activate
+def test_long_retry_after_surfaces_as_public_board_failure():
+    responses.add(responses.GET, AS_URL, status=429, headers={'Retry-After':'99999'})
+    with patch('src.http.time.sleep') as sleep:
+        with pytest.raises(PublicBoardError, match='HTTP 429'):
+            list(adapter('ashby').fetch())
+    sleep.assert_not_called()
+    assert len(responses.calls) == 1
 
 
 @pytest.mark.parametrize('platform', ['greenhouse','ashby'])

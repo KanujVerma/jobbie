@@ -16,6 +16,8 @@ from collections.abc import Iterator
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import requests
+
 from src.adapters.base import BaseAdapter
 from src.eligibility import _check_tech_role, _SENIOR_TITLE_PATTERN, _INTERN_TITLE_PATTERN
 from src.filtering import make_job_id, _check_single_location
@@ -111,6 +113,8 @@ def _fetch_workday_detail(
         if resp.status_code == 200:
             return resp.json().get("jobPostingInfo", {})
     except Exception as exc:
+        if isinstance(exc, requests.HTTPError) and exc.response is not None and exc.response.status_code == 429:
+            raise
         logger.debug("Workday CXS detail fetch failed for %s: %s", external_path, exc)
     return None
 
@@ -167,9 +171,13 @@ class WorkdayAdapter(BaseAdapter):
                 self.record_fetch_error(exc)
                 return
 
+            detail_rate_limited = False
             for posting in postings:
                 title = posting.get("title") or ""
                 external_path = posting.get("externalPath") or ""
+                if not external_path:
+                    self.record_fetch_error("Workday posting missing externalPath")
+                    continue
                 locations_text = posting.get("locationsText") or ""
                 posted_on = posting.get("postedOn") or ""
                 bullet_fields = posting.get("bulletFields") or []
@@ -178,14 +186,11 @@ class WorkdayAdapter(BaseAdapter):
 
                 # Workday externalPath may or may not include the site segment.
                 # Ensure it's always present: base_url/{site}/job/...
-                if external_path:
-                    site_prefix = f"/{site.strip('/')}/"
-                    if not external_path.startswith(site_prefix):
-                        url = f"{base_url.rstrip('/')}/{site.strip('/')}{external_path}"
-                    else:
-                        url = f"{base_url.rstrip('/')}{external_path}"
+                site_prefix = f"/{site.strip('/')}/"
+                if not external_path.startswith(site_prefix):
+                    url = f"{base_url.rstrip('/')}/{site.strip('/')}{external_path}"
                 else:
-                    url = ""
+                    url = f"{base_url.rstrip('/')}{external_path}"
                 official_id = _extract_official_id(bullet_fields)
                 posted_at = _parse_posted_on(posted_on, reference_dt=detected_at)
                 department = job_family_group if job_family_group else None
@@ -211,15 +216,20 @@ class WorkdayAdapter(BaseAdapter):
                 is_us = None if is_multi_loc else _check_single_location(location)[0]
 
                 if (
-                    is_tech
+                    not detail_rate_limited
+                    and is_tech
                     and not is_nontech
                     and not is_senior
                     and not is_intern
                     and is_us is not False
                     and self.config.get("fetch_details", True)
-                    and external_path
                 ):
-                    detail = _fetch_workday_detail(self.http, base_url, tenant, site, external_path)
+                    try:
+                        detail = _fetch_workday_detail(self.http, base_url, tenant, site, external_path)
+                    except requests.HTTPError as exc:
+                        self.record_fetch_error(exc)
+                        detail_rate_limited = True
+                        detail = None
                     if detail:
                         clean_desc = _clean_workday_description(detail.get("jobDescription", ""))
                         time_type = detail.get("timeType")
@@ -265,6 +275,9 @@ class WorkdayAdapter(BaseAdapter):
                     matched_keywords=(),
                 )
 
+            # Keep every usable row in this response, then stop calling the throttled tenant.
+            if detail_rate_limited:
+                return
             offset += _LIMIT
             if total is not None and offset >= total:
                 break

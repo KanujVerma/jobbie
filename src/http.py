@@ -1,4 +1,6 @@
 from __future__ import annotations
+from datetime import timezone
+from email.utils import parsedate_to_datetime
 import time
 import random
 import logging
@@ -9,9 +11,8 @@ logger = logging.getLogger(__name__)
 
 _RETRY_DELAYS = [1, 2, 4]
 
-# An ATS that throttles us can ask for an arbitrarily long wait. Honour the ask,
-# but never past this, or one rude Retry-After parks the whole run until the CI
-# step times out and every remaining company goes unscraped.
+# If the provider asks for more time than the scan can spare, fail this request.
+# Retrying at the cap would send a request before the provider's deadline.
 _MAX_RETRY_AFTER_SECONDS = 30.0
 
 
@@ -32,18 +33,20 @@ class HTTPClient:
 
     @staticmethod
     def _retry_after_delay(resp: requests.Response, fallback: float) -> float:
-        """Seconds to wait per the Retry-After header, capped. Falls back on absence.
-
-        Only the numeric form is honoured; the HTTP-date form falls back to the
-        normal backoff rather than pretending to parse it.
-        """
+        """Read the provider's delay-seconds or HTTP-date, falling back on invalid input."""
         raw = resp.headers.get("Retry-After")
         if raw is None:
             return fallback
+        raw = raw.strip()
+        if raw.isascii() and raw.isdecimal():
+            return float(raw)
         try:
-            return min(float(raw), _MAX_RETRY_AFTER_SECONDS)
-        except (TypeError, ValueError):
+            retry_at = parsedate_to_datetime(raw)
+        except (TypeError, ValueError, OverflowError):
             return fallback
+        if retry_at.tzinfo is None:
+            retry_at = retry_at.replace(tzinfo=timezone.utc)
+        return max(0.0, retry_at.timestamp() - time.time())
 
     def _request(self, method: str, url: str, **kwargs) -> requests.Response:
         kwargs.setdefault("timeout", self.timeout)
@@ -59,6 +62,9 @@ class HTTPClient:
                         delay = _RETRY_DELAYS[min(attempt, len(_RETRY_DELAYS) - 1)]
                         if resp.status_code == 429:
                             delay = self._retry_after_delay(resp, delay)
+                            if delay > _MAX_RETRY_AFTER_SECONDS:
+                                logger.warning("%s %s returned 429 with Retry-After beyond the wait budget", method, url)
+                                resp.raise_for_status()
                         logger.warning(
                             f"{method} {url} → {resp.status_code}; "
                             f"retrying in {delay}s (attempt {attempt + 1}/{self.max_retries})"

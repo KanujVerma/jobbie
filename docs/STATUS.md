@@ -1,6 +1,14 @@
 # Jobbie canonical project status
 
-Snapshot2026-11-12UTC; verify live HEAD/PRs/Actions before acting. Phase2 remains PARTIAL. [Requirement audit](PHASE-2-ACCEPTANCE.md).
+Phase 2 remains **PARTIAL**. Verify current GitHub main and Actions before acting. [Requirement audit](PHASE-2-ACCEPTANCE.md).
+
+## Scheduled catalogue shadow through 2026-11-17 UTC
+
+The first ordinary C2 run bootstrapped and published encrypted custody. Across 21 ordinary runs through [44164832540](https://github.com/KanujVerma/jobbie/actions/runs/44164832540), 21 verified a fresh exact-key cache restore, 7 reported healthy parity, and 14 were degraded. The longest consecutive healthy stretch in the public logs was about 26 hours, and the last healthy run was [43767315174](https://github.com/KanujVerma/jobbie/actions/runs/43767315174). These are public run counters. The authenticated 72-hour audit remains open.
+
+The latest run restored the parent checkpoint and published its successor under the same catalogue UUID. It fetched 3,856 rows and recorded zero job alert ACKs. Eight of 13 adapters responded successfully, including an empty SanDisk response. Workday returned HTTP 429 for Micron, Salesforce, CrowdStrike and Intel, and stopped Applied Materials after 80 rows. Parity was false with `BLOCKED_SOURCE_SCAN`. [Run and logs](https://github.com/KanujVerma/jobbie/actions/runs/44164832540)
+
+[Run 43790517896](https://github.com/KanujVerma/jobbie/actions/runs/43790517896) also recorded two Applied Materials catalogue rejects. A separate local dry run reproduced one rejection in the same source: the adapter yielded a row without an official posting URL while reporting success. The exact historical rows and the original 429 headers were unavailable in the public logs. See [release evidence](RELEASE_LOG.md#p2-c2-scheduled-shadow-reliability).
 
 ## Merged components
 
@@ -31,7 +39,9 @@ Final C2 full1171passed45.02s after hosted audit-window correction; exact-head C
 
 All3evaluated feeds remain OFF/BLOCKED_SOURCE_RIGHTS/BLOCKED_APPROVAL;0datasets fetched and real coverage/freshness NOT_MEASURED. [Rights](evidence/P2-B-SOURCE-RIGHTS.json), [feed guide](PUBLIC_FEEDS.md). Owner onboarding is [COMPANY_INTAKE.md](COMPANY_INTAKE.md); requested monitors default discovered/networkfalse/referralunavailable and stay disabled until separate exact approval.
 
-Actual>=72h catalogue shadow has not started. Cutover requires exact owner approval, parity/identity/ACK reconciliation and rollback proof, then an ordinary scheduled run. BLOCKED_72H_EVIDENCE/BLOCKED_APPROVAL remain; finish independent code/release work meanwhile. Exact next major goal: P3-A signed allowlisted private Discord interactions, private profile/resume upload/evidence and deterministic matching. Tailoring Phase4; exact one-job approved applications Phase5. No verified dot API/trigger.
+Cutover requires a qualifying 72-hour window, parity/identity/ACK reconciliation, rollback proof and exact owner approval, followed by an ordinary scheduled run. `BLOCKED_72H_EVIDENCE` and `BLOCKED_APPROVAL` remain. The next major phase begins with P3-A signed, allowlisted Discord interactions after P2-C releases.
+
+### Historical C2 development and merge evidence
 
 C2 rejection-isolation correction passes full1168tests43.52s; first failed live shadow receipt remains preserved, never a passing claim. Corrected original13memory-only read is still in progress. Optional repository secret CATALOGUE_SHADOW_KEY was provisioned2026-11-12T04:07:35Z from a new private owner-only recovery file; value withheld. Current main does not consume it, so this is preparation, not shadow deployment or cutover.
 
@@ -47,4 +57,4 @@ C2 audit correction full1171passed45.02s/config/diff, no ingestion/source/alert 
 
 ## C2 release2026-11-12
 
-PR36 merged830dcd13d05433b286e7b810385807481e9cc744 after exactfe8f7f73e42c928e99d96025ff906d43169a1a6d test43155934557/public-read43155934550 and completed hosted review with both finding flags false. The merged/reviewed trees match. Postmerge Tests43156415856 passed.1171local tests include the hosted audit-window regression; local Sol independently approved earlier source with1170tests. Key provisioned and Job Alerts workflow337994764active. No ordinary post-C2run qualifies yet: first bootstrap/custody/restore/parity are PENDING_LIVE, actual72hclock has not started. Code release is not operational evidence. Legacy JSON remains authority; no employer/feed/canonical activation beyond authorized shadow code deployment.
+PR36 merged830dcd13d05433b286e7b810385807481e9cc744 after exactfe8f7f73e42c928e99d96025ff906d43169a1a6d test43155934557/public-read43155934550 and completed hosted review with both finding flags false. The merged/reviewed trees match. Postmerge Tests43156415856 passed.1171local tests include the hosted audit-window regression; local Sol independently approved earlier source with1170tests. The key and workflow were ready at merge. The scheduled evidence above supersedes the merge-time live status.

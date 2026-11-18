@@ -4,15 +4,17 @@ Read AGENTS, STATUS, PHASES, exact specs/prompts, DECISIONS/CONTRACTS/SECURITY/O
 
 ## Active scope
 
-Full-send ALL remaining feasible Phase2 across scoped PRs. Preserve13original enabled Network Priority sources/unconfirmed referrals and2historicaldisabled. Expansion opt-in. No exact new employer/feed or canonical cutover approval. No production reset/seed, forced backfill, surprise sends, private disclosures, paid services, invented dot API or applications. Continue independent work despite rights/access/approval/time gates; never claim them satisfied by fixtures.
+P2-C2 scheduled shadow reliability. The original C2 bootstrap and cache restore have live receipts. Workday HTTP 429 and rows without posting URLs can still leave a scan degraded. Preserve the 13 enabled original sources, two historical disabled entries, legacy ACK history, and encrypted checkpoint lineage. Keep public feeds off and use ordinary scheduled runs for production evidence.
 
-## Verified releases and production
+After the reliability PR merges, inspect the first ordinary main run containing the fix. Record source coverage and errors, parity, job ACK counts, legacy state persistence, parent checkpoint restore, fresh exact-key restore, and publication. A partial scan breaks the qualifying 72-hour window. Keep legacy JSON as delivery authority and hold cutover for exact owner approval. [Current release evidence](RELEASE_LOG.md#p2-c2-scheduled-shadow-reliability)
+
+## Historical releases and C2 development
 
 Merged #23/#29/#30/#32/#31/#33/#34/#35. STATUS has full SHAs; C1 #35 merged1614d804001edbf1d1fe10f33d661b6331c8961a after exact0be562f CI/hosted clean; postmerge43148218676 passed. Watches for merged PRs cleared; no local delegates running.
 
 Ordinary43140198821 on f3a61f4 committed state d4724df: Plaid143/Oracle2113complete quiet baselines,0new job ACKs, all257prior seen ACK flags/10URL entries retained.13successful responses/1empty SanDisk,11569fetched/2matched/356review/11211excluded,0job ACKs/failures,600.08s/301.43minute gap. See evidence/P2-R2-R3-LIVE-2026-11-12.*. Baseline gates VERIFIED_LIVE; no seeded state or forced send. Production seen SHA256e1967067a69c86c5e39b8ac49e3c206aeb2193b17387aea4bf1dfa6885c7cdd6, config8afbe552edb59566e6bedf604510337bf5d1e3a6cc02c02f1b8161dd0ece12f0. Never restore the older12bed state. Earlier43100310762 established2individual HTTP204job sends; human receipt/rendering unverified. SanDisk replacement406blocked, no bypass/no-openings claim; cron best effort.
 
-## C2 current work
+### C2 implementation checkpoints
 
 Native feat-p2-owner-intake-8ecb3af4bff95df4 worktree now owns feat/p2-c-shadow, rebased onto actual C1 main1614d804. Original checkout remains merged C1 feature branch; verify cleanliness/ownership before editing. Use /Users/kanuj/Documents/projects/jobbie/.venv/bin/python with explicit native cwd.
 
@@ -36,7 +38,7 @@ C2 PR36 hosted H1 fixed directly: bounded audit now starts from recent96h instea
 
 C2 H1 corrected code full1171passed45.02s/config/diff; no ingestion/alert/source changes. Push new head, link immediately, resolve replied finding and request exactly one new hosted review, retaining existing watcher.
 
-## After C2 merge
+### C2 merge-time checkpoint
 
 PR36 is merged830dcd13d05433b286e7b810385807481e9cc744. Exactfe8f7f7 named CI checks/completed hosted review clean, merged tree identical; postmerge43156415856success. No open C2code PR. Local Sol source1170pass/approval and later1171pass audit correction remain separately qualified. Secret prepared, workflow337994764active, no ordinary post-C2run yet at this snapshot. No new SourceActor/link/watch of merged PR36 required; its watch is cleared.
 
