@@ -4,6 +4,8 @@ Read AGENTS, STATUS, PHASES, exact specs/prompts, DECISIONS/CONTRACTS/SECURITY/O
 
 ## Active scope
 
+Build P3-A, P3-B, P3-C and P3-D as separate reviewable feature branches. Keep the stack off main while Phase 2 is in shadow and private deployment awaits owner authorization. P3-A adds the separate interaction boundary and durable tasks. Next implement the encrypted private model and resume upload in P3-B. [Stack plan](superpowers/plans/2026-11-18-phase-3-stack.md)
+
 P2-C2 scheduled shadow reliability. The original C2 bootstrap and cache restore have live receipts. Workday HTTP 429 and rows without posting URLs can still leave a scan degraded. Preserve the 13 enabled original sources, two historical disabled entries, legacy ACK history, and encrypted checkpoint lineage. Keep public feeds off and use ordinary scheduled runs for production evidence.
 
 After the reliability PR merges, inspect the first ordinary main run containing the fix. Record source coverage and errors, parity, job ACK counts, legacy state persistence, parent checkpoint restore, fresh exact-key restore, and publication. A partial scan breaks the qualifying 72-hour window. Keep legacy JSON as delivery authority and hold cutover for exact owner approval. [Current release evidence](RELEASE_LOG.md#p2-c2-scheduled-shadow-reliability)

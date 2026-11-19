@@ -1,11 +1,22 @@
 # Phase 3 executable contract — authenticated search, private profile and application ledger
 
-**PLANNED.** Depends on P2-C released. No auto-application or model-driven external action in this phase. Four sequential PRs P3-A–P3-D; keep legacy webhook alerts working if this private subsystem fails.
+**ISOLATED DEVELOPMENT.** The owner has authorized a four-PR development stack while P2-C remains in shadow. Private deployment is separately authorized. No auto-application or model-driven external action in this phase. Four sequential PRs P3-A–P3-D; keep legacy webhook alerts working if this private subsystem fails.
 
 ## P3-A: authenticated Discord interactions
 - Verify official Discord Ed25519 signature and timestamp/replay controls before executing commands. Single owner's allowlisted Discord ID; private ephemeral replies and rate limiting.
 - `/jobs find`, `/jobs top`, `/profile show`, `/github repos`, `/resume upload`, `/applications`, `/settings`, `/health`. Real buttons/commands: job source link, save, explain, request tailoring (only when Phase 4 live). No inert "Approve & Apply" before Phase 5.
 - Defer tasks within Discord deadline, use durable queue for long analysis; sign all private URLs and reject cross-user/expired requests. No full channel scanning.
+
+The isolated service emits the currently working command manifest with
+`python -m jobbie_private.server commands`. Its `serve` mode binds to loopback and
+`worker` processes deferred interactions through the original ephemeral reply.
+`/tasks status` lists the owner's recent requests across restarts. Live
+configuration requires `JOBBIE_DISCORD_PUBLIC_KEY`,
+`JOBBIE_DISCORD_APPLICATION_ID`, `JOBBIE_DISCORD_OWNER_ID`,
+`JOBBIE_PRIVATE_DB`, and a separately custodied Fernet `JOBBIE_PRIVATE_KEY`.
+Use an existing owner-only directory outside Git, a supervised worker and an
+owner-approved HTTPS ingress with body and connection time limits. Roll back
+by removing the interactions endpoint and stopping both private processes.
 
 ## P3-B: durable private profile/storage and basic app ledger
 - Owner-scoped private DB + private blob store for uploaded resumes, temporary PDFs, validated candidate answer drafts and job metadata. No raw resumes/citizenship details in public GitHub state or Discord embeds.
