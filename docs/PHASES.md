@@ -14,7 +14,7 @@ One small user-usable release at a time. Each functionality PR must keep earlier
 | Shipped code (#32) | P2-ACT owner-directed intake | Issue form, tested portable CLI requests and disabled reviewed proposals for monitor/startup-research | P2-R1; activation separately approved |
 | Merged #34; all feeds OFF | P2-B optional public feeds | Reusable OFF capability, rights/provenance/official-link checks; activate only if permitted and owner-approved | P2-A; expansion optional |
 | C1 #35/C2 #36 merged; live gates pending | P2-C canonical catalogue | SQLite pre-filter identity/history/search/export; legacy delivery authority through >=72h shadow and approved cutover | Existing normalized adapters; feed activation optional |
-| 3A | P3-A — Signed Discord interactions | Real private buttons/commands, allowlist, durable task status | P2-C |
+| 3A | P3-A — Signed Discord interactions | Owner-only private commands and durable task status | Isolated development authorized during P2-C shadow. Live activation requires owner authorization. |
 | 3B | P3-B — Private store + basic app ledger | Saved jobs, owner-only docs/versioned uploads, append-only application event/attempt records | P3-A |
 | 3C | P3-C — Candidate evidence | Owner-confirmed facts and explicitly approved GitHub project evidence, no private leaks | P3-B |
 | 3D | P3-D — Ranking/search | Deterministic fit explanations; AI only where verified and budgeted | P3-C |

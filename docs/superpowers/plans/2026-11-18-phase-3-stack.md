@@ -1,0 +1,12 @@
+# Phase 3 implementation plan
+
+Deliver four reviewable PRs in order. Branch P3-A from current main, then base each PR on the reviewed behavior of its predecessor. Keep the full stack open for owner review. Phase 2 code, configuration, workflow, state and transport stay under their existing ownership. Compare the Phase 2 fingerprint inputs against main on each PR.
+
+| PR | Files and behavior | Proof | Migration and rollback |
+| --- | --- | --- | --- |
+| P3-A | `jobbie_private/discord.py`, `tasks.py`, `server.py`, isolated CI, `tests/test_p3a_discord.py` | Signed PING and real commands, forged/expired requests, replay and rate counters, private restart-safe tasks, hostile inputs and no registration of absent commands | Create a new owner-only SQLite task database explicitly. Remove the private endpoint and stop its worker to roll back. |
+| P3-B | `jobbie_private/storage.py`, `resume.py`, `profile.py`, private download route and tests | Encrypted owner-bound records, PDF/DOCX parser bounds, deletion and restore, expiry, idempotent immutable versions and append-only application events | Add versioned private schemas on explicit start. Keep legacy state untouched. Back up private ciphertext and key custody separately. |
+| P3-C | `jobbie_private/evidence.py`, `github.py` and tests | Source spans, explicit review, protected claim handling, revocation/correction, pinned allowed repository reads and commit attribution | Add private evidence records. Disable the evidence handlers on rollback while keeping the ledger. |
+| P3-D | `jobbie_private/ranking.py`, `catalogue.py`, Discord search and controls, evidence fixtures and tests | At least 40 source-backed cases, tri-state gate, score weights, unknown handling, live revocations, snapshot provenance and immutable source DB | Point the reader at a separately approved read-only catalogue. Disable ranking, feedback and controls without changing alert authority. |
+
+Use Python and standard-library SQLite on an approved existing persistent owner host. SQLite has no service or license fee. Discord HTTPS routing, owner credentials, private storage location and keys, and any external access require owner setup and live approval. Keep fixtures fictional where personal data would otherwise be present. Each PR needs adversarial tests, full pytest, config validation, exact-head CI, independent review, privacy and rollback proof, and updates to STATUS, HANDOFF, RELEASE_LOG and affected contracts.

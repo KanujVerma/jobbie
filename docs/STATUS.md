@@ -2,6 +2,10 @@
 
 Phase 2 remains **PARTIAL**. Verify current GitHub main and Actions before acting. [Requirement audit](PHASE-2-ACCEPTANCE.md).
 
+## Isolated Phase 3 stack
+
+P3-A adds a separate signed Discord endpoint and worker. The enabled manifest contains health, settings, and deferred task status. Additional commands and controls enter the manifest as their private backends arrive. Live Discord registration, HTTPS hosting, and keys are `BLOCKED_LIVE` pending owner setup and approval. [Phase 3 contract](phases/PHASE-3.md)
+
 ## Scheduled catalogue shadow through 2026-11-17 UTC
 
 The first ordinary C2 run bootstrapped and published encrypted custody. Across 21 ordinary runs through [44164832540](https://github.com/KanujVerma/jobbie/actions/runs/44164832540), 21 verified a fresh exact-key cache restore, 7 reported healthy parity, and 14 were degraded. The longest consecutive healthy stretch in the public logs was about 26 hours, and the last healthy run was [43767315174](https://github.com/KanujVerma/jobbie/actions/runs/43767315174). These are public run counters. The authenticated 72-hour audit remains open.
