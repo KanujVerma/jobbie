@@ -10,7 +10,7 @@ import pytest
 from main import do_run
 from src.catalogue import Catalogue, CatalogueError
 from src.catalogue_checkpoint import seal
-from src.catalogue_shadow import Shadow
+from src.catalogue_shadow import Shadow, source_key
 from src.models import Job
 from src.storage import POLICY_VERSION, _empty_state, is_url_alerted, load_state, mark_backfill_completed
 
@@ -132,3 +132,52 @@ def test_fallback_refuses_ambiguous_delivery_mapping(tmp_path):
     with pytest.raises(CatalogueError, match="ambiguous"):
         stage_legacy_fallback(checkpoint, cipher, key, legacy, output, after_run_id="last-legacy")
     assert not output.exists()
+
+
+@pytest.mark.parametrize("scope", ["same_source", "same_company", "other_company"])
+def test_fallback_scopes_legacy_id_collisions_by_company(tmp_path, scope):
+    from src.catalogue_fallback import stage_legacy_fallback
+
+    now = datetime.now(timezone.utc)
+    a = job("A", now)
+    b = replace(job("B", now), id=a.id)
+    other_source = {**SOURCE, "config": {**SOURCE["config"], "path": "Other_Site"}}
+    if scope == "other_company":
+        other_source = {**other_source, "name": "Other Company"}
+        b = replace(b, company=other_source["name"])
+    initial = _empty_state()
+    initial.update(policy_version=POLICY_VERSION, first_run_completed_at=(now - timedelta(days=2)).isoformat())
+    mark_backfill_completed(initial, now=now)
+    legacy = tmp_path / "retained.json"
+    legacy.write_text(json.dumps(initial))
+    original = legacy.read_bytes()
+    db = tmp_path / "db.sqlite"
+    with Catalogue(db, create=True) as store:
+        with Shadow(store, "last-legacy", now - timedelta(minutes=1), initial, filters=FILTERS) as shadow:
+            shadow.observe(SOURCE, [], status="complete", observed_at=now)
+            shadow.finish(initial, now)
+        with Shadow(store, "sqlite-fixture", now, initial, filters=FILTERS, config_sha="b" * 64) as shadow:
+            shadow.observe(SOURCE, [a, b] if scope == "same_source" else [a], status="complete", observed_at=now)
+            if scope != "same_source":
+                shadow.observe(other_source, [b], status="complete", observed_at=now)
+            rows = store.scan_rows("sqlite-fixture", source_key(SOURCE))
+            if scope != "same_source":
+                rows += store.scan_rows("sqlite-fixture", source_key(other_source))
+            payloads = [json.loads(row["payload"]) for row in rows]
+            assert len({row["job_id"] for row in rows}) == 2
+            assert len({data["source_job_id"] for data in payloads}) == 2
+            assert len({data["url"] for data in payloads}) == 2
+            assert {data["id"] for data in payloads} == {a.id}
+            shadow.delivery(SOURCE, a, "ack", now)
+            shadow.finish(initial, now)
+    cipher = tmp_path / "sealed.bin"
+    key = Fernet.generate_key()
+    checkpoint = seal(db, cipher, key, legacy_path=legacy)
+    output = tmp_path / "staged.json"
+    if scope == "other_company":
+        assert stage_legacy_fallback(checkpoint, cipher, key, legacy, output, after_run_id="last-legacy") == 1
+    else:
+        with pytest.raises(CatalogueError, match="ambiguous"):
+            stage_legacy_fallback(checkpoint, cipher, key, legacy, output, after_run_id="last-legacy")
+        assert not output.exists()
+    assert legacy.read_bytes() == original

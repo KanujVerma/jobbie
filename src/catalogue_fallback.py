@@ -35,18 +35,30 @@ def _confirmed_receipts(store, after_run_id, through_run_id):
         ORDER BY r.rowid, d.source_id, d.id
     """, (first, last))
     for (run_id, source_id), group in groupby(rows, lambda row: (row["run_id"], row["source_id"])):
+        receipts = list(group)
+        if receipts[0]["result"] is None:
+            raise CatalogueError("unmapped or ambiguous confirmed delivery receipt")
+        company = json.loads(receipts[0]["result"])["company"]
+        identities = {}
         urls = {}
-        for observation in store.scan_rows(run_id, source_id):
-            data = json.loads(observation["payload"])
-            key = (observation["job_id"], data["id"])
-            urls.setdefault(key, set()).add(normalize_url(data["url"]))
-        for receipt in group:
+        # JSON suppresses by (company name, legacy ID), not canonical ID.
+        sources = store.db.execute("""
+            SELECT source_id FROM shadow_sources
+            WHERE run_id=? AND json_extract(result, '$.company')=?
+        """, (run_id, company))
+        for source in sources:
+            for observation in store.scan_rows(run_id, source["source_id"]):
+                data = json.loads(observation["payload"])
+                identities.setdefault(data["id"], set()).add(observation["job_id"])
+                if source["source_id"] == source_id:
+                    key = (observation["job_id"], data["id"])
+                    urls.setdefault(key, set()).add(normalize_url(data["url"]))
+        for receipt in receipts:
             key = (receipt["job_id"], receipt["legacy_id"])
             matches = urls.get(key, set())
-            if len(matches) != 1 or receipt["result"] is None:
+            if len(matches) != 1 or len(identities.get(receipt["legacy_id"], set())) != 1:
                 raise CatalogueError("unmapped or ambiguous confirmed delivery receipt")
             (url,) = matches
-            company = json.loads(receipt["result"])["company"]
             when = datetime.fromisoformat(receipt["observed_at"])
             if not url or not isinstance(company, str) or not company or when.tzinfo is None:
                 raise CatalogueError("invalid confirmed delivery receipt")
