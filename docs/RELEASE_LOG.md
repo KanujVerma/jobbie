@@ -4,6 +4,10 @@
 
 This is an **append-only summary of verified engineering milestones**, not a claim that every implemented feature is currently working live. Each entry has a code/CI/review layer distinct from user-facing live operational evidence. More detailed logs are in GitHub PRs, Actions and phase documents. Runtime state-only commits are NOT separate product releases.
 
+## P2-C: local delivery rollback proof
+- Before: a successful restore could leave a SQLite-only delivery confirmation absent from JSON. After: staging a new fallback JSON file transfers retained confirmed receipts with exact source provenance.
+- Local verification: `pytest -q tests/test_catalogue_fallback.py` uses the legacy scanner with a mock transport. When SQLite retained a confirmation for A, only B sends; when A failed, both A and B send. Wrong custody, an unknown boundary, an existing output, or an ambiguous receipt is rejected. No authority switch, workflow change, PR, or live send is part of this milestone.
+
 ## 2026-11-06: P1-E final corrective code
 - [PR #18](https://github.com/KanujVerma/jobbie/pull/18) **merged**; squash source commit `9c9365ae5f3d936b20fc8a90c7ac22a5e0c6ff42`.
 - Work: `src/experience.py` adds bachelor-relevant experience-path checks, protects mandatory vs preferred qualification clauses; `src/eligibility.py` abstains on 2–4-year stretch conditions and prevents using a lower unrelated master/PhD or tool skill number; `src/backfill.py` and `main.py` acknowledge only displayed, confirmed-delivered URLs in batches of 10. Original state format, source cohort and CLI preserved.

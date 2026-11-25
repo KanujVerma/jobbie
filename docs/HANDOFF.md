@@ -4,6 +4,8 @@ Read AGENTS, STATUS, PHASES, exact specs/prompts, DECISIONS/CONTRACTS/SECURITY/O
 
 ## Active scope
 
+Local fallback proof: stage a new JSON ledger from confirmed SQLite receipts after the declared last JSON-owned run, and feed it to the unchanged legacy scanner. The mocked test sends only B when SQLite retained A's confirmation; a failed SQLite attempt remains retryable. The production switch, receipt durability after cutover, and the scheduled evidence window are separate gates. See [Catalogue](CATALOGUE.md#live-evidence-and-cutover-gate) and `tests/test_catalogue_fallback.py`.
+
 P2-C2 scheduled shadow reliability. The original C2 bootstrap and cache restore have live receipts. Workday HTTP 429 and rows without posting URLs can still leave a scan degraded. Preserve the 13 enabled original sources, two historical disabled entries, legacy ACK history, and encrypted checkpoint lineage. Keep public feeds off and use ordinary scheduled runs for production evidence.
 
 After the reliability PR merges, inspect the first ordinary main run containing the fix. Record source coverage and errors, parity, job ACK counts, legacy state persistence, parent checkpoint restore, fresh exact-key restore, and publication. A partial scan breaks the qualifying 72-hour window. Keep legacy JSON as delivery authority and hold cutover for exact owner approval. [Current release evidence](RELEASE_LOG.md#p2-c2-scheduled-shadow-reliability)
