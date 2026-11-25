@@ -2,6 +2,8 @@
 
 Phase 2 remains **PARTIAL**. Verify current GitHub main and Actions before acting. [Requirement audit](PHASE-2-ACCEPTANCE.md).
 
+The local SQLite-to-JSON fallback fixture suppresses a job with a retained SQLite confirmation and still sends a fresh job. It retries a failed send. Production remains JSON-owned; no SQLite-authoritative writer, live rollback, or qualifying cutover window was verified by this fixture.
+
 ## Scheduled catalogue shadow through 2026-11-17 UTC
 
 The first ordinary C2 run bootstrapped and published encrypted custody. Across 21 ordinary runs through [44164832540](https://github.com/KanujVerma/jobbie/actions/runs/44164832540), 21 verified a fresh exact-key cache restore, 7 reported healthy parity, and 14 were degraded. The longest consecutive healthy stretch in the public logs was about 26 hours, and the last healthy run was [43767315174](https://github.com/KanujVerma/jobbie/actions/runs/43767315174). These are public run counters. The authenticated 72-hour audit remains open.
